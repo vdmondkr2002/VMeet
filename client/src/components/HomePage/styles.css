@@ -1,0 +1,49 @@
+.main1 {
+  align-items: center;
+  display: -webkit-inline-box;
+  display: inline-flex;
+  justify-content: space-evenly;
+  min-height: 100%;
+  width: 100vw;
+}
+
+.left {
+  display: -webkit-inline-box;
+  display: inline-flex;
+  flex-basis: 35rem;
+  flex-direction: column;
+  flex-shrink: 1;
+  max-width: 35rem;
+  padding: 1em 3em;
+}
+
+.right {
+  align-items: center;
+  display: -webkit-inline-box;
+  display: inline-flex;
+  flex-direction: column;
+  flex-basis: 45%;
+  overflow: hidden;
+  padding: 1em 3em;
+}
+
+.YpQfNc {
+  font-family: "Google Sans Display", Roboto, Arial, sans-serif;
+  font-size: 2.75rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 3.25rem;
+  padding-bottom: 0.5em;
+}
+
+.rH9mRb {
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  font-size: 1.125rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.5rem;
+  color: #5f6368;
+  color: var(--gm-color-caption, #5f6368);
+  max-width: 30rem;
+  padding-bottom: 3em;
+}
