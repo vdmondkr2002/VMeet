@@ -9,14 +9,12 @@ import JoiningPage from "./components/JoiningPage/JoiningPage";
 const App = () => {
   return (
     <Router>
-      <Container maxWidth="lg">
         <Navbar />
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route exact path="/join" component={JoiningPage}/>
         </Switch>
         <Footer />
-      </Container>
     </Router>
   );
 };
