@@ -6,7 +6,6 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 import MicIcon from '@material-ui/icons/Mic';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
-import blankImg from "../JoiningPage/VideOff.png"
 import { Mic, VideocamOff } from '@material-ui/icons';
 import { CircularProgress } from '@material-ui/core';
 
