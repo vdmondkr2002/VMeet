@@ -47,3 +47,8 @@
   max-width: 30rem;
   padding-bottom: 3em;
 }
+
+.iOSzxe {
+  display: flex;
+  flex-wrap: wrap;
+}
