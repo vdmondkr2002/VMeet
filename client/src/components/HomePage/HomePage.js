@@ -29,12 +29,12 @@ const HomePage = () => {
 
   return (
     <>
-      <div class="main1">
-        <div class="left">
-          <div class="YpQfNc">
+      <div className="main1">
+        <div className="left">
+          <div className="YpQfNc">
             Premium video meetings. Now free for everyone.
           </div>
-          <div class="rH9mRb">
+          <div className="rH9mRb">
             We re-engineered the service we built for secure business meetings,
             Google Meet, to make it free and available for all.
           </div>
@@ -103,8 +103,7 @@ const HomePage = () => {
             /> */}
           </div>
         </div>
-
-        <div class="right">Right</div>
+        <div className="right">Right</div>
       </div>
     </>
   );
