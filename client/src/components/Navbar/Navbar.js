@@ -1,12 +1,13 @@
-import React from 'react';
-import { makeStyles,AppBar,Toolbar,Typography,Button,IconButton,Box } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import { makeStyles,AppBar,Toolbar,Typography,Button,IconButton,Box,Avatar } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 
 import {GoogleLogin} from 'react-google-login'
 import moment from 'moment'
 import {useDispatch, useSelector} from 'react-redux'
-import {googleSignIn} from '../../actions/auth'
+import {googleSignIn,logOut} from '../../actions/auth'
 import GoogleIcon from './GoogleIcon'
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,7 +26,25 @@ const useStyles = makeStyles((theme) => ({
 const Navbar = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const history = useHistory()
+  const [loggedIn,setLoggedIn] = useState(false)
+  const [time,setTime] = useState(Date.now())
   const user = useSelector(state => state.user)
+
+  useEffect(()=>{
+    if(user.name){
+      setLoggedIn(true)
+    }
+  },[user])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+        setTime(Date.now())
+    }, 60000)
+    return () => {
+        clearInterval(timer)
+    }
+}, [])
   const googleSuccess = async (res) => {
     console.log(res)
     try {
@@ -47,6 +66,10 @@ const Navbar = () => {
     alert("Google Sign In was unsuccessful. Try again later");
   };
 
+  const logout = ()=>{
+    dispatch(logOut(history))
+  }
+
   return (
     <AppBar position="static">
       <Toolbar>
@@ -57,9 +80,22 @@ const Navbar = () => {
           V Meet
         </Typography>
         <Typography variant="h6" className={classes.date}>
-          {moment().format(' h:mm a ⚈ MMMM Do YYYY')}
+          {moment(time).format(' h:mm a ⚈ MMMM Do YYYY')}
         </Typography>
-        <GoogleLogin
+        {
+          loggedIn?(
+            <>
+            <IconButton>
+              <Avatar alt={`${user.name}`} src={user.profilePic} >
+              {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+              </Avatar>
+            </IconButton>
+            <Button color="secondary" variant="contained" onClick={logout}>
+              Logout
+            </Button>
+            </>
+          ):(
+            <GoogleLogin
                 clientId="716279671550-uhbhnkiocr43jt3don07qtr9inmi4hk7.apps.googleusercontent.com"
                 render={(renderProps) => (
                   <Box align="center">
@@ -80,6 +116,9 @@ const Navbar = () => {
                 onFailure={googleError}
                 cookiePolicy="single_host_origin"
               />
+          )
+        }
+        
       </Toolbar>
     </AppBar>
   );
