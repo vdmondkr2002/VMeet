@@ -1,5 +1,6 @@
 import React from "react";
 import "./styles.css";
+import { Button,Link } from "@material-ui/core";
 
 const HomePage = () => {
   return (
@@ -14,6 +15,7 @@ const HomePage = () => {
             Google Meet, to make it free and available for all.
           </div>
         </div>
+        <Link to="/join"><Button>Joining Page</Button></Link>
         <div className="right">Right</div>
       </div>
     </>
