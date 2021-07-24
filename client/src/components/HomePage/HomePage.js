@@ -1,9 +1,12 @@
 import React from "react";
+import Navbar from '../Navbar/Navbar'
+import Footer from '../Footer/Footer'
 import "./styles.css";
 
 const HomePage = () => {
   return (
     <>
+      <Navbar/>
       <div className="main1">
         <div className="left">
           <div className="YpQfNc">
@@ -16,6 +19,7 @@ const HomePage = () => {
         </div>
         <div className="right">Right</div>
       </div>
+      <Footer/>
     </>
   );
 };

@@ -153,7 +153,7 @@ const Navbar = () => {
             </>
           ):(
             <GoogleLogin
-                clientId="716279671550-uhbhnkiocr43jt3don07qtr9inmi4hk7.apps.googleusercontent.com"
+                clientId="771936552840-bo8590qfhbgqqp1e12fe8pllbqvkfo4g.apps.googleusercontent.com"
                 render={(renderProps) => (
                   <Box align="center">
                     <Button
