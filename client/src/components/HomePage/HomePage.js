@@ -12,7 +12,7 @@ import IconButton from "@material-ui/core/IconButton";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
 import FormControl from "@material-ui/core/FormControl";
 import { Typography } from "@material-ui/core";
-
+import {Link} from "react-router-dom"
 const HomePage = () => {
   const classes = useStyles();
   const [code, setcode] = useState(" ");
@@ -28,6 +28,8 @@ const HomePage = () => {
   // const handleMouseDownPassword = (event) => {
   //   event.preventDefault();
   // };
+  
+
 
   return (
     <>
@@ -106,6 +108,7 @@ const HomePage = () => {
             /> */}
           </div>
         </div>
+        <Link to="/join"><Button>Joining Page</Button></Link>
         <div className="right">Right</div>
       </div>
       <Footer/>
