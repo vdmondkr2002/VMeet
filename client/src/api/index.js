@@ -14,4 +14,6 @@ API.interceptors.request.use((req) => {
 const urlAuth = 'api/v1/auth'
 
 export const googleSignIn = (data)=>API.post(`${urlAuth}/google`,data);
+export const getCurrentUser = ()=>API.get(`${urlAuth}/user`);
+
 

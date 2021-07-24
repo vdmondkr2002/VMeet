@@ -5,13 +5,15 @@ import useStyles from "./styles.js";
 import Carousel from "react-material-ui-carousel";
 import "./styles.css";
 import descData from "./descData.js";
+import Navbar from "../Navbar/Navbar";
+import Footer from "../Footer/Footer";
 import KeyboardIcon from "@material-ui/icons/Keyboard";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
 import FormControl from "@material-ui/core/FormControl";
-import { Typography } from "@material-ui/core";
+import { Typography, Link } from "@material-ui/core";
 import mission from "../../assests/mission.svg";
 import vision from "../../assests/vision.svg";
 import value from "../../assests/values.svg";
@@ -46,6 +48,7 @@ const HomePage = () => {
 
   return (
     <>
+      <Navbar />
       <div className="main1">
         <div className="left">
           <div className="YpQfNc">
@@ -145,7 +148,12 @@ const HomePage = () => {
             </ul>
           </main>
         </div>
+        <Link to="/join">
+          <Button>Joining Page</Button>
+        </Link>
+        <div className="right">Right</div>
       </div>
+      <Footer />
     </>
   );
 };
