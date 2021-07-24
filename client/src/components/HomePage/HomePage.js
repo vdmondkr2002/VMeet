@@ -117,7 +117,9 @@ const HomePage = () => {
           <Grid container spacing={3} alignItems="stretch">
             <Grid item sm={7} xs={12}>
               <div>
-                <Typography variant="h2">About Zoom</Typography>
+                <Typography variant="h2" style={{ marginBottom: "20px" }}>
+                  About Zoom
+                </Typography>
                 <Typography variant="subtitle1">
                   Zoom is for you. We help you express ideas, connect to others,
                   and build toward a future limited only by your imagination.
@@ -140,17 +142,6 @@ const HomePage = () => {
         </div>
 
         <div>
-          {/* <header>
-            <h1>
-              Reliable, efficient delivery
-              <br />
-              <strong>Powered by Technology</strong>
-            </h1>
-            <p>
-              Our Artificial Intelligence powered tools use millions of project
-              data points to ensure that your project is successful
-            </p>
-          </header> */}
           <main>
             <ul className="cards-container">
               <li className="cyan-feature-card">
