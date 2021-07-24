@@ -1,6 +1,15 @@
 import { makeStyles } from '@material-ui/core';
 
 const styles = makeStyles((theme) => ({
+    btn:{
+    //   color: "white",
+      backgroundColor: "#99d6ff",
+      padding: "10px 15px ",
+      borderRadius: "30px",
+      margin:"5px",
+      boxShadow:"1px 0px 10px grey",
+    },
+
     video1: {
       borderRadius: "20px",
       width: '650px',
@@ -65,39 +74,42 @@ const styles = makeStyles((theme) => ({
       },
     },
     camOff :{
-      width: "650px",
-      height: "60vh",
-      margin: "0 !important",
+        width:"90%",
+        height:"60vh" ,
       background: "#080808",
       borderRadius: "20px",
       // background: "-webkit-linear-gradient(to right, #ffefba, #ffffff)",  
       // background: "linear-gradient(to right, #ffefba, #ffffff)", 
       [theme.breakpoints.down('md')]: {
         flexDirection: 'column',
-        width:"600px",
-        height:"60vh" 
+        marginLeft:"200px !important",
+        border:"2px solid red",
+
+        width:"550px",
+        height:"40vh" ,
+
       },
       [theme.breakpoints.down('sm')]: {
         flexDirection: 'column',
-        width:"600px",
-        height:"60vh" ,
+        marginRight:"0px !important",
+     
+        width:"550px",
+        height:"40vh" ,
         padding:"0",
-        maxWidth:"500px !important"
+
       },
+    },
       camOffText:{
         textAlign: "center",
-        paddingTop: "180px",
+        paddingTop:"180px",
         fontSize: "38px",
         color: "white",
-      },
-      btn:{
-        color: "white",
-        backgroundColor: "blue",
-        padding: "10px 15px ",
-        borderRadius: "30px",
-        margin:"5px",
-        boxShadow:"1px 0px 10px grey"
+        // display:"flex",
+        // flexDirection:"column",
+        // alignItems:"center",
+        // justifyContent:"center",
       }
-    },
   }));
+  
+
 export default styles;
