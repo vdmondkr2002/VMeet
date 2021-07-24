@@ -29,5 +29,48 @@ const styles = makeStyles((theme) => ({
     },
     color: "white",
   },
+
+  codearrow: {
+    color: "green",
+  },
+
+  card: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    height: "auto",
+    width: "25vw",
+    "@media (max-width : 700px)": {
+      height: "70vh",
+      width: "100%",
+    },
+  },
+  frontCard: {
+    padding: "1rem 0rem 1rem 0rem",
+  },
+
+  img: {
+    width: "100%",
+    height: "100%",
+    padding: "5px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    margin: "0 1rem 1rem 1rem",
+    alignSelf: "center",
+    textAlign: "center",
+    lineHeight: "25rem",
+  },
+
+  main3: {
+    padding: theme.spacing(12, 4),
+  },
+
+  monitor: {
+    height: "auto",
+    width: "80%",
+
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
 }));
 export default styles;
