@@ -12,12 +12,24 @@ import { CircularProgress } from '@material-ui/core';
 
 
 const useStyles = makeStyles((theme) => ({
+  btn:{
+    color: "white",
+    backgroundColor: "blue",
+    padding: "10px 15px ",
+    borderRadius: "30px",
+    margin:"5px",
+    boxShadow:"1px 0px 10px grey"
+  },
   video1: {
     borderRadius: "20px",
     width: '650px',
 
     [theme.breakpoints.down('xs')]: {
       width: '300px',
+    },
+    [theme.breakpoints.down('md')]: {
+      width: '650px',
+      marginLeft:"200px",
     },
   },
   video2: {
@@ -42,14 +54,63 @@ const useStyles = makeStyles((theme) => ({
   actionBtns: {
     // marginTop:"-100px",
     // marginLeft:"320px",
-    zIndex: "10",
     display: "flex",
     width: "650px",
     height: "auto",
     color: "white",
     justifyContent: "center",
+    [theme.breakpoints.down('md')]: {
+      width: "1100px",
+    },
+    
 
-  }
+  },
+  descText:{
+    borderRadius: "20px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    [theme.breakpoints.down('sm')]: {
+        position:"absolute",
+        top:"700px",
+        left:"500px"
+    },
+    [theme.breakpoints.down('xs')]: {
+      width:"400px",
+      position:"absolute",
+      top:"700px",
+      left:"500px"
+    },
+  },
+  camOff :{
+    width: "650px",
+    height: "60vh",
+    margin: "0 !important",
+    background: "#080808",
+    borderRadius: "20px",
+    // background: "-webkit-linear-gradient(to right, #ffefba, #ffffff)",  
+    // background: "linear-gradient(to right, #ffefba, #ffffff)", 
+    [theme.breakpoints.down('md')]: {
+      flexDirection: 'column',
+      width:"600px",
+      height:"60vh" ,
+      maxWidth:"900px !important"
+    },
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column',
+      width:"600px",
+      height:"60vh" ,
+      padding:"0",
+      maxWidth:"900px !important"
+    },
+  },
+    camOffText:{
+      textAlign: "center",
+      padding:"70px",
+      fontSize: "38px",
+      color: "white",
+    }
 }));
 
 const JoiningPage = () => {
@@ -65,6 +126,7 @@ const JoiningPage = () => {
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         setStream(currentStream);
+        console.log(currentStream)
         // myAudio.current.srcObject = currentStream;
         // console.log(myAudio)
         myVideo.current.srcObject = currentStream;
@@ -95,35 +157,19 @@ const JoiningPage = () => {
   }
 
   return (
-    <Grid container className={classes.gridContainer}>
+    <Grid container  alignItems="center"className={classes.gridContainer} xs={12} >
 
       {stream && (
         <>
 
-          <Grid item xs={8} md={6}  >
-            <br /><br /><br />
+          <Grid item xs={12} sm={12} md={12} lg={6} justifyContent="center" alignItems="center">
+            
             <video playsInline muted={mute} ref={myVideo} autoPlay className={videoon ? (classes.video1) : (classes.video2)} />
             {
               !videoon ? (
-                <div style={{
-                  width: "650px",
-                  height: "60vh",
-                  marginTop: "0px",
-                  background: "#080808",
-                  borderRadius: "20px",
-                  // background: "-webkit-linear-gradient(to right, #ffefba, #ffffff)",  
-                  // background: "linear-gradient(to right, #ffefba, #ffffff)", 
-
-                }} >
-                  <Typography variant="h3" style={{
-                    textAlign: "center",
-                    paddingTop: "180px",
-                    fontSize: "38px",
-                    color: "white",
-
-
-                  }}>Camera is Off</Typography>
-
+                <div className={classes.camOff}  >
+                  <Typography variant="h3" className={classes.camOffText}>Camera is Off</Typography>
+                <video playsInline muted={false} style={{width:"0",height:"0"}} />
                 </div>
               ) : null
             }
@@ -141,14 +187,7 @@ const JoiningPage = () => {
               </IconButton>
             </div>
           </Grid>
-          <Grid item xs={4} md={4} style={{
-            borderRadius: "20px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-
-          }}>
+          <Grid item xs={10} sm={12} md={12} lg={4}  className={classes.descText} >
             <br /><br /><br /><br />
             <Typography variant="h4" gutterBottom>Ready To Join ? </Typography>
             <br />
@@ -160,24 +199,10 @@ const JoiningPage = () => {
               display:"flex",
              
             }}>
-              <Button style={{
-                color: "white",
-                backgroundColor: "blue",
-                padding: "10px 15px ",
-                borderRadius: "30px",
-                margin:"5px",
-                boxShadow:"1px 0px 10px grey"
-              }} outlined>
+              <Button className={classes.btn}  outlined>
                 Join Now
               </Button>
-              <Button style={{
-                color: "white",
-                backgroundColor: "blue",
-                padding: "10px 15px ",
-                borderRadius: "30px",
-                margin:"5px",
-                boxShadow:"1px 0px 10px grey"
-              }} outlined>
+              <Button className={classes.btn} outlined>
                 Present
               </Button>
             </div>
