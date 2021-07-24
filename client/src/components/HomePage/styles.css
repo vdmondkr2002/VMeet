@@ -139,19 +139,6 @@ header > p {
   margin: auto;
 }
 
-/*
- * ### Responsive Layout Rules
- */
-
-/* When viewport width is equal or greater than 788 pixels,
- * the cards container will fix its width and will append the
- * clear fix pseudo-class to avoid float property issues.
- *
- * The width will depend from the current viewport width.
- * If is greater than 1166 pixels, will be 1106 pixels.
- * Else, then will be 728 pixels.
- */
-
 @media (min-width: 788px) {
   .cards-container {
     width: 728px;
@@ -201,9 +188,30 @@ header > p {
 }
 
 [class$="feature-card"] img {
+  max-width: 100%;
+  height: auto;
+  width: auto;
+}
+.circle-container-icon {
   position: absolute;
-  bottom: 32px;
-  right: 32px;
+  bottom: 20px;
+  right: 20px;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  font-size: 14px;
+  line-height: 1.42857143;
+  font-family: Lato, sans-serif;
+  box-sizing: border-box;
+  width: 80px;
+  height: 80px;
+  min-width: 80px;
+  min-height: 80px;
+  border-radius: 50%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 0;
+  margin-left: 0;
 }
 
 /*
@@ -225,29 +233,6 @@ header > p {
 [class$="feature-card"][class*="blue"] {
   border-color: hsl(212, 86%, 64%);
 }
-
-/*
- * ### Responsive Layout Rules
- */
-
-/* When the viewport width is less than 788 pixels, the container
- * will not be fixed and every card will arrange normally one over
- * other. This layout is comfortable for mobile devices.
- *
- * But if is equal or greather, every card will set the float
- * property to the left.
- *
- * They will sort smartly on a grid of two columns and two rows if
- * the current viewport width is less than 1166 pixels, that is,
- * for notebooks and tablets screens.
- *
- * Else, then they will sort like the final challenge for desktop
- * larger screens (with a viewport width greather than 1166 pixels.)
- *
- * I had to hard coded every effect because I only use float
- * properties. And I didn't went to use auxiliar HTML elements,
- * trying to keep separation of concerns.
- */
 
 @media (min-width: 788px) {
   [class$="feature-card"] {
@@ -298,22 +283,6 @@ header > p {
   }
 }
 
-/*
- * ## Main Footer
- */
-
-footer {
-  margin-top: 80px;
-}
-
-/*
- * ## Attribution Watermark
- */
-
-.attribution {
-  font-size: 11px;
-  text-align: center;
-}
-.attribution a {
-  color: hsl(228, 45%, 44%);
+.center {
+  vertical-align: middle;
 }

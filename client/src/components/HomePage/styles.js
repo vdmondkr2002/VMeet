@@ -60,5 +60,17 @@ const styles = makeStyles((theme) => ({
     textAlign: "center",
     lineHeight: "25rem",
   },
+
+  main3: {
+    padding: theme.spacing(12, 4),
+  },
+
+  monitor: {
+    height: "auto",
+    width: "80%",
+
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
 }));
 export default styles;
