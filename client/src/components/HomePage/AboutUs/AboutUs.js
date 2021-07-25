@@ -15,27 +15,32 @@ const AboutUs = () => {
     <>
       <div className={classes.main3}>
         <div style={{ paddingBottom: "20px" }}>
-          <Grid container spacing={3} alignItems="stretch">
-            <Grid item sm={7} xs={12}>
+          <Grid
+            container
+            spacing={3}
+            alignItems="stretch"
+            justifyContent="center"
+          >
+            <Grid item sm={6} xs={12}>
               <div>
                 <Typography variant="h2" style={{ marginBottom: "20px" }}>
-                  About Zoom
+                  About MEETV
                 </Typography>
                 <Typography variant="subtitle1">
-                  Zoom is for you. We help you express ideas, connect to others,
-                  and build toward a future limited only by your imagination.
-                  Our frictionless communications platform is the only one that
-                  started with video as its foundation, and we have set the
-                  standard for innovation ever since. That is why we are an
-                  intuitive, scalable, and secure choice for large enterprises,
-                  small businesses, and individuals alike. Founded in 2011, Zoom
-                  is publicly traded (NASDAQ:ZM) and headquartered in San Jose,
-                  California.
+                  MeetV is for you. We help you express ideas, connect to
+                  others, and build toward a future limited only by your
+                  imagination. Our frictionless communications platform is the
+                  only one that started with video as its foundation, and we
+                  have set the standard for innovation ever since. That is why
+                  we are an intuitive, scalable, and secure choice for large
+                  enterprises, small businesses, and individuals alike. Founded
+                  in 2011, MeetV is publicly traded (NASDAQ:ZM) and
+                  headquartered in San Jose, California.
                 </Typography>
               </div>
             </Grid>
-            <Grid item sm={5} xs={12}>
-              <div>
+            <Grid sm={5} xs={12}>
+              <div className={classes.image}>
                 <img src={monitor} alt="" className={classes.monitor} />
               </div>
             </Grid>

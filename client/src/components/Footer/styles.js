@@ -5,11 +5,11 @@ const styles = makeStyles(() => ({
     position: "center",
     background: "#403C44",
     marginTop: "20px",
+    paddingTop: "15px",
   },
 
   image1: {
-    width: "50%",
-    margin: "0px 10px ",
+    width: "40%",
     position: "centre",
   },
 
@@ -39,6 +39,7 @@ const styles = makeStyles(() => ({
   touch: {
     fontSize: "25px",
     fontWeight: "bold",
+    color: "#ffffff",
     padding: "0 0 30px 0",
     "@media (max-width : 700px)": {
       padding: "10px 0 5px 0",

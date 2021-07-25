@@ -1,13 +1,10 @@
 import React from "react";
-import useStyles from "./styles.js";
 import "./styles.css";
 import descData from "./descData.js";
 import Carousel from "react-material-ui-carousel";
 import { Card } from "@material-ui/core";
 
 const Testimonals = () => {
-  const classes = useStyles();
-
   const Item = (props) => {
     return (
       <div style={{ margin: "auto 10px" }}>
