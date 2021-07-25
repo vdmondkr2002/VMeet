@@ -77,8 +77,8 @@
 }
 
 /*
- * ## Elements Styles
- */
+  * ## Elements Styles
+  */
 
 h1,
 h2 {
@@ -93,12 +93,12 @@ p {
 /* - - - */
 
 /*
- * # Specific Styles Rules
- */
+  * # Specific Styles Rules
+  */
 
 /*
- * ## Main Header Element
- */
+  * ## Main Header Element
+  */
 
 header {
   margin: 80px 30px 75px;
@@ -126,8 +126,8 @@ header > p {
 }
 
 /*
- * ## Cards Container Class
- */
+  * ## Cards Container Class
+  */
 
 .cards-container {
   /* List Styling Clean-Up */
@@ -158,8 +158,8 @@ header > p {
 }
 
 /*
- * ## Feature Card Class
- */
+  * ## Feature Card Class
+  */
 
 [class$="feature-card"] {
   /* Positioning and Sizing */
@@ -179,8 +179,8 @@ header > p {
 }
 
 /*
- * ### Inner Elements
- */
+  * ### Inner Elements
+  */
 
 [class$="feature-card"] h2,
 [class$="feature-card"] p {
@@ -215,8 +215,8 @@ header > p {
 }
 
 /*
- * ### Top Border Colors Rules
- */
+  * ### Top Border Colors Rules
+  */
 
 [class$="feature-card"][class*="cyan"] {
   border-color: hsl(180, 62%, 55%);
@@ -285,4 +285,89 @@ header > p {
 
 .center {
   vertical-align: middle;
+}
+
+#demo {
+  background: linear-gradient(112deg, #ffffff 50%, antiquewhite 50%);
+  max-width: 900px;
+  margin: auto;
+}
+
+.carousel-caption {
+  position: initial;
+  z-index: 10;
+  padding: 5rem 8rem;
+  color: rgba(78, 77, 77, 0.856);
+  text-align: center;
+  font-size: 1.2rem;
+  font-style: italic;
+  font-weight: bold;
+  line-height: 2rem;
+}
+
+@media (max-width: 767px) {
+  .carousel-caption {
+    position: initial;
+    z-index: 10;
+    padding: 3rem 2rem;
+    color: rgba(78, 77, 77, 0.856);
+    text-align: center;
+    font-size: 0.7rem;
+    font-style: italic;
+    font-weight: bold;
+    line-height: 1.5rem;
+  }
+}
+
+.carousel-caption img {
+  width: 6rem;
+  border-radius: 5rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 767px) {
+  .carousel-caption img {
+    width: 4rem;
+    border-radius: 4rem;
+    margin-top: 1rem;
+  }
+}
+
+#image-caption {
+  font-style: normal;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 767px) {
+  #image-caption {
+    font-style: normal;
+    font-size: 0.6rem;
+    margin-top: 0.5rem;
+  }
+}
+
+i {
+  background-color: rgb(223, 56, 89);
+  padding: 1.4rem;
+}
+
+@media (max-width: 767px) {
+  i {
+    padding: 0.8rem;
+  }
+}
+
+.carousel-control-prev {
+  justify-content: flex-start;
+}
+
+.carousel-control-next {
+  justify-content: flex-end;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  transition: none;
+  opacity: unset;
 }

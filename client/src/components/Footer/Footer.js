@@ -1,6 +1,6 @@
 import React from "react";
 import useStyles from "./styles.js";
-import logo from "../../assests/monitor-screen.png";
+import logo from "../../assests/logo.png";
 import { Typography, CssBaseline, Link, Grid } from "@material-ui/core";
 import InstagramIcon from "@material-ui/icons/Instagram";
 import FacebookIcon from "@material-ui/icons/Facebook";
@@ -14,19 +14,18 @@ const Footer = () => {
 
   return (
     <>
-      <CssBaseline />
       <div className={classes.footer}>
-        <Grid container spacing={3} alignItems="stretch">
+        <Grid container alignItems="stretch">
           <Grid item sm={4} xs={12}>
             <Typography align="center">
               <Link href="#" color="inherit">
-                <img className={classes.image1} src={logo} alt="BookXchanger" />
+                <img className={classes.image1} src={logo} alt="MeetV" />
               </Link>
               <br />
               <Typography
                 style={{
                   fontSize: "15px",
-                  color: "#E2F0F9",
+                  color: "#ffffff",
                 }}
                 align="center"
               >
@@ -75,7 +74,7 @@ const Footer = () => {
           </Grid>
           <Grid item sm={4} xs={12}>
             <Typography
-              style={{ fontSize: "20px", fontWeight: "bold" }}
+              style={{ fontSize: "20px", fontWeight: "bold", color: "#ffffff" }}
               align="center"
             >
               Quick Links
