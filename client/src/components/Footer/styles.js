@@ -4,6 +4,7 @@ const styles = makeStyles(() => ({
   footer: {
     position: "center",
     background: "#403C44",
+    marginTop: "20px",
   },
 
   image1: {
