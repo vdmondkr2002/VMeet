@@ -31,7 +31,7 @@ const HomePage = () => {
   const Item = (props) => {
     return (
       <div className={`${classes.card} ${classes.frontCard}`}>
-        <img src={props.item.img} alt="image" className={classes.img} />
+        <img src={props.item.img} alt="header" className={classes.img} />
         <Typography component="span" align="center" variant="h5">
           {props.item.heading}
         </Typography>

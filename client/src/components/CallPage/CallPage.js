@@ -5,7 +5,9 @@ import io from 'socket.io-client'
 import { Container,Grid,makeStyles, Paper,Avatar,Box, Typography } from '@material-ui/core'
 import CallPageFooter from './CallPageFooter/CallPageFooter'
 import clsx from 'clsx'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
+import { SET_STREAM } from '../../constants/actions'
 
 
 
@@ -58,26 +60,33 @@ const peer = null;
 
 const CallPage = () => {
     const classes = useStyles()
-    const myVideo = useRef();
-    const [stream,setStream] = useState()
-    const [videoon,setVideoOn] = useState(false)
-    const [isAdmin,setasAdmin] = useState(true)
+    const myStream = useRef();
+    const history = useHistory()
+    const dispatch = useDispatch()
+    const profile = useSelector(state=>state.profile)
     const user = useSelector(state=>state.user)
+    
+    
 
     const initWebRTC = async()=>{
         const currStream = await navigator.mediaDevices.getUserMedia({audio:true,video:true})
-        setStream(currStream)
+        dispatch({type:SET_STREAM,payload:currStream})
 
-        myVideo.current.srcObject = currStream;
-
+        myStream.current.srcObject = currStream;
     }
 
-    
-    
     useEffect(()=>{
-        if(videoon)
-            initWebRTC();
+        if(!user.isAdmin){
+            history.push('/join')
+        }
     },[])
+    
+    // useEffect(()=>{
+    //     if(user.videoOn)
+    //         initWebRTC();
+    // },[])
+
+
 
    
     
@@ -87,16 +96,16 @@ const CallPage = () => {
         <Container className={classes.mainCont}>
             <Grid container className={classes.usersCont} spacing={2}>
                 <Grid item sm={6} className={classes.userCont}>
-                        <video playsInline className={videoon?classes.video:classes.offvideo} muted ref={myVideo} autoPlay/>
+                        <video playsInline className={user.videoOn?classes.video:classes.offvideo} muted ref={myStream} autoPlay/>
                         {
-                            !videoon?(
+                            !user.videoOn?(
                                <Paper className={classes.userPaper}>
-                                    <Avatar src={user?.profilePic} className={clsx(classes.largeAvatar)} alt={user?.userName}>
-                                            {user?.firstName?.charAt(0)} {user?.lastName?.charAt(0)}
+                                    <Avatar src={profile?.profilePic} className={clsx(classes.largeAvatar)} alt={profile?.userName}>
+                                            {profile?.firstName?.charAt(0)} {profile?.lastName?.charAt(0)}
                                     </Avatar>
                                     <div className={classes.bottomline}>
-                                        <Typography variant="body">
-                                            {user.name}
+                                        <Typography variant="body1">
+                                            {profile.name}
                                         </Typography>
                                     </div>
                                     
@@ -113,7 +122,7 @@ const CallPage = () => {
                     {/* <Paper className={classes.userPaper}> */}
                     {/* User 2 */}
                         {/* <video playsInline muted ref={myVideo} autoPlay/> */}
-                        <video playsInline className={classes.video} muted ref={myVideo} autoPlay/>
+                        <video playsInline className={classes.video} muted ref={myStream} autoPlay/>
 
                     {/* </Paper> */}
                 </Grid>
@@ -121,17 +130,17 @@ const CallPage = () => {
                     {/* <Paper className={classes.userPaper}> */}
                     {/* User 3 */}
                         {/* <video playsInline muted ref={myVideo} autoPlay/> */}
-                        <video playsInline className={classes.video} muted ref={myVideo} autoPlay/>
+                        <video playsInline className={classes.video} muted ref={myStream} autoPlay/>
 
                     {/* </Paper> */}
                 </Grid>
                 <Grid item sm={6} className={classes.userCont}>
-                        <video playsInline className={videoon?classes.video:classes.offvideo} muted ref={myVideo} autoPlay/>
+                        <video playsInline className={user.videoOn?classes.video:classes.offvideo} ref={myStream} autoPlay/>
                         {
-                            !videoon?(
+                            !user.videoOn?(
                                <Paper className={classes.userPaper}>
-                                    <Avatar src={user?.profilePic} className={clsx(classes.largeAvatar)} alt={user?.userName}>
-                                            {user?.firstName?.charAt(0)} {user?.lastName?.charAt(0)}
+                                    <Avatar src={profile?.profilePic} className={clsx(classes.largeAvatar)} alt={profile?.userName}>
+                                            {profile?.firstName?.charAt(0)} {profile?.lastName?.charAt(0)}
                                     </Avatar>
                                 </Paper>
                             ):null
@@ -145,9 +154,37 @@ const CallPage = () => {
                 </Grid>
             </Grid>
             
-            <CallPageFooter myVideo={myVideo} stream={stream} setStream={setStream} videoon={videoon} setVideoOn={setVideoOn}/>
+            <CallPageFooter myStream={myStream} />
         </Container>
     )
 }
 
 export default CallPage
+
+
+// stop both mic and camera
+// function stopBothVideoAndAudio(stream) {
+//     stream.getTracks().forEach(function(track) {
+//         if (track.readyState == 'live') {
+//             track.stop();
+//         }
+//     });
+// }
+
+// // stop only camera
+// function stopVideoOnly(stream) {
+//     stream.getTracks().forEach(function(track) {
+//         if (track.readyState == 'live' && track.kind === 'video') {
+//             track.stop();
+//         }
+//     });
+// }
+
+// // stop only mic
+// function stopAudioOnly(stream) {
+//     stream.getTracks().forEach(function(track) {
+//         if (track.readyState == 'live' && track.kind === 'audio') {
+//             track.stop();
+//         }
+//     });
+// }
