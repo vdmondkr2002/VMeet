@@ -1,29 +1,56 @@
 import { makeStyles } from '@material-ui/core';
 
 const styles = makeStyles((theme) => ({
+    root : {
+      margin:"0 !important",
+      padidng:"0 !important",
+      width:"0",
+      display:"none !important"
+    },
     btn:{
-    //   color: "white",
-      backgroundColor: "#99d6ff",
+      color: "white",
+      backgroundColor: "#1a73e8",
       padding: "10px 15px ",
       borderRadius: "30px",
       margin:"5px",
       boxShadow:"1px 0px 10px grey",
+      "&:hover": {
+        backgroundColor: 'blue'
+      }
+    },
+    icon:{
+      color:"white !important",
+      fontSize:"28px",
+    },
+    iconBg:{
+        width:"50px",
+        borderRadius:"50%",
+        border:"1px solid black",
+        padding:"10px",
+        backgroundColor :"#f44336",
+        "&:hover": {
+          backgroundColor: '#f44336'
+        },
+        
     },
 
     video1: {
-      borderRadius: "20px",
+
       width: '650px',
+      height:"500px",
+      borderRadius: "30px !important",
   
       [theme.breakpoints.down('xs')]: {
         width: '300px',
       },
       [theme.breakpoints.down('md')]: {
         width: '650px',
-        marginLeft:"200px",
+        margin:"0px 164px",
       },
     },
     video2: {
       width: "0",
+      display:"none"
     },
   
     offvideo: {
@@ -31,8 +58,12 @@ const styles = makeStyles((theme) => ({
       height: "60vh",
   
     },
+    video :{
+      padding:"100px 100px",
+      
+    },
     gridContainer: {
-      margin: "10px 20px 10px 100px",
+      // margin: "100px 20px 10px 0px",  
       [theme.breakpoints.down('xs')]: {
         flexDirection: 'column',
       },
@@ -42,10 +73,10 @@ const styles = makeStyles((theme) => ({
       borderRadius: "10px",
     },
     actionBtns: {
-      // marginTop:"-100px",
+      marginTop:"-85px",
       // marginLeft:"320px",
       display: "flex",
-      width: "650px",
+      width: "625px",
       height: "auto",
       color: "white",
       justifyContent: "center",
@@ -56,26 +87,31 @@ const styles = makeStyles((theme) => ({
   
     },
     descText:{
+     paddingLeft:"100px ",
+     marginLeft:"20px",
       borderRadius: "20px",
       display: "flex",
       flexDirection: "column",
-      justifyContent: "center",
       alignItems: "center",
       [theme.breakpoints.down('sm')]: {
+          width:"100%",
           position:"absolute",
+          // paddingLeft:"100px ",
+          // marginLeft:"200px",
           top:"700px",
-          left:"500px"
+          left:"240px",
+          marginTop : " 0px",
       },
       [theme.breakpoints.down('xs')]: {
-        width:"400px",
+        width:"100%",
         position:"absolute",
         top:"700px",
-        left:"500px"
+        left:"240px",
       },
     },
     camOff :{
-        width:"90%",
-        height:"60vh" ,
+        width:"650px",
+        height:"390px",
       background: "#080808",
       borderRadius: "20px",
       // background: "-webkit-linear-gradient(to right, #ffefba, #ffffff)",  
