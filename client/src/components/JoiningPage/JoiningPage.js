@@ -13,78 +13,140 @@ import Tooltip from '@material-ui/core/Tooltip';
 // import { Mic, VideocamOff } from '@material-ui/icons';
 import { CircularProgress } from '@material-ui/core';
 
-
+import { useDispatch, useSelector } from 'react-redux';
+import { SET_STREAM, TOGGLE_MIC, TOGGLE_VIDEO } from '../../constants/actions';
 
 
 const JoiningPage = () => {
+  const dispatch = useDispatch()
+  const user = useSelector(state=>state.user)
+  const myStream = useRef();
+  const [changed,setChanged] = useState(false)
+  // const [mute,setMute] = useState(true)
+  const [time,setTime] = useState(Date.now())
 
-  const [stream, setStream] = useState(true)
-  const [mute, setMute] = useState(true)
-  const [videoon, setVideoOn] = useState(true)
+  
+  const initWebRTC = async()=>{
+    console.log("initWebRTC called")
+    const currStream = await navigator.mediaDevices.getUserMedia({audio:user.micOn,video:user.videoOn})
+    dispatch({type:SET_STREAM,payload:currStream})
+
+    myStream.current.srcObject = currStream;
+
+}
+
+  useEffect(()=>{
+      console.log(user.micOn?"mic On":"mic Off")
+      if(user.micOn){
+          initWebRTC()
+      }else{
+          const stream = user.stream
+          stopAudioStream(stream)
+      }
+          
+  },[user.micOn])
+  
+  useEffect(()=>{
+      console.log(user.videoOn?"video On":"video Off")
+      if(user.videoOn){
+          initWebRTC()
+      }else{
+          if(user.stream){
+              var stream = user.stream
+              stopVideoStreams(stream)
+          }
+          
+      }
+  },[user.videoOn])
+
+
+  // useEffect(()=>{
+      // console.log("turning off")
+      // console.log(user.stream)  
+      // myStream.current.srcObject = user.stream
+  // },[user.stream])
+
+  // const setStream = (stream)=>{
+  //     console.log("inside stream")
+  //     console.log(stream.getVideoTracks())
+  //     // console.log(stream.getAudioTracks())
+  //     myStream.current.srcObject = stream
+  //     dispatch({type:SET_STREAM,payload:stream})
+  // }
+
+  const stopVideoStreams = (stream)=>{
+      try{
+          // console.log("before")
+          console.log("100")
+          console.log(stream.getVideoTracks())
+          console.log("102")
+          stream.getVideoTracks()[0].stop();
+          // stream.getVideoTracks().forEach(track=>
+          //     {
+          //     track.stop()
+          //     console.log("hi")
+
+          // }
+          // )
+
+
+          console.log("107")
+          console.log("after")
+          // setTimeout(()=>{
+          //     console.log("turning off stream")
+          //     // dispatch({type:SET_STREAM,payload:stream})
+          // },6000)
+         
+          
+      }catch(err){
+          console.log(err)
+      }
+  }
+
+  const stopAudioStream = async(stream)=>{
+      try{
+          console.log("before")
+          console.log(stream.getAudioTracks())
+          await stream.getAudioTracks().forEach(track=>{
+              track.stop()
+          })
+          console.log("after")
+          // dispatch({type:SET_STREAM,payload:stream})
+      }catch(err){
+          console.log(err)
+      }
+  }
+ 
+  
+ 
+
+  const handleClickVideo =()=>{
+      dispatch({type:TOGGLE_VIDEO})
+  }
+  const handleClickMute =()=>{
+      dispatch({type:TOGGLE_MIC})
+  }
+
+  const handleEndCall = ()=>{
+      console.log("call ended")
+  }
+
   const classes = useStyles();
-  const myVideo = useRef();
-  const myAudio = useRef();
-//   const getUserAudio = () => {
-//     if ( navigator.mediadevices.userMediaAvailable() ) {
-//         return navigator.mediaDevices.getUserMedia( {
-//             audio: {
-//                 echoCancellation: true,
-//                 noiseSuppression: true
-//             }
-//         } );
-//     }
 
-//     else {
-//         throw new Error( 'User media not available' );
-//     }
-// }
-  useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setStream(currentStream);
-        console.log(currentStream)
-        // myAudio.current.srcObject = currentStream;
-        // console.log(myAudio)
-        // getUserAudio();
-        myVideo.current.srcObject = currentStream;
-        console.log(myVideo)
-      });
-
-  }, []);
-
-  const handleClickMute = () => {
-    setMute(prev => !prev)
-  }
-
-  const handleClickVideo = () => {
-    setVideoOn(prev => !prev)
-
-    if (myVideo.current.srcObject) {
-      stream.getTracks().forEach(track => track.stop());
-      myVideo.current.srcObject = null
-    } else {
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        .then((currentStream) => {
-          setStream(currentStream);
-
-          myVideo.current.srcObject = currentStream;
-        });
-    }
-
-  }
+ 
 
   return (
     <Grid container  alignItems="center"className={classes.gridContainer} xs={12} >
        
-      {stream && (
+      {/* {stream && ( */}
         <>
       
 
           <Grid item xs={12} sm={12} md={12} lg={6} className={classes.video} >
             
-            <video playsInline muted={mute} ref={myVideo} autoPlay className={videoon ? (classes.video1) : (classes.video2)} />
+            <video playsInline  ref={myStream}  autoPlay className={user.videoOn ? (classes.video1) : (classes.video2)} />
             {
-              !videoon ? (
+              !user.videoOn ? (
                 <div className={classes.camOff}  >
                   <Typography className={classes.camOffText}>Camera is Off</Typography>
                 <video playsInline muted={false} style={{width:"0",height:"0"}} />
@@ -94,7 +156,7 @@ const JoiningPage = () => {
             <hr style={{ borderWidth: 0 }} />
             <div className={classes.actionBtns}>
                 {
-                !mute ? (
+                user.micOn ? (
                  
                   <Tooltip title="Mic Off">
                   <IconButton onClick={handleClickMute} className={classes.iconBg}>
@@ -110,7 +172,7 @@ const JoiningPage = () => {
                 )
              } &nbsp;&nbsp;&nbsp;&nbsp;
              {
-                videoon ? (
+                user.videoOn ? (
                   <Tooltip title="VideoOff">
                   <IconButton onClick={handleClickVideo} className={classes.iconBg}>
                     <VideocamIcon fontSize="large" className={classes.icon} /> 
@@ -156,7 +218,7 @@ const JoiningPage = () => {
           </Grid>
         </>
 
-      )}
+      {/* )} */}
     </Grid>
     
   );
