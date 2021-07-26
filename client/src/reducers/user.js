@@ -1,9 +1,15 @@
-import {GET_PROFILE,LOGOUT} from '../constants/actions'
+import {GET_PROFILE,LOGOUT,SET_STREAM,TOGGLE_MIC,TOGGLE_VIDEO} from '../constants/actions'
 
-const userReducer = (userData={},action)=>{
+const userReducer = (userData={isAdmin:true,stream:null,micOn:true,videoOn:true},action)=>{
     switch (action.type) {
-        case GET_PROFILE:
-            return action.payload;
+        case SET_STREAM:
+            return {...userData,stream:action.payload}
+        case TOGGLE_MIC:
+            const micOn = userData.micOn;
+            return {...userData,micOn:!micOn};
+        case TOGGLE_VIDEO:
+            const videoOn = userData.videoOn;
+            return {...userData,videoOn:!videoOn};
         case LOGOUT:
             return {};
         default:

@@ -10,7 +10,7 @@ const styles = makeStyles((theme) => ({
     btn:{
       color: "white",
       backgroundColor: "#1a73e8",
-      padding: "10px 15px ",
+      padding: "14px 20px ",
       borderRadius: "30px",
       margin:"5px",
       boxShadow:"1px 0px 10px grey",
@@ -40,13 +40,13 @@ const styles = makeStyles((theme) => ({
       height:"500px",
       borderRadius: "30px !important",
   
-      [theme.breakpoints.down('xs')]: {
-        width: '300px',
-      },
-      [theme.breakpoints.down('md')]: {
-        width: '650px',
-        margin:"0px 164px",
-      },
+      // [theme.breakpoints.down('xs')]: {
+      //   width: '300px',
+      // },
+      // [theme.breakpoints.down('md')]: {
+      //   width: '650px',
+         
+      // },
     },
     video2: {
       width: "0",
@@ -76,20 +76,37 @@ const styles = makeStyles((theme) => ({
       marginTop:"-85px",
       // marginLeft:"320px",
       display: "flex",
-      width: "625px",
+      width: "655px",
       height: "auto",
       color: "white",
       justifyContent: "center",
       [theme.breakpoints.down('md')]: {
-        width: "1100px",
+        width: "960px",
+      },
+      [theme.breakpoints.down('sm')]: {
+        width: "960px",
+      },
+      [theme.breakpoints.down('xs')]: {
+        width: "970px",
       },
       
   
+    },
+    readyToJoin : {
+      fontSize : "30px",
+      fontWeight : "200",
+      letterSpacing : "2px",
+    },
+    readyToJoinTxt : {
+      fontSize : "22px",
+      fontWeight : "400",
+      letterSpacing : "1px",
     },
     descText:{
      paddingLeft:"100px ",
      marginLeft:"20px",
       borderRadius: "20px",
+      fontSize:"15px  !important",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -98,22 +115,26 @@ const styles = makeStyles((theme) => ({
           position:"absolute",
           // paddingLeft:"100px ",
           // marginLeft:"200px",
-          top:"700px",
-          left:"240px",
-          marginTop : " 0px",
+          top:"550px",
+          left:"120px",
+          
       },
       [theme.breakpoints.down('xs')]: {
         width:"100%",
         position:"absolute",
-        top:"700px",
-        left:"240px",
+        top:"480px",
+        padding:"0px",
+        left:"410px",
+        marginTop : " 0px",
       },
     },
     camOff :{
         width:"650px",
         height:"390px",
-      background: "#080808",
+      // background: " #696969",
+       background: " #545454",
       borderRadius: "20px",
+
       // background: "-webkit-linear-gradient(to right, #ffefba, #ffffff)",  
       // background: "linear-gradient(to right, #ffefba, #ffffff)", 
       [theme.breakpoints.down('md')]: {
@@ -134,15 +155,33 @@ const styles = makeStyles((theme) => ({
         padding:"0",
 
       },
+      [theme.breakpoints.down('xs ')]: {
+        flexDirection: 'column',
+        marginRight:"0px !important",
+     
+        width:"550px",
+        height:"40vh" ,
+        padding:"0",
+
+      },
     },
       camOffText:{
         textAlign: "center",
-        paddingTop:"180px",
-        fontSize: "38px",
+        paddingTop:"150px",
+        fontSize:"30px !important",
+        letterSpacing:"4px",
         color: "white",
         // display:"flex",
         // flexDirection:"column",
         // alignItems:"center",
+        [theme.breakpoints.down('md')]: {
+       
+          paddingTop:"100px",
+        },
+        [theme.breakpoints.down('sm')]: {
+          paddingTop:"100px",
+  
+        },
         // justifyContent:"center",
       }
   }));

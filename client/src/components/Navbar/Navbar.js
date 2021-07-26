@@ -42,7 +42,7 @@ const Navbar = () => {
   const [mobileView, setMobileView] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [time, setTime] = useState(Date.now());
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.profile);
 
   useEffect(() => {
     if (user.name) {

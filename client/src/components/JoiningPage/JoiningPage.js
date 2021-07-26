@@ -11,7 +11,7 @@ import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import Tooltip from '@material-ui/core/Tooltip';
 
 // import { Mic, VideocamOff } from '@material-ui/icons';
-// import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@material-ui/core';
 
 
 
@@ -86,7 +86,7 @@ const JoiningPage = () => {
             {
               !videoon ? (
                 <div className={classes.camOff}  >
-                  <Typography variant="h3" className={classes.camOffText}>Camera is Off</Typography>
+                  <Typography className={classes.camOffText}>Camera is Off</Typography>
                 <video playsInline muted={false} style={{width:"0",height:"0"}} />
                 </div>
               ) : null
@@ -132,10 +132,10 @@ const JoiningPage = () => {
           </Grid>
           <Grid item xs={10} sm={12} md={12} lg={4}  className={classes.descText} >
             <br /><br /><br /><br />
-            <Typography variant="h4" gutterBottom>Ready To Join ? </Typography>
+            <Typography variant="h4"  className={classes.readyToJoin} >Ready To Join ? </Typography>
             <br />
-            <Typography variant="h5">
-              You will join when someone lets you in..
+            <Typography variant="h6" className={classes.readyToJoinTxt}>
+              You will join when someone lets you in...
             </Typography>
             <br />
             <div style={{
