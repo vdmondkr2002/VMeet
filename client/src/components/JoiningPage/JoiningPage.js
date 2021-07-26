@@ -8,8 +8,10 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 import MicIcon from '@material-ui/icons/Mic';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
+import Tooltip from '@material-ui/core/Tooltip';
+
 // import { Mic, VideocamOff } from '@material-ui/icons';
-// import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@material-ui/core';
 
 
 
@@ -73,42 +75,67 @@ const JoiningPage = () => {
 
   return (
     <Grid container  alignItems="center"className={classes.gridContainer} xs={12} >
-             
+       
       {stream && (
         <>
-        <br /> <br />   <br /> <br />
+      
 
-          <Grid item xs={12} sm={12} md={12} lg={6} justifyContent="center" alignItems="center">
+          <Grid item xs={12} sm={12} md={12} lg={6} className={classes.video} >
             
             <video playsInline muted={mute} ref={myVideo} autoPlay className={videoon ? (classes.video1) : (classes.video2)} />
             {
               !videoon ? (
                 <div className={classes.camOff}  >
-                  <Typography variant="h3" className={classes.camOffText}>Camera is Off</Typography>
+                  <Typography className={classes.camOffText}>Camera is Off</Typography>
                 <video playsInline muted={false} style={{width:"0",height:"0"}} />
                 </div>
               ) : null
             }
             <hr style={{ borderWidth: 0 }} />
             <div className={classes.actionBtns}>
-              <IconButton onClick={handleClickMute}>
                 {
-                  !mute ? (<MicNoneSharpIcon fontSize="large" color="primary" />) : (<MicOffOutlinedIcon fontSize="large" color="primary" />)
-                }
-              </IconButton>
-              <IconButton onClick={handleClickVideo}>
-                {
-                  videoon ? (<VideocamIcon fontSize="large" color="primary" />) : (<VideocamOffIcon fontSize="large" color="primary" />)
-                }
-              </IconButton>
+                !mute ? (
+                 
+                  <Tooltip title="Mic Off">
+                  <IconButton onClick={handleClickMute} className={classes.iconBg}>
+                     <MicNoneSharpIcon fontSize="large" className={classes.icon} /> 
+                  </IconButton>
+                  </Tooltip>
+                ) :
+                (   <Tooltip title="Mic On">
+                  <IconButton onClick={handleClickMute} className={classes.iconBg}>
+                    <MicOffOutlinedIcon fontSize="large" className={classes.icon} />
+                  </IconButton>
+                  </Tooltip>
+                )
+             } &nbsp;&nbsp;&nbsp;&nbsp;
+             {
+                videoon ? (
+                  <Tooltip title="VideoOff">
+                  <IconButton onClick={handleClickVideo} className={classes.iconBg}>
+                    <VideocamIcon fontSize="large" className={classes.icon} /> 
+                  </IconButton>
+                  </Tooltip>
+                ) :
+                (   <Tooltip title="VideoOn">
+                  <IconButton onClick={handleClickVideo} className={classes.iconBg}>
+                    <VideocamOffIcon fontSize="large" className={classes.icon} />
+                  </IconButton>
+                  </Tooltip>
+                )
+             }
+             
+           
+             
+             
             </div>
           </Grid>
           <Grid item xs={10} sm={12} md={12} lg={4}  className={classes.descText} >
             <br /><br /><br /><br />
-            <Typography variant="h4" gutterBottom>Ready To Join ? </Typography>
+            <Typography variant="h4"  className={classes.readyToJoin} >Ready To Join ? </Typography>
             <br />
-            <Typography variant="h5">
-              You will join when someone lets you in..
+            <Typography variant="h6" className={classes.readyToJoinTxt}>
+              You will join when someone lets you in...
             </Typography>
             <br />
             <div style={{
@@ -131,6 +158,7 @@ const JoiningPage = () => {
 
       )}
     </Grid>
+    
   );
 };
 
