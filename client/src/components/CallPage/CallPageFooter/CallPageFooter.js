@@ -15,6 +15,7 @@ import InfoIcon from '@material-ui/icons/Info';
 import moment from 'moment'
 import { useDispatch, useSelector } from 'react-redux';
 import { SET_STREAM, TOGGLE_MIC, TOGGLE_VIDEO } from '../../../constants/actions';
+import People from '../PeopleDrawer/People';
 
 const useStyles = makeStyles((theme)=>({
     mainPaper:{
@@ -44,13 +45,14 @@ const useStyles = makeStyles((theme)=>({
     }
 }))
 
-const CallPageFooter = ({myStream}) => {
+const CallPageFooter = ({myStream,peopleOpen,setPeopleOpen}) => {
     const classes = useStyles()
     const dispatch = useDispatch()
     const user = useSelector(state=>state.user)
     const [changed,setChanged] = useState(false)
     // const [mute,setMute] = useState(true)
     const [time,setTime] = useState(Date.now())
+    
 
     
 
@@ -111,6 +113,7 @@ const CallPageFooter = ({myStream}) => {
 
             console.log("107")
             console.log("after")
+            dispatch({type:SET_STREAM,payload:stream})
             // setTimeout(()=>{
             //     console.log("turning off stream")
             //     // dispatch({type:SET_STREAM,payload:stream})
@@ -130,7 +133,7 @@ const CallPageFooter = ({myStream}) => {
                 track.stop()
             })
             console.log("after")
-            // dispatch({type:SET_STREAM,payload:stream})
+            dispatch({type:SET_STREAM,payload:stream})
         }catch(err){
             console.log(err)
         }
@@ -168,8 +171,13 @@ const CallPageFooter = ({myStream}) => {
         console.log("call ended")
     }
 
+    const handleDrawerToggle = ()=>[
+        setPeopleOpen(prev=>!prev)
+    ]
+
     return (
         <Box position="absolute" bottom="0" left="0" width="100%">
+            
             {/* <Paper className={classes.mainPaper}> */}
                 <Grid container>
                     <Grid item sm="3" className={classes.leftCont}>
@@ -205,7 +213,8 @@ const CallPageFooter = ({myStream}) => {
                     </Grid>
                     <Grid item sm="3" className={classes.rightCont}>
                         <IconButton>
-                            <PeopleIcon fontSize="large" color="primary"/>
+                            <PeopleIcon fontSize="large" color="primary" onClick={handleDrawerToggle}/>
+                            
                         </IconButton>
                         <IconButton>
                             <ChatIcon fontSize="large" color="primary"/>

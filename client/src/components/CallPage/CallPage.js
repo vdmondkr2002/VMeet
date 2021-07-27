@@ -8,13 +8,16 @@ import clsx from 'clsx'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { SET_STREAM } from '../../constants/actions'
+import People from './PeopleDrawer/People'
 
 
+
+const drawerWidth = 380;
 
 const useStyles = makeStyles((theme)=>({
-    mainCont:{
-        height:"100vh",
-    },
+    // root: {
+    //     display: 'flex',
+    // },
     vidCont:{
        maxWidth:"100%",
        height:"100%",
@@ -53,7 +56,35 @@ const useStyles = makeStyles((theme)=>({
         position:"absolute",
         left:"5%",
         bottom:"5%",
-    }
+    },
+    content: {
+        height:"90vh",
+        flexGrow: 1,
+        margin:"auto",
+        // padding: theme.spacing(3),
+        transition: theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+        
+    },
+    contentShift: {
+        height:"90vh",
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.easeOut,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+        marginRight: drawerWidth,
+    },
+    drawerHeader: {
+        display: 'flex',
+        alignItems: 'center',
+        width:0,
+        // necessary for content to be below app bar
+        ...theme.mixins.toolbar,
+        justifyContent: 'flex-start',
+    },
 }))
 
 const peer = null;
@@ -66,8 +97,11 @@ const CallPage = () => {
     const profile = useSelector(state=>state.profile)
     const user = useSelector(state=>state.user)
     
+    const [peopleOpen,setPeopleOpen] = useState(false)
+    
     
 
+    
     const initWebRTC = async()=>{
         const currStream = await navigator.mediaDevices.getUserMedia({audio:true,video:true})
         dispatch({type:SET_STREAM,payload:currStream})
@@ -86,20 +120,23 @@ const CallPage = () => {
     //         initWebRTC();
     // },[])
 
-
+    
 
    
     
 
     
     return (
-        <Container className={classes.mainCont}>
+        <div className={classes.root}>
+        <Container className={clsx(classes.content,{
+            [classes.contentShift]: peopleOpen,
+          })}>
             <Grid container className={classes.usersCont} spacing={2}>
-                <Grid item sm={6} className={classes.userCont}>
+                <Grid item sm={6} xs={12} className={classes.userCont}>
                         <video playsInline className={user.videoOn?classes.video:classes.offvideo} muted ref={myStream} autoPlay/>
                         {
                             !user.videoOn?(
-                               <Paper className={classes.userPaper}>
+                                <Paper className={classes.userPaper}>
                                     <Avatar src={profile?.profilePic} className={clsx(classes.largeAvatar)} alt={profile?.userName}>
                                             {profile?.firstName?.charAt(0)} {profile?.lastName?.charAt(0)}
                                     </Avatar>
@@ -118,23 +155,39 @@ const CallPage = () => {
                         
                     {/* </Paper> */}
                 </Grid>
-                <Grid item sm={6}>
+                <Grid item sm={6} xs={12} className={classes.userCont}>
                     {/* <Paper className={classes.userPaper}> */}
                     {/* User 2 */}
                         {/* <video playsInline muted ref={myVideo} autoPlay/> */}
-                        <video playsInline className={classes.video} muted ref={myStream} autoPlay/>
-
+                        <video playsInline className={user.videoOn?classes.video:classes.offvideo} muted ref={myStream} autoPlay/>
+                        {
+                            !user.videoOn?(
+                               <Paper className={classes.userPaper}>
+                                    <Avatar src={profile?.profilePic} className={clsx(classes.largeAvatar)} alt={profile?.userName}>
+                                            {profile?.firstName?.charAt(0)} {profile?.lastName?.charAt(0)}
+                                    </Avatar>
+                                </Paper>
+                            ):null
+                        }
                     {/* </Paper> */}
                 </Grid>
-                <Grid item sm={6}>
+                <Grid item sm={6} xs={12} className={classes.userCont}>
                     {/* <Paper className={classes.userPaper}> */}
                     {/* User 3 */}
                         {/* <video playsInline muted ref={myVideo} autoPlay/> */}
-                        <video playsInline className={classes.video} muted ref={myStream} autoPlay/>
-
+                        <video playsInline className={user.videoOn?classes.video:classes.offvideo} muted ref={myStream} autoPlay/>
+                        {
+                            !user.videoOn?(
+                               <Paper className={classes.userPaper}>
+                                    <Avatar src={profile?.profilePic} className={clsx(classes.largeAvatar)} alt={profile?.userName}>
+                                            {profile?.firstName?.charAt(0)} {profile?.lastName?.charAt(0)}
+                                    </Avatar>
+                                </Paper>
+                            ):null
+                        }
                     {/* </Paper> */}
                 </Grid>
-                <Grid item sm={6} className={classes.userCont}>
+                <Grid item sm={6} xs={12} className={classes.userCont}>
                         <video playsInline className={user.videoOn?classes.video:classes.offvideo} ref={myStream} autoPlay/>
                         {
                             !user.videoOn?(
@@ -153,9 +206,11 @@ const CallPage = () => {
                     {/* </Paper> */}
                 </Grid>
             </Grid>
-            
-            <CallPageFooter myStream={myStream} />
+            <div className={classes.drawerHeader} />
+            <CallPageFooter peopleOpen={peopleOpen} setPeopleOpen={setPeopleOpen} myStream={myStream} />
         </Container>
+        <People open={peopleOpen} setDrawerOpen={setPeopleOpen}/>
+        </div>
     )
 }
 
