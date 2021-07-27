@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router";
 import Button from "@material-ui/core/Button";
 import VideoCallIcon from "@material-ui/icons/VideoCall";
 import useStyles from "./styles.js";
@@ -14,10 +15,15 @@ import { Typography, Grid } from "@material-ui/core";
 
 const Description = () => {
   const classes = useStyles();
+  const history = useHistory();
   const [code, setcode] = useState("");
 
   const handleChange = (event) => {
     setcode(event.target.value);
+  };
+
+  const handleJoin = () => {
+    history.push("/join");
   };
 
   const Item = (props) => {
@@ -89,7 +95,6 @@ const Description = () => {
                           <Button
                             disabled={!code}
                             className={classes.codearrow}
-                            to="/join"
                           >
                             Join
                           </Button>
