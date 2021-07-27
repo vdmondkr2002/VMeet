@@ -10,7 +10,7 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
 import FormControl from "@material-ui/core/FormControl";
-import { Typography, Grid, Paper } from "@material-ui/core";
+import { Typography, Grid } from "@material-ui/core";
 
 const Description = () => {
   const classes = useStyles();
@@ -59,11 +59,11 @@ const Description = () => {
                 alignItems="stretch"
                 justifyContent="flex-start"
               >
-                <Grid item sm={6} xs={12}>
+                <Grid item sm={12} xs={12} md={6}>
                   <Button
                     fullwidth
                     variant="contained"
-                    startIcon={<VideoCallIcon style={{ fontSize: "27px" }} />}
+                    startIcon={<VideoCallIcon style={{ fontSize: "20px" }} />}
                     className={classes.buttoncolor}
                   >
                     <Typography className={classes.newmeeting}>
@@ -72,7 +72,7 @@ const Description = () => {
                   </Button>
                 </Grid>
 
-                <Grid item sm={6} xs={12}>
+                <Grid item sm={12} xs={12} md={6}>
                   <FormControl variant="outlined" className={classes.codeinput}>
                     <OutlinedInput
                       style={{ width: "100%", height: "50px" }}
@@ -86,14 +86,13 @@ const Description = () => {
                       }
                       endAdornment={
                         <InputAdornment position="end">
-                          <IconButton
-                            edge="end"
+                          <Button
                             disabled={!code}
                             className={classes.codearrow}
                             to="/join"
                           >
-                            <ArrowForwardIcon />
-                          </IconButton>
+                            Join
+                          </Button>
                         </InputAdornment>
                       }
                     />
