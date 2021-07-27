@@ -19,208 +19,174 @@ import { SET_STREAM, TOGGLE_MIC, TOGGLE_VIDEO } from '../../constants/actions';
 
 const JoiningPage = () => {
   const dispatch = useDispatch()
-  const user = useSelector(state=>state.user)
+  const user = useSelector(state => state.user)
   const myStream = useRef();
-  const [changed,setChanged] = useState(false)
+  const [changed, setChanged] = useState(false)
   // const [mute,setMute] = useState(true)
-  const [time,setTime] = useState(Date.now())
+  const [time, setTime] = useState(Date.now())
 
-  
-  const initWebRTC = async()=>{
+
+  const initWebRTC = async () => {
     console.log("initWebRTC called")
-    const currStream = await navigator.mediaDevices.getUserMedia({audio:user.micOn,video:user.videoOn})
-    dispatch({type:SET_STREAM,payload:currStream})
+    const currStream = await navigator.mediaDevices.getUserMedia({ audio: user.micOn, video: user.videoOn })
+    dispatch({ type: SET_STREAM, payload: currStream })
 
     myStream.current.srcObject = currStream;
 
-}
-
-  useEffect(()=>{
-      console.log(user.micOn?"mic On":"mic Off")
-      if(user.micOn){
-          initWebRTC()
-      }else{
-          const stream = user.stream
-          stopAudioStream(stream)
-      }
-          
-  },[user.micOn])
-  
-  useEffect(()=>{
-      console.log(user.videoOn?"video On":"video Off")
-      if(user.videoOn){
-          initWebRTC()
-      }else{
-          if(user.stream){
-              var stream = user.stream
-              stopVideoStreams(stream)
-          }
-          
-      }
-  },[user.videoOn])
-
-
-  // useEffect(()=>{
-      // console.log("turning off")
-      // console.log(user.stream)  
-      // myStream.current.srcObject = user.stream
-  // },[user.stream])
-
-  // const setStream = (stream)=>{
-  //     console.log("inside stream")
-  //     console.log(stream.getVideoTracks())
-  //     // console.log(stream.getAudioTracks())
-  //     myStream.current.srcObject = stream
-  //     dispatch({type:SET_STREAM,payload:stream})
-  // }
-
-  const stopVideoStreams = (stream)=>{
-      try{
-          // console.log("before")
-          console.log("100")
-          console.log(stream.getVideoTracks())
-          console.log("102")
-          stream.getVideoTracks()[0].stop();
-          // stream.getVideoTracks().forEach(track=>
-          //     {
-          //     track.stop()
-          //     console.log("hi")
-
-          // }
-          // )
-
-
-          console.log("107")
-          console.log("after")
-          // setTimeout(()=>{
-          //     console.log("turning off stream")
-          //     // dispatch({type:SET_STREAM,payload:stream})
-          // },6000)
-         
-          
-      }catch(err){
-          console.log(err)
-      }
   }
 
-  const stopAudioStream = async(stream)=>{
-      try{
-          console.log("before")
-          console.log(stream.getAudioTracks())
-          await stream.getAudioTracks().forEach(track=>{
-              track.stop()
-          })
-          console.log("after")
-          // dispatch({type:SET_STREAM,payload:stream})
-      }catch(err){
-          console.log(err)
+  useEffect(() => {
+    console.log(user.micOn ? "mic On" : "mic Off")
+    if (user.micOn) {
+      initWebRTC()
+    } else {
+      const stream = user.stream
+      stopAudioStream(stream)
+    }
+
+  }, [user.micOn])
+
+  useEffect(() => {
+    console.log(user.videoOn ? "video On" : "video Off")
+    if (user.videoOn) {
+      initWebRTC()
+    } else {
+      if (user.stream) {
+        var stream = user.stream
+        stopVideoStreams(stream)
       }
-  }
+
+    }
+  }, [user.videoOn])
+
  
-  
- 
-
-  const handleClickVideo =()=>{
-      dispatch({type:TOGGLE_VIDEO})
+  const stopVideoStreams = (stream) => {
+    try {
+      console.log(stream.getVideoTracks())
+      stream.getVideoTracks()[0].stop();
+    } catch (err) {
+      console.log(err)
+    }
   }
-  const handleClickMute =()=>{
-      dispatch({type:TOGGLE_MIC})
+
+  const stopAudioStream = async (stream) => {
+    try {
+      console.log("before")
+      console.log(stream.getAudioTracks())
+      await stream.getAudioTracks().forEach(track => {
+        track.stop()
+      })
+      console.log("after")
+      // dispatch({type:SET_STREAM,payload:stream})
+    } catch (err) {
+      console.log(err)
+    }
   }
 
-  const handleEndCall = ()=>{
-      console.log("call ended")
+
+
+
+  const handleClickVideo = () => {
+    dispatch({ type: TOGGLE_VIDEO })
+  }
+  const handleClickMute = () => {
+    dispatch({ type: TOGGLE_MIC })
+  }
+
+  const handleEndCall = () => {
+    console.log("call ended")
   }
 
   const classes = useStyles();
 
- 
+
 
   return (
-    <Grid container  alignItems="center"className={classes.gridContainer} xs={12} >
-       
-      {/* {stream && ( */}
-        <>
-      
+    <Grid container alignItems="center" className={classes.gridContainer} xs={12} >
 
-          <Grid item xs={12} sm={12} md={12} lg={6} className={classes.video} >
-            
-            <video playsInline  ref={myStream}  autoPlay className={user.videoOn ? (classes.video1) : (classes.video2)} />
+      {/* {stream && ( */}
+      <>
+
+
+        <Grid item xs={12} sm={12} md={12} lg={6} className={classes.video} >
+
+          <video playsInline ref={myStream} autoPlay className={user.videoOn ? (classes.video1) : (classes.video2)} />
+          {
+            !user.videoOn ? (
+              <div className={classes.camOff}  >
+                <Typography className={classes.camOffText}>Camera is Off</Typography>
+                <video playsInline muted={false} style={{ width: "0", height: "0" }} />
+              </div>
+            ) : null
+          }
+          <hr style={{ borderWidth: 0 }} />
+          <div className={classes.actionBtns}>
             {
-              !user.videoOn ? (
-                <div className={classes.camOff}  >
-                  <Typography className={classes.camOffText}>Camera is Off</Typography>
-                <video playsInline muted={false} style={{width:"0",height:"0"}} />
-                </div>
-              ) : null
-            }
-            <hr style={{ borderWidth: 0 }} />
-            <div className={classes.actionBtns}>
-                {
-                user.micOn ? (
-                 
-                  <Tooltip title="Mic Off">
+              user.micOn ? (
+
+                <Tooltip title="Mic Off">
                   <IconButton onClick={handleClickMute} className={classes.iconBg}>
-                     <MicNoneSharpIcon fontSize="large" className={classes.icon} /> 
+                    <MicNoneSharpIcon fontSize="large" className={classes.icon} />
                   </IconButton>
-                  </Tooltip>
-                ) :
-                (   <Tooltip title="Mic On">
+                </Tooltip>
+              ) :
+                (<Tooltip title="Mic On">
                   <IconButton onClick={handleClickMute} className={classes.iconBg}>
                     <MicOffOutlinedIcon fontSize="large" className={classes.icon} />
                   </IconButton>
-                  </Tooltip>
+                </Tooltip>
                 )
-             } &nbsp;&nbsp;&nbsp;&nbsp;
-             {
-                user.videoOn ? (
-                  <Tooltip title="VideoOff">
+            } &nbsp;&nbsp;&nbsp;&nbsp;
+            {
+              user.videoOn ? (
+                <Tooltip title="VideoOff">
                   <IconButton onClick={handleClickVideo} className={classes.iconBg}>
-                    <VideocamIcon fontSize="large" className={classes.icon} /> 
+                    <VideocamIcon fontSize="large" className={classes.icon} />
                   </IconButton>
-                  </Tooltip>
-                ) :
-                (   <Tooltip title="VideoOn">
+                </Tooltip>
+              ) :
+                (<Tooltip title="VideoOn">
                   <IconButton onClick={handleClickVideo} className={classes.iconBg}>
                     <VideocamOffIcon fontSize="large" className={classes.icon} />
                   </IconButton>
-                  </Tooltip>
+                </Tooltip>
                 )
-             }
-             
-           
-             
-             
-            </div>
-          </Grid>
-          <Grid item xs={10} sm={12} md={12} lg={4}  className={classes.descText} >
-            <br /><br /><br /><br />
-            <Typography variant="h4"  className={classes.readyToJoin} >Ready To Join ? </Typography>
-            <br />
-            <Typography variant="h6" className={classes.readyToJoinTxt}>
-              You will join when someone lets you in...
-            </Typography>
-            <br />
-            <div style={{
-              display:"flex",
-             
-            }}>
-              <Button className={classes.btn}  >
-                Join Now
-              </Button>
-              <Button className={classes.btn} >
-                Present &nbsp;
-                <ScreenShareIcon />
-              </Button>
-            </div>
+            }
 
-            <br />
-            {/* <CircularProgress color="secondary" /> */}
-          </Grid>
-        </>
+
+
+
+          </div>
+        </Grid>
+        <Grid item xs={10} sm={12} md={12} lg={4} className={classes.descText} >
+          <br /><br /><br /><br />
+          <Typography variant="h4" className={classes.readyToJoin} >Ready To Join ? </Typography>
+          <br />
+          <Typography variant="h6" className={classes.readyToJoinTxt}>
+            You will join when someone lets you in...
+          </Typography>
+          <br />
+          <div style={{
+            display: "flex",
+
+          }}>
+            <Button className={classes.btn}  >
+              Join Now
+            </Button>
+            <Button className={classes.btn} >
+              Present &nbsp;
+              <ScreenShareIcon />
+            </Button>
+          </div>
+
+          <br />
+          {/* <CircularProgress color="secondary" /> */}
+        </Grid>
+      </>
 
       {/* )} */}
     </Grid>
-    
+
   );
 };
 
