@@ -1,48 +1,37 @@
 import React, { useEffect, useState } from "react";
 import {
-  makeStyles,
   AppBar,
   Toolbar,
   Typography,
   Button,
   IconButton,
-  Box,
+  Drawer,
+  Link,
   Avatar,
-  Menu,
-  MenuItem,
 } from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
-
+import { HashLink } from "react-router-hash-link";
 import { GoogleLogin } from "react-google-login";
-import moment from "moment";
+import logo from "../../assests/logo.png";
+import MenuIcon from "@material-ui/icons/Menu";
+import useStyles from "./styles.js";
 import { useDispatch, useSelector } from "react-redux";
 import { googleSignIn, logOut } from "../../actions/auth";
-import GoogleIcon from "./GoogleIcon";
-import { useHistory } from "react-router-dom";
+import { Link as RouterLink, useHistory } from "react-router-dom";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
-  title: {
-    flexGrow: 1,
-  },
-  date: {
-    marginLeft: "auto",
-  },
-}));
 const Navbar = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const history = useHistory();
   const [loggedIn, setLoggedIn] = useState(false);
-  const [mobileView, setMobileView] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [time, setTime] = useState(Date.now());
   const user = useSelector((state) => state.profile);
+  const [state, setState] = useState({
+    mobileView: false,
+    drawerOpen: false,
+  });
+  const { mobileView, drawerOpen } = state;
 
   useEffect(() => {
     if (user.name) {
@@ -50,35 +39,7 @@ const Navbar = () => {
     }
   }, [user]);
 
-  useEffect(() => {
-    const setResponsiveness = () => {
-      return window.innerWidth < 900 && window.innerWidth > 100
-        ? setMobileView(true)
-        : setMobileView(false);
-    };
-    setResponsiveness();
-
-    window.addEventListener("resize", setResponsiveness);
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTime(Date.now());
-    }, 60000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
-
-  const handleAvatarMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleClickAvatar = (e) => {
-    setAnchorEl(e.currentTarget);
-  };
   const googleSuccess = async (res) => {
-    console.log(res);
     try {
       dispatch(
         googleSignIn({
@@ -103,91 +64,232 @@ const Navbar = () => {
     dispatch(logOut(history));
   };
 
-  return (
-    <AppBar position="static" style={{ margin: "0" }}>
-      <Toolbar>
-        <Typography variant="h6" className={classes.title}>
-          V Meet
-        </Typography>
-        {!mobileView && (
-          <Typography variant="h6" className={classes.date}>
-            {moment(time).format(" h:mm a ⚈ MMMM Do YYYY")}
-          </Typography>
-        )}
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  useEffect(() => {
+    const setResponsiveness = () => {
+      return window.innerWidth < 700 && window.innerWidth > 100
+        ? setState((prevState) => ({ ...prevState, mobileView: true }))
+        : setState((prevState) => ({ ...prevState, mobileView: false }));
+    };
+    setResponsiveness();
+    window.addEventListener("resize", () => setResponsiveness());
+  }, []);
+
+  const displayDesktop = () => {
+    return (
+      <>
+        <Link component={RouterLink} to="\" color="inherit">
+          <img className={classes.image1} src={logo} alt="MeetV" />
+        </Link>
+        <Toolbar className={classes.toolbar}>
+          <div className={classes.midNavbar}>
+            <HashLink smooth to={"#feature"}>
+              <Button className={classes.menuButton}>Feature</Button>{" "}
+            </HashLink>
+            <HashLink smooth to={"#aboutus"}>
+              <Button className={classes.menuButton}>About Us</Button>{" "}
+            </HashLink>
+          </div>
+          {loggedIn ? (
+            <>
+              <Button
+                aria-controls="simple-menu"
+                aria-haspopup="true"
+                onClick={handleClick}
+              >
+                <Avatar
+                  src={user?.profile?.profilePic}
+                  alt={user?.profile?.name}
+                >
+                  {user?.profile?.name?.charAt(0)}
+                </Avatar>
+              </Button>
+              <Menu
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                <MenuItem
+                  onClick={handleClose}
+                  style={{ backgroundColor: "#03045e" }}
+                >
+                  <Button onClick={logout}>
+                    <Typography
+                      variant="h6"
+                      style={{
+                        fontWeight: "400",
+                        boxShadow: " none",
+                        fontSize: "1.1rem",
+                        color: "white",
+                      }}
+                    >
+                      Logout
+                    </Typography>
+                  </Button>
+                </MenuItem>
+              </Menu>
+            </>
+          ) : (
+            <>
+              <GoogleLogin
+                clientId="771936552840-bo8590qfhbgqqp1e12fe8pllbqvkfo4g.apps.googleusercontent.com"
+                render={(renderProps) => (
+                  <Button
+                    style={{
+                      margin: "5px",
+                      color: "white",
+                      backgroundColor: "#00B4D8",
+                    }}
+                    onClick={renderProps.onClick}
+                    disabled={renderProps.disabled}
+                  >
+                    Sign In
+                  </Button>
+                )}
+                onSuccess={googleSuccess}
+                onFailure={googleError}
+                cookiePolicy="single_host_origin"
+              />
+            </>
+          )}
+        </Toolbar>
+      </>
+    );
+  };
+
+  const displayMobile = () => {
+    const handleDrawerOpen = () => {
+      setState((prevState) => ({ ...prevState, drawerOpen: true }));
+    };
+    const handleDrawerClose = () => {
+      setState((prevState) => ({ ...prevState, drawerOpen: false }));
+    };
+
+    return (
+      <>
+        <Toolbar className={classes.parentTool}>
+          <IconButton
+            {...{
+              edge: "start",
+              color: "inherit",
+              "aria-label": "menu",
+              "aria-haspopup": "true",
+              onClick: handleDrawerOpen,
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Drawer
+            {...{
+              anchor: "left",
+              open: drawerOpen,
+              onClose: handleDrawerClose,
+            }}
+          >
+            <div className={classes.drawerContainer}>
+              <HashLink
+                smooth
+                to={"#feature"}
+                className={classes.menuButton}
+                style={{ textDecoration: "none" }}
+              >
+                <MenuItem>Feature</MenuItem>
+              </HashLink>
+
+              <HashLink
+                smooth
+                to={"#aboutus"}
+                className={classes.menuButton}
+                style={{ textDecoration: "none" }}
+              >
+                <MenuItem>About Us</MenuItem>
+              </HashLink>
+            </div>
+          </Drawer>
+          <Link component={RouterLink} to="\" color="inherit">
+            <img className={classes.image1} src={logo} alt="MeetV" />
+          </Link>
+        </Toolbar>
 
         {loggedIn ? (
-          <>
-            {mobileView ? (
-              <>
-                <Button
-                  aria-controls="simple-menu"
-                  aria-haspopup="true"
-                  onClick={handleClickAvatar}
-                >
-                  <Avatar alt={`${user.name}`} src={user.profilePic}>
-                    {user?.firstName?.charAt(0)}
-                    {user?.lastName?.charAt(0)}
-                  </Avatar>
+          <div className={classes.mobileloginMenu}>
+            <Button
+              aria-controls="simple-menu"
+              aria-haspopup="true"
+              onClick={handleClick}
+            >
+              <Avatar src={user?.profile?.profilePic} alt={user?.profile?.name}>
+                {user?.profile?.name.charAt(0)}
+              </Avatar>
+            </Button>
+            <Menu
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+              style={{ color: "pink" }}
+            >
+              <MenuItem
+                onClick={handleClose}
+                style={{ backgroundColor: "#03045e" }}
+              >
+                <Button onClick={logout}>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      fontWeight: "400",
+                      boxShadow: " none",
+                      fontSize: "1.2rem",
+                      color: "white",
+                    }}
+                  >
+                    Logout
+                  </Typography>
                 </Button>
-                <Menu
-                  id="simple-menu"
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={Boolean(anchorEl)}
-                  onClose={handleAvatarMenuClose}
-                >
-                  <MenuItem onClick={handleAvatarMenuClose}>
-                    <Button
-                      color="inherit"
-                      className={classes.menuButton}
-                      onClick={logout}
-                    >
-                      <Typography variant="h6" className={classes.menuitemText}>
-                        Logout
-                      </Typography>
-                    </Button>
-                  </MenuItem>
-                </Menu>
-              </>
-            ) : (
-              <>
-                <IconButton>
-                  <Avatar alt={`${user.name}`} src={user.profilePic}>
-                    {user?.firstName?.charAt(0)}
-                    {user?.lastName?.charAt(0)}
-                  </Avatar>
-                </IconButton>
-                <Button color="secondary" variant="contained" onClick={logout}>
-                  Logout
-                </Button>
-              </>
-            )}
-          </>
+              </MenuItem>
+            </Menu>
+          </div>
         ) : (
-          <GoogleLogin
-            clientId="771936552840-bo8590qfhbgqqp1e12fe8pllbqvkfo4g.apps.googleusercontent.com"
-            render={(renderProps) => (
-              <Box align="center">
+          <div className={classes.mobileloginMenu}>
+            <GoogleLogin
+              clientId="771936552840-bo8590qfhbgqqp1e12fe8pllbqvkfo4g.apps.googleusercontent.com"
+              render={(renderProps) => (
                 <Button
-                  color="secondary"
-                  fullWidth
-                  className={classes.customLogin}
+                  style={{
+                    margin: "5px",
+                    color: "white",
+                    backgroundColor: "#00B4D8",
+                  }}
                   onClick={renderProps.onClick}
                   disabled={renderProps.disabled}
-                  startIcon={<GoogleIcon />}
-                  variant="contained"
                 >
-                  Sign In with Google
+                  Sign In
                 </Button>
-              </Box>
-            )}
-            onSuccess={googleSuccess}
-            onFailure={googleError}
-            cookiePolicy="single_host_origin"
-          />
+              )}
+              onSuccess={googleSuccess}
+              onFailure={googleError}
+              cookiePolicy="single_host_origin"
+            />
+          </div>
         )}
-      </Toolbar>
-    </AppBar>
+      </>
+    );
+  };
+
+  return (
+    <>
+      <AppBar className={classes.appBar} position="static">
+        {mobileView ? displayMobile() : displayDesktop()}
+      </AppBar>
+    </>
   );
 };
 

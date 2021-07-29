@@ -1,7 +1,8 @@
 import React from "react";
 import useStyles from "./styles.js";
+import { HashLink } from "react-router-hash-link";
 import logo from "../../assests/logo.png";
-import { Typography, CssBaseline, Link, Grid } from "@material-ui/core";
+import { Typography, Link, Grid, Button } from "@material-ui/core";
 import InstagramIcon from "@material-ui/icons/Instagram";
 import FacebookIcon from "@material-ui/icons/Facebook";
 import GitHubIcon from "@material-ui/icons/GitHub";
@@ -82,37 +83,21 @@ const Footer = () => {
             <Typography align="center">
               <li style={{ listStyleType: "none", textAlign: "center" }}>
                 <ul className={classes.link}>
-                  <Link
-                    to="/join"
-                    component={RouterLink}
-                    key="join"
-                    color="inherit"
-                    className={classes.linkName}
-                  >
-                    Join / New Meeting
-                  </Link>
+                  <HashLink smooth to={"#description"}>
+                    <Button className={classes.linkName}>
+                      Join / New Meeting
+                    </Button>{" "}
+                  </HashLink>
                 </ul>
                 <ul className={classes.link}>
-                  <Link
-                    to="/all"
-                    component={RouterLink}
-                    key="feature"
-                    color="inherit"
-                    className={classes.linkName}
-                  >
-                    Feature
-                  </Link>
+                  <HashLink smooth to={"#feature"}>
+                    <Button className={classes.linkName}>Feature</Button>{" "}
+                  </HashLink>
                 </ul>
                 <ul className={classes.link}>
-                  <Link
-                    to="/aboutus"
-                    component={RouterLink}
-                    key="About Us"
-                    color="inherit"
-                    className={classes.linkName}
-                  >
-                    About Us
-                  </Link>
+                  <HashLink smooth to={"#aboutus"}>
+                    <Button className={classes.linkName}>About Us</Button>{" "}
+                  </HashLink>
                 </ul>
               </li>
             </Typography>
