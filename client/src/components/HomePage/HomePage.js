@@ -11,7 +11,7 @@ const HomePage = () => {
     <>
       <Navbar />
       <Description />
-      {/* <Feature /> */}
+      <Feature />
       <AboutUs />
       <Testimonals />
       <Footer />
