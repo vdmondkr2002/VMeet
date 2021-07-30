@@ -72,10 +72,10 @@ const Chat = ({open,setDrawerOpen}) => {
         setDrawerOpen(false)
     }
 
-    const chatData = [{senderName:profile.name,msgTime:moment(Date.now()).format(' h:mm a'),videoOn:user.videoOn},
-                        {senderName:profile.name,msgTime:moment(Date.now()).format(' h:mm a'),videoOn:user.videoOn}, 
-                        {senderName:profile.name,msgTime:moment(Date.now()).format(' h:mm a'),videoOn:user.videoOn}, 
-                        {senderName:profile.name,msgTime:moment(Date.now()).format(' h:mm a'),videoOn:user.videoOn}]
+    const chatData = [{senderName:profile.name,msgTime:moment(Date.now()).format(' h:mm a'),text:"Hello"},
+                        {senderName:profile.name,msgTime:moment(Date.now()).format(' h:mm a'),text:"Hii"}, 
+                        {senderName:profile.name,msgTime:moment(Date.now()).format(' h:mm a'),text:'Are u fine?'}, 
+                        {senderName:profile.name,msgTime:moment(Date.now()).format(' h:mm a'),text:"No i am not!!!"}]
     return (
         <Drawer
         className={classes.drawer}
@@ -130,7 +130,7 @@ const Chat = ({open,setDrawerOpen}) => {
                         </Typography>
                     </div>
                     <div>
-                        Hello
+                        {msg.text}
                     </div>
                 </div>
               ))
