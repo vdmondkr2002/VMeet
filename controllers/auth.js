@@ -1,12 +1,13 @@
-const User = require('../models/User')
-const jwt = require('jsonwebtoken')
+const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+
 
 const getCurrentUser = async(req,res)=>{
     try{
         if(!req.userId)
             return res.status(401).json({msg:"Unauthorized"})
         // console.log("Hello")
-        const user = await User.findOne({googleId:req.userId})
+        const user = await User.findOne({_id:req.userId})
         // console.log(user)
         // console.log(user)
         // return res.status(200).json(user)
@@ -16,29 +17,35 @@ const getCurrentUser = async(req,res)=>{
     }
 }
 
-const googleSignIn = async(req,res)=>{
-    try{
-        const oldUser = await User.findOne({googleId:req.body.googleId})
 
-        if(!oldUser){
-            const newUser = await User.create({...req.body,createdAt:Date.now()})
-            const payload ={
-                email:newUser.email,
-                id: newUser.googleId
-            }
-            const token = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: "3h" });
-            return res.status(200).json(token)
-        }
-        const payload ={
-            email:oldUser.email,
-            id: oldUser.googleId
-        }
-        const token = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: "3h" });
 
-        return res.status(200).json(token)
-    }catch(err){
-        console.log(err)
+const googleSignIn = async (req, res) => {
+  try {
+    const oldUser = await User.findOne({ googleId: req.body.googleId });
+
+    if (!oldUser) {
+      const newUser = await User.create({ ...req.body, createdAt: Date.now() });
+      const payload = {
+        email: newUser.email,
+        id: newUser._id,
+      };
+      const token = jwt.sign(payload, process.env.TOKEN_SECRET, {
+        e2xpiresIn: "3h",
+      });
+      return res.status(200).json(token);
     }
-}
+    const payload = {
+      email: oldUser.email,
+      id: oldUser._id,
+    };
+    const token = jwt.sign(payload, process.env.TOKEN_SECRET, {
+      expiresIn: "3h",
+    });
 
-module.exports = {googleSignIn,getCurrentUser}
+    return res.status(200).json(token);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports = { googleSignIn, getCurrentUser };

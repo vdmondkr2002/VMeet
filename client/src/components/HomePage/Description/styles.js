@@ -61,7 +61,7 @@ const styles = makeStyles((theme) => ({
     color: "white",
   },
   newmeeting: {
-    fontSize: "18px",
+    fontSize: "15px",
     fontWeight: "600",
     lineHeight: "1.5",
     letterSpacing: "0.05em",
