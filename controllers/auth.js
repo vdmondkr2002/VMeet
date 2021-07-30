@@ -5,9 +5,9 @@ const getCurrentUser = async(req,res)=>{
     try{
         if(!req.userId)
             return res.status(401).json({msg:"Unauthorized"})
-        console.log("Hello")
+        // console.log("Hello")
         const user = await User.findOne({googleId:req.userId})
-        console.log(user)
+        // console.log(user)
         // console.log(user)
         // return res.status(200).json(user)
         return res.status(200).json({firstName:user.firstName,lastName:user.lastName,profilePic:user.image,name:user.displayName,_id:user._id,email:user.email})

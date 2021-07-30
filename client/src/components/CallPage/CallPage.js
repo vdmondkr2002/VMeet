@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { SET_STREAM } from '../../constants/actions'
 import People from './PeopleDrawer/People'
+import Chat from './ChatDrawer/Chat'
 
 
 
@@ -98,6 +99,7 @@ const CallPage = () => {
     const user = useSelector(state=>state.user)
     
     const [peopleOpen,setPeopleOpen] = useState(false)
+    const [chatOpen,setChatOpen] = useState(false)
     
     
 
@@ -129,7 +131,7 @@ const CallPage = () => {
     return (
         <div className={classes.root}>
         <Container className={clsx(classes.content,{
-            [classes.contentShift]: peopleOpen,
+            [classes.contentShift]: peopleOpen || chatOpen,
           })}>
             <Grid container className={classes.usersCont} spacing={2}>
                 <Grid item sm={6} xs={12} className={classes.userCont}>
@@ -207,9 +209,10 @@ const CallPage = () => {
                 </Grid>
             </Grid>
             <div className={classes.drawerHeader} />
-            <CallPageFooter peopleOpen={peopleOpen} setPeopleOpen={setPeopleOpen} myStream={myStream} />
+            <CallPageFooter peopleOpen={peopleOpen} setChatOpen={setChatOpen} setPeopleOpen={setPeopleOpen} myStream={myStream} />
         </Container>
         <People open={peopleOpen} setDrawerOpen={setPeopleOpen}/>
+        <Chat open={chatOpen} setDrawerOpen={setChatOpen}/>
         </div>
     )
 }
