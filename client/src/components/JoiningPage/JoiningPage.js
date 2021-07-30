@@ -9,10 +9,8 @@ import MicIcon from '@material-ui/icons/Mic';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import Tooltip from '@material-ui/core/Tooltip';
-
 // import { Mic, VideocamOff } from '@material-ui/icons';
 import { CircularProgress } from '@material-ui/core';
-
 import { useDispatch, useSelector } from 'react-redux';
 import { SET_STREAM, TOGGLE_MIC, TOGGLE_VIDEO } from '../../constants/actions';
 
@@ -152,6 +150,7 @@ const JoiningPage = () => {
                 </Tooltip>
                 )
             }
+
 
 
 

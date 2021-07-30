@@ -5,13 +5,13 @@ const api = require('../api/index')
 
 export const googleSignIn = (formData)=>async(dispatch)=>{
     try{
-        console.log(formData)
+        // console.log(formData)
         const {data} = await api.googleSignIn(formData)
         console.log(data)
         localStorage.setItem('meetToken',JSON.stringify(data))
         dispatch(loadUser())
     }catch(err){
-        console.log(err)
+        console.log(err.message)
     }
 }
 
