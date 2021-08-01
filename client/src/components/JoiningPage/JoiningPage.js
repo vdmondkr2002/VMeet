@@ -13,10 +13,12 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { CircularProgress } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { SET_STREAM, TOGGLE_MIC, TOGGLE_VIDEO } from '../../constants/actions';
-
+import { connectToSocketServer } from '../CallPage/CallPageUtils/connectTosocket';
+import { useHistory } from 'react-router';
 
 const JoiningPage = () => {
   const dispatch = useDispatch()
+  const history = useHistory();
   const user = useSelector(state => state.user)
   const myStream = useRef();
   const [changed, setChanged] = useState(false)
@@ -95,6 +97,7 @@ const JoiningPage = () => {
     console.log("call ended")
   }
 
+
   const classes = useStyles();
 
 
@@ -104,7 +107,6 @@ const JoiningPage = () => {
 
       {/* {stream && ( */}
       <>
-
 
         <Grid item xs={12} sm={12} md={12} lg={6} className={classes.video} >
 

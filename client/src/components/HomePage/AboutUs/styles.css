@@ -1,3 +1,21 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+}
+
+h1,
+h2 {
+  font-weight: 600;
+  color: hsl(234, 12%, 34%);
+}
+
+p {
+  color: hsl(229, 6%, 66%);
+}
+
 .cards-container {
   list-style: none;
   padding: 0;
@@ -22,36 +40,27 @@
   }
 }
 
+[class$="feature-card"] {
+  position: relative;
+  box-sizing: border-box;
+  width: 350px;
+  height: 250px;
+  margin: 0;
+  padding: 32px;
+  border-radius: 10px;
+  border-top: solid 5px black;
+  box-shadow: 2px 5px 20px rgb(0, 0, 0, 0.1);
+}
+
 [class$="feature-card"] h2,
 [class$="feature-card"] p {
   margin: 0;
 }
 
 [class$="feature-card"] img {
-  max-width: 100%;
-  height: auto;
-  width: auto;
-}
-.circle-container-icon {
   position: absolute;
-  bottom: 20px;
-  right: 20px;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  font-size: 14px;
-  line-height: 1.42857143;
-  font-family: Lato, sans-serif;
-  box-sizing: border-box;
-  width: 80px;
-  height: 80px;
-  min-width: 80px;
-  min-height: 80px;
-  border-radius: 50%;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 0;
-  margin-left: 0;
+  bottom: 32px;
+  right: 32px;
 }
 
 [class$="feature-card"][class*="cyan"] {
@@ -117,55 +126,4 @@
   [class$="feature-card"]:not(:first-child) {
     margin-top: 22px;
   }
-}
-
-h1,
-h2 {
-  font-weight: 600;
-  color: hsl(234, 12%, 34%);
-}
-
-p {
-  color: hsl(229, 6%, 66%);
-}
-
-header {
-  margin: 80px 30px 75px;
-  text-align: center;
-}
-
-header > h1 {
-  margin: 20px 0;
-  font-weight: 200;
-}
-
-header > h1 strong {
-  font-weight: 600;
-}
-
-header > p {
-  max-width: 520px;
-  margin: auto;
-}
-
-@media (max-width: 443px) {
-  header > h1 {
-    font-size: 1.6em;
-  }
-}
-
-[class$="feature-card"] {
-  position: relative;
-  box-sizing: border-box;
-  width: 350px;
-  height: 250px;
-  margin: 0;
-  padding: 32px;
-  border-radius: 10px;
-  border-top: solid 5px black;
-  box-shadow: 2px 5px 20px rgb(0, 0, 0, 0.1);
-}
-
-.center {
-  vertical-align: middle;
 }
