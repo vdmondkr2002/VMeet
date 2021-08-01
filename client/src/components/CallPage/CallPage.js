@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { SET_STREAM } from '../../constants/actions'
 import People from './PeopleDrawer/People'
+import Chat from './ChatDrawer/Chat'
 
 
 const drawerWidth = 380;
@@ -118,6 +119,7 @@ const CallPage = () => {
 
     const [peopleOpen,setPeopleOpen] = useState(false)     //Frontend 
     
+<<<<<<< HEAD
     /* 
      * Following Function takes the currStream, 
         Stops previous streams if any and add currstreams all the tracks to all the connections (people) by using for loop 
@@ -127,6 +129,12 @@ const CallPage = () => {
 		try {
 			window.localStream?.getTracks().forEach(track => track.stop())
 		} catch(e) { console.log(e) }
+=======
+    const [peopleOpen,setPeopleOpen] = useState(false)
+    const [chatOpen,setChatOpen] = useState(false)
+    
+    
+>>>>>>> e9babc282d7cd59f55a9ef89aff6ce5faa92aa36
 
 		window.localStream = stream                //store curremt stream to winow.localstream  (?)
 		myStream.current.srcObject = stream
@@ -377,7 +385,7 @@ const CallPage = () => {
                             Join Now
                     </Button>
         <Container className={clsx(classes.content,{
-            [classes.contentShift]: peopleOpen,
+            [classes.contentShift]: peopleOpen || chatOpen,
           })}>
           
                  
@@ -425,6 +433,7 @@ const CallPage = () => {
             <CallPageFooter peopleOpen={peopleOpen} setPeopleOpen={setPeopleOpen} myStream={myStream} />
         </Container>
         <People open={peopleOpen} setDrawerOpen={setPeopleOpen}/>
+        <Chat open={chatOpen} setDrawerOpen={setChatOpen}/>
         </div>
     )
 }

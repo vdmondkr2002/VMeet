@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme)=>({
     }
 }))
 
-const CallPageFooter = ({myStream,peopleOpen,setPeopleOpen}) => {
+const CallPageFooter = ({myStream,peopleOpen,setChatOpen,setPeopleOpen}) => {
     const classes = useStyles()
     const dispatch = useDispatch()
     const user = useSelector(state=>state.user)
@@ -171,9 +171,12 @@ const CallPageFooter = ({myStream,peopleOpen,setPeopleOpen}) => {
         console.log("call ended")
     }
 
-    const handleDrawerToggle = ()=>[
+    const handlePeopleDrawerToggle = ()=>{
         setPeopleOpen(prev=>!prev)
-    ]
+    }
+    const handleChatDrawerToggle = ()=>{
+        setChatOpen(prev=>!prev)
+    }
 
     return (
         <Box position="absolute" bottom="0" left="0" width="100%">
@@ -213,11 +216,11 @@ const CallPageFooter = ({myStream,peopleOpen,setPeopleOpen}) => {
                     </Grid>
                     <Grid item sm="3" className={classes.rightCont}>
                         <IconButton>
-                            <PeopleIcon fontSize="large" color="primary" onClick={handleDrawerToggle}/>
+                            <PeopleIcon fontSize="large" color="primary" onClick={handlePeopleDrawerToggle}/>
                             
                         </IconButton>
                         <IconButton>
-                            <ChatIcon fontSize="large" color="primary"/>
+                            <ChatIcon fontSize="large" color="primary" onClick={handleChatDrawerToggle}/>
                         </IconButton>
                         <IconButton>
                             <InfoIcon fontSize="large" color="primary"/>

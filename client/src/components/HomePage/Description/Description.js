@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useHistory } from "react-router";
 import Button from "@material-ui/core/Button";
 import VideoCallIcon from "@material-ui/icons/VideoCall";
@@ -11,12 +11,24 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
 import FormControl from "@material-ui/core/FormControl";
+import {useDispatch,useSelector} from 'react-redux'
 import { Typography, Grid } from "@material-ui/core";
+import {createLink} from '../../../actions/call'
+import MeetDialog from '../MeetDialog/MeetDialog'
 
 const Description = () => {
   const classes = useStyles();
   const history = useHistory();
+  const dispatch = useDispatch()
   const [code, setcode] = useState("");
+  const call = useSelector(state => state.call)
+  const [openDialog,setOpenDialog] = useState(false)
+
+  useEffect(()=>{
+    if(call.code){
+      setOpenDialog(true)
+    }
+  },[call.code])
 
   const handleChange = (event) => {
     setcode(event.target.value);
@@ -26,10 +38,14 @@ const Description = () => {
     history.push("/join");
   };
 
+  const createNewMeet = ()=>{
+    dispatch(createLink())
+  }
+
   const Item = (props) => {
     return (
       <div className={`${classes.card} ${classes.frontCard}`}>
-        <img src={props.item.img} alt="image" className={classes.img} />
+        <img src={props.item.img} alt="user" className={classes.img} />
         <Typography component="span" align="center" variant="h5">
           {props.item.heading}
         </Typography>
@@ -48,6 +64,7 @@ const Description = () => {
   return (
     <>
       <section id="description">
+        <MeetDialog open={openDialog} code={call.code} setOpen={setOpenDialog}/>
         <div style={{ margin: "10px auto" }}>
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid item sm={6} xs={12}>
@@ -72,6 +89,7 @@ const Description = () => {
                       variant="contained"
                       startIcon={<VideoCallIcon style={{ fontSize: "20px" }} />}
                       className={classes.buttoncolor}
+                      onClick={createNewMeet}
                     >
                       <Typography className={classes.newmeeting}>
                         New Meeting
