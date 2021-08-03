@@ -13,16 +13,21 @@ import OutlinedInput from "@material-ui/core/OutlinedInput";
 import FormControl from "@material-ui/core/FormControl";
 import {useDispatch,useSelector} from 'react-redux'
 import { Typography, Grid } from "@material-ui/core";
-import {createLink} from '../../../actions/call'
+import {createLink,joinCall1} from '../../../actions/call'
 import MeetDialog from '../MeetDialog/MeetDialog'
+import Alert from '../../Utils/Alert'
 
 const Description = () => {
   const classes = useStyles();
   const history = useHistory();
   const dispatch = useDispatch()
-  const [code, setcode] = useState("");
+  const [code, setCode] = useState("");
   const call = useSelector(state => state.call)
+  const alert = useSelector(state => state.alert)
+  const profile = useSelector(state => state.profile)
+  const user = useSelector(state => state.user)
   const [openDialog,setOpenDialog] = useState(false)
+  const [openAlert,setOpenAlert] = useState(false)
 
   useEffect(()=>{
     if(call.code){
@@ -30,8 +35,14 @@ const Description = () => {
     }
   },[call.code])
 
-  const handleChange = (event) => {
-    setcode(event.target.value);
+  useEffect(()=>{
+    if(alert.msg){
+      setOpenAlert(true)
+    }
+  },[alert.msg])
+
+  const handleChangeCode = (event) => {
+    setCode(event.target.value);
   };
 
   const handleJoin = () => {
@@ -40,6 +51,11 @@ const Description = () => {
 
   const createNewMeet = ()=>{
     dispatch(createLink())
+  }
+
+  const handleClickJoinMeet = ()=>{
+    console.log("Joining...")
+    dispatch(joinCall1(history,code,profile._id))
   }
 
   const Item = (props) => {
@@ -64,6 +80,7 @@ const Description = () => {
   return (
     <>
       <section id="description">
+        <Alert vertical='bottom' horizontal='left' openAlert={openAlert} setOpenAlert={setOpenAlert} />
         <MeetDialog open={openDialog} code={call.code} setOpen={setOpenDialog}/>
         <div style={{ margin: "10px auto" }}>
           <Grid container alignItems="center" justifyContent="space-between">
@@ -105,7 +122,7 @@ const Description = () => {
                       <OutlinedInput
                         style={{ width: "100%", height: "50px" }}
                         value={code}
-                        onChange={handleChange}
+                        onChange={handleChangeCode}
                         placeholder="Enter a code"
                         startAdornment={
                           <InputAdornment position="start">
@@ -117,6 +134,7 @@ const Description = () => {
                             <Button
                               disabled={!code}
                               className={classes.codearrow}
+                              onClick={handleClickJoinMeet}
                             >
                               Join
                             </Button>
