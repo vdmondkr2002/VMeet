@@ -2,7 +2,7 @@ import { makeStyles } from "@material-ui/core";
 const drawerWidth = 380;
 
 const useStyles = makeStyles((theme) => ({
-  main: {
+  root: {
     position: "absolute",
     top: 0,
     right: 0,
