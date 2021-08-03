@@ -104,13 +104,14 @@ const Navbar = () => {
                 aria-haspopup="true"
                 onClick={handleClick}
               >
-                <Avatar
-                  src={user?.profile?.profilePic}
-                  alt={user?.profile?.name}
-                >
-                  {user?.profile?.name?.charAt(0)}
+                <Typography style={{ marginRight: "10px", color: "#f4943c" }}>
+                  {user.firstName}
+                </Typography>
+                <Avatar src={user?.profilePic} alt={user?.name}>
+                  {user?.name.charAt(0)}
                 </Avatar>
               </Button>
+
               <Menu
                 anchorEl={anchorEl}
                 keepMounted
@@ -226,8 +227,8 @@ const Navbar = () => {
               aria-haspopup="true"
               onClick={handleClick}
             >
-              <Avatar src={user?.profile?.profilePic} alt={user?.profile?.name}>
-                {user?.profile?.name.charAt(0)}
+              <Avatar src={user?.profilePic} alt={user?.name}>
+                {user?.name.charAt(0)}
               </Avatar>
             </Button>
             <Menu
