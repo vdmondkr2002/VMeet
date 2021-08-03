@@ -36,11 +36,16 @@ io.on("connection",(socket)=>{
 		if(connections[path] === undefined){
 			connections[path] = []
 		}
+        //const currCall =  await   Call.findOne({_id:path})
+        //connections[path] is equivalent to currCall.people
+        //currCall.people.push(socket.id)
+        //await Call.findOneAndUpdate({_id:path},{people:currCall.people},{new:true})
 		connections[path].push(socket.id)
 
-
-		for(let a = 0; a < connections[path].length; ++a){
-			io.to(connections[path][a]).emit("user-joined", socket.id, connections[path])
+		for(let i = 0; i < connections[path].length; ++i){
+            
+			io.to(connections[path][i]).emit("user-joined", socket.id, connections[path])
+            //CurrCall.people
 		}
 
 		// console.log(path, connections[path])
