@@ -14,17 +14,10 @@ import VideocamIcon from "@material-ui/icons/Videocam";
 import VideocamOffIcon from "@material-ui/icons/VideocamOff";
 import PresentToAllIcon from "@material-ui/icons/PresentToAll";
 import CallEndIcon from "@material-ui/icons/CallEnd";
-import PeopleOutlinedIcon from "@material-ui/icons/PeopleOutlined";
+import PeopleIcon from "@material-ui/icons/People";
 import ChatIcon from "@material-ui/icons/Chat";
-import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
+import InfoIcon from "@material-ui/icons/Info";
 import moment from "moment";
-
-import Fab from "@material-ui/core/Fab";
-import MenuIcon from "@material-ui/icons/Menu";
-import AddIcon from "@material-ui/icons/Add";
-import SearchIcon from "@material-ui/icons/Search";
-import MoreIcon from "@material-ui/icons/MoreVert";
-
 import { useDispatch, useSelector } from "react-redux";
 import {
   SET_STREAM,
@@ -162,89 +155,76 @@ const CallPageFooter = ({
 
   return (
     <>
-      <AppBar position="fixed" color="primary" className={classes.appBar}>
-        <Toolbar>
-          <Grid container>
-            <Grid item sm="3" className={classes.leftCont}>
-              <Typography variant="body1" className={classes.time}>
-                {moment(time).format(" h:mm a |")}
-              </Typography>
-            </Grid>
-
-            <Grid item sm="6" className={classes.midCont}>
-              <Button
-                className={user.micOn ? classes.buttonOn : classes.buttonOff}
-                variant="contained"
-              >
-                <IconButton onClick={handleClickMute}>
-                  {user.micOn ? (
-                    <MicNoneSharpIcon
-                      fontSize="medium"
-                      style={{ color: "white" }}
-                    />
-                  ) : (
-                    <MicOffOutlinedIcon
-                      fontSize="medium"
-                      style={{ color: "white" }}
-                    />
-                  )}
-                </IconButton>
-              </Button>
-              <Button
-                className={user.videoOn ? classes.buttonOn : classes.buttonOff}
-                variant="contained"
-              >
-                <IconButton onClick={handleClickVideo}>
-                  {user.videoOn ? (
-                    <VideocamIcon
-                      fontSize="medium"
-                      style={{ color: "white" }}
-                    />
-                  ) : (
-                    <VideocamOffIcon
-                      fontSize="medium"
-                      style={{ color: "white" }}
-                    />
-                  )}
-                </IconButton>
-              </Button>
-              <Button className={classes.buttonOn} variant="contained">
-                <IconButton>
-                  <PresentToAllIcon
-                    fontSize="medium"
-                    style={{ color: "white" }}
-                  />
-                </IconButton>
-              </Button>
-              <Button className={classes.buttonOff} variant="contained">
-                <IconButton onClick={handleEndCall}>
-                  <CallEndIcon fontSize="medium" style={{ color: "white" }} />
-                </IconButton>
-              </Button>
-            </Grid>
-
-            <Grid item sm="3" className={classes.rightCont}>
-              <IconButton>
-                <InfoOutlinedIcon fontSize="large" style={{ color: "white" }} />
-              </IconButton>
-              <IconButton>
-                <PeopleOutlinedIcon
-                  fontSize="large"
-                  style={{ color: "white" }}
-                  onClick={handlePeopleDrawerToggle}
-                />
-              </IconButton>
-              <IconButton>
-                <ChatIcon
-                  fontSize="large"
-                  style={{ color: "white" }}
-                  onClick={handleChatDrawerToggle}
-                />
-              </IconButton>
-            </Grid>
+      <Box position="absolute" bottom="0" left="0" width="100%">
+        <Grid container>
+          <Grid item sm="3" className={classes.leftCont}>
+            <Typography variant="h6" className={classes.time}>
+              {moment(time).format(" h:mm a|")}
+            </Typography>
           </Grid>
-        </Toolbar>
-      </AppBar>
+          <Grid item sm="6" className={classes.midCont}>
+            <Button
+              className={classes.callBtns}
+              color={user.micOn ? "default" : "secondary"}
+              variant="contained"
+            >
+              <IconButton color="inherit" onClick={handleClickMute}>
+                {user.micOn ? (
+                  <MicNoneSharpIcon fontSize="medium" color="primary" />
+                ) : (
+                  <MicOffOutlinedIcon fontSize="medium" color="primary" />
+                )}
+              </IconButton>
+            </Button>
+            <Button
+              className={classes.callBtns}
+              color={!user.videoOn ? "secondary" : "default"}
+              variant="contained"
+            >
+              <IconButton onClick={handleClickVideo}>
+                {user.videoOn ? (
+                  <VideocamIcon fontSize="medium" color="primary" />
+                ) : (
+                  <VideocamOffIcon fontSize="medium" color="primary" />
+                )}
+              </IconButton>
+            </Button>
+            <Button className={classes.callBtns} variant="contained">
+              <IconButton>
+                <PresentToAllIcon fontSize="large" color="primary" />
+              </IconButton>
+            </Button>
+            <Button
+              className={classes.callBtns}
+              color="secondary"
+              variant="contained"
+            >
+              <IconButton onClick={handleEndCall}>
+                <CallEndIcon fontSize="medium" color="primary" />
+              </IconButton>
+            </Button>
+          </Grid>
+          <Grid item sm="3" className={classes.rightCont}>
+            <IconButton>
+              <PeopleIcon
+                fontSize="large"
+                color="primary"
+                onClick={handlePeopleDrawerToggle}
+              />
+            </IconButton>
+            <IconButton>
+              <ChatIcon
+                fontSize="large"
+                color="primary"
+                onClick={handleChatDrawerToggle}
+              />
+            </IconButton>
+            <IconButton>
+              <InfoIcon fontSize="large" color="primary" />
+            </IconButton>
+          </Grid>
+        </Grid>
+      </Box>
     </>
   );
 };
