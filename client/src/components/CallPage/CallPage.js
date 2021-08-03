@@ -119,7 +119,6 @@ const CallPage = () => {
 
     const [peopleOpen,setPeopleOpen] = useState(false)     //Frontend 
     
-<<<<<<< HEAD
     /* 
      * Following Function takes the currStream, 
         Stops previous streams if any and add currstreams all the tracks to all the connections (people) by using for loop 
@@ -129,12 +128,8 @@ const CallPage = () => {
 		try {
 			window.localStream?.getTracks().forEach(track => track.stop())
 		} catch(e) { console.log(e) }
-=======
-    const [peopleOpen,setPeopleOpen] = useState(false)
-    const [chatOpen,setChatOpen] = useState(false)
-    
-    
->>>>>>> e9babc282d7cd59f55a9ef89aff6ce5faa92aa36
+// const [peopleOpen,setPeopleOpen] = useState(false)
+// const [chatOpen,setChatOpen] = useState(false)
 
 		window.localStream = stream                //store curremt stream to winow.localstream  (?)
 		myStream.current.srcObject = stream
