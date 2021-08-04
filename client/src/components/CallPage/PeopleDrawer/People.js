@@ -51,44 +51,42 @@ const People = ({ open, setDrawerOpen }) => {
         paper: classes.drawerPaper,
       }}
     >
-      <Paper className={classes.innerPaper}>
-        <div className={classes.drawerHeader}>
-          <Typography variant="h6">People</Typography>
-          <IconButton onClick={handleDrawerClose}>
-            <CloseIcon />
-          </IconButton>
-        </div>
-        <div className={classes.subHeader}>
-          <Typography variant="h6" component="p">
-            In call
-          </Typography>
-        </div>
-        <Divider />
-        <List>
-          {peopleData.map((text, index) => (
-            <ListItem button key={text.name}>
-              <ListItemIcon>
-                <Avatar
-                  src={profile?.profilePic}
-                  className={clsx(classes.largeAvatar)}
-                  alt={profile?.userName}
-                >
-                  {profile?.firstName?.charAt(0)} {profile?.lastName?.charAt(0)}
-                </Avatar>
-              </ListItemIcon>
-              <ListItemText primary={text.name} />
-              <ListItemSecondaryAction>
-                <IconButton edge="end" aria-label="delete">
-                  {text.micOn ? <MicNoneSharpIcon /> : <MicOffOutlinedIcon />}
-                </IconButton>
-                <IconButton edge="end" aria-label="delete">
-                  {text.videoOn ? <VideocamIcon /> : <VideocamOffIcon />}
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
-      </Paper>
+      <div className={classes.drawerHeader}>
+        <Typography variant="h6">People</Typography>
+        <IconButton onClick={handleDrawerClose}>
+          <CloseIcon />
+        </IconButton>
+      </div>
+      <div className={classes.subHeader}>
+        <Typography variant="h6" component="p">
+          In call
+        </Typography>
+      </div>
+      <Divider />
+      <List>
+        {peopleData.map((text, index) => (
+          <ListItem button key={text.name}>
+            <ListItemIcon>
+              <Avatar
+                src={profile?.profilePic}
+                className={clsx(classes.largeAvatar)}
+                alt={profile?.userName}
+              >
+                {profile?.firstName?.charAt(0)} {profile?.lastName?.charAt(0)}
+              </Avatar>
+            </ListItemIcon>
+            <ListItemText primary={text.name} />
+            <ListItemSecondaryAction>
+              <IconButton edge="end" aria-label="delete">
+                {text.micOn ? <MicNoneSharpIcon /> : <MicOffOutlinedIcon />}
+              </IconButton>
+              <IconButton edge="end" aria-label="delete">
+                {text.videoOn ? <VideocamIcon /> : <VideocamOffIcon />}
+              </IconButton>
+            </ListItemSecondaryAction>
+          </ListItem>
+        ))}
+      </List>
     </Drawer>
   );
 };

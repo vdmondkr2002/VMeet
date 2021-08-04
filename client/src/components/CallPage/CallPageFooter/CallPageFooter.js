@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Box,
   Grid,
   IconButton,
   Button,
@@ -18,13 +17,6 @@ import PeopleOutlinedIcon from "@material-ui/icons/PeopleOutlined";
 import ChatIcon from "@material-ui/icons/Chat";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import moment from "moment";
-
-import Fab from "@material-ui/core/Fab";
-import MenuIcon from "@material-ui/icons/Menu";
-import AddIcon from "@material-ui/icons/Add";
-import SearchIcon from "@material-ui/icons/Search";
-import MoreIcon from "@material-ui/icons/MoreVert";
-
 import { useDispatch, useSelector } from "react-redux";
 import {
   SET_STREAM,
@@ -35,14 +27,13 @@ import useStyles from "./styles";
 
 const CallPageFooter = ({
   myStream,
-  peopleOpen,
+  setInfoOpen,
   setChatOpen,
   setPeopleOpen,
 }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-  const [changed, setChanged] = useState(false);
   const [time, setTime] = useState(Date.now());
 
   useEffect(() => {
@@ -67,42 +58,15 @@ const CallPageFooter = ({
     }
   }, [user.videoOn]);
 
-  // useEffect(()=>{
-  // console.log("turning off")
-  // console.log(user.stream)
-  // myStream.current.srcObject = user.stream
-  // },[user.stream])
-
-  // const setStream = (stream)=>{
-  //     console.log("inside stream")
-  //     console.log(stream.getVideoTracks())
-  //     // console.log(stream.getAudioTracks())
-  //     myStream.current.srcObject = stream
-  //     dispatch({type:SET_STREAM,payload:stream})
-  // }
-
   const stopVideoStreams = (stream) => {
     try {
-      // console.log("before")
       console.log("100");
       console.log(stream.getVideoTracks());
       console.log("102");
       stream.getVideoTracks()[0].stop();
-      // stream.getVideoTracks().forEach(track=>
-      //     {
-      //     track.stop()
-      //     console.log("hi")
-
-      // }
-      // )
-
       console.log("107");
       console.log("after");
       dispatch({ type: SET_STREAM, payload: stream });
-      // setTimeout(()=>{
-      //     console.log("turning off stream")
-      //     // dispatch({type:SET_STREAM,payload:stream})
-      // },6000)
     } catch (err) {
       console.log(err);
     }
@@ -158,6 +122,10 @@ const CallPageFooter = ({
   };
   const handleChatDrawerToggle = () => {
     setChatOpen((prev) => !prev);
+  };
+
+  const handleInfoDrawerToggle = () => {
+    setInfoOpen((prev) => !prev);
   };
 
   return (
@@ -225,7 +193,11 @@ const CallPageFooter = ({
 
             <Grid item sm="3" className={classes.rightCont}>
               <IconButton>
-                <InfoOutlinedIcon fontSize="large" style={{ color: "white" }} />
+                <InfoOutlinedIcon
+                  fontSize="large"
+                  style={{ color: "white" }}
+                  onClick={handleInfoDrawerToggle}
+                />
               </IconButton>
               <IconButton>
                 <PeopleOutlinedIcon
