@@ -1,15 +1,11 @@
 import { makeStyles } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
-  drawer: {
-    width: "25vw",
-    flexShrink: 0,
-    height: 800,
-  },
   drawerPaper: {
     width: "25vw",
-    height: "90vh",
+    height: "88vh",
     zIndex: -100,
+    padding: "10px",
   },
   innerPaper: {
     height: "99%",
