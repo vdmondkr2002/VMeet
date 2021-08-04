@@ -16,6 +16,9 @@ const urlAuth = 'api/v1/auth'
 export const googleSignIn = (data)=>API.post(`${urlAuth}/google`,data);
 export const getCurrentUser = ()=>API.get(`${urlAuth}/user`);
 
-export const createLink = ()=>API.get(`${urlAuth}/createlink`);
+
+const urlCall = '/api/v1/call'
+export const createLink = ()=>API.get(`${urlCall}/createlink`);
+export const joinCall1 = (code)=>API.post(`${urlCall}/checkjoincall`,{code:code})
 
 

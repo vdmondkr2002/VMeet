@@ -84,7 +84,7 @@ const Chat = ({ open, setDrawerOpen }) => {
             </ListItem>
           ))} */}
           {chatData.map((msg, index) => (
-            <div className={classes.msgCont} key={msg.senderName}>
+            <div className={classes.msgCont} key={index}>
               <div className={classes.listIcon}>
                 <Typography className={classes.senderName}>
                   {msg.senderName}

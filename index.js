@@ -71,5 +71,6 @@ app.use(express.json({ limit: "80mb", extended: true }));
 app.use(express.urlencoded({ limit: "80mb", extended: true }));
 
 app.use('/api/v1/auth',require('./routes/auth'))
+app.use('/api/v1/call',require('./routes/call'))
 
 server.listen(PORT,()=>console.log(`Listening on ${PORT}`))

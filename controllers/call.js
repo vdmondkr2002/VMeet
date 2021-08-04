@@ -1,5 +1,6 @@
 const User = require('../models/User')
-const Call = require('../models/Call')
+const Call = require('../models/Call');
+const mongoose = require('mongoose');
 
 
 const createLink = async(req,res)=>{
@@ -13,4 +14,26 @@ const createLink = async(req,res)=>{
     }
 }
 
-module.exports = {createLink}
+const checkJoinCall = async(req,res)=>{
+    try{
+        const code = req.body.code;
+
+        if(!mongoose.isValidObjectId(code)){
+            console.log("Not a valid object id")
+            return res.status(400).json({msg:"Couldn't find the meeting that you are trying to join."})
+        }
+        const call = await Call.findOne({_id:code})
+        
+        if(!call){
+            return res.status(400).json({msg:"Couldn't find the meeting that you are trying to join."})
+        }
+        console.log("call",call)
+        console.log("code",code)
+        return res.status(200).json({adminId:call.adminId})
+    }catch(err){
+        console.log(err)
+        return res.status(500)
+    }
+}
+
+module.exports = {createLink,checkJoinCall}
