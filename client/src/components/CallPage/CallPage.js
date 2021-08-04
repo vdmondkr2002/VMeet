@@ -1,16 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import Peer from "simple-peer";
 import io from "socket.io-client";
-import {
-  Container,
-  Grid,
-  makeStyles,
-  Paper,
-  Avatar,
-  Box,
-  Typography,
-  Button,
-} from "@material-ui/core";
+import { Container, Paper, Avatar, Button } from "@material-ui/core";
 import CallPageFooter from "./CallPageFooter/CallPageFooter";
 import clsx from "clsx";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +8,7 @@ import { useHistory } from "react-router-dom";
 import { SET_STREAM } from "../../constants/actions";
 import People from "./PeopleDrawer/People";
 import Chat from "./ChatDrawer/Chat";
+import Info from "./InfoDrawer/Info";
 import useStyles from "./styles";
 
 const CallPage = () => {
@@ -31,17 +22,14 @@ const CallPage = () => {
   const history = useHistory();
   const profile = useSelector((state) => state.profile);
   const user = useSelector((state) => state.user);
-
   const server_url = "localhost:5000"; //URL Where room will be created
-
   var connections = {}; //Stores all the users(connections) joined
   var socket = null; //To initialize socket in the client Side
   var socketId = null; //To store socket's Id ,later used for comparing
   var elms = 0; //No. of users Joined the meet
-
   const [peopleOpen, setPeopleOpen] = useState(false);
-  const [chatOpen, setChatOpen] = useState(false); //Frontend
-
+  const [chatOpen, setChatOpen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
   /* 
      * Following Function takes the currStream, 
         Stops previous streams if any and add currstreams all the tracks to all the connections (people) by using for loop 
@@ -364,11 +352,7 @@ const CallPage = () => {
           autoPlay
         />
         <div id="main">
-          {/* <Paper className={classes.userPaper}> */}
-          {/* User 2 */}
-          {/* <video playsInline muted ref={myVideo} autoPlay/> */}
           <video id="my-video" ref={myStream} autoPlay muted></video>
-          {/* <video playsInline  muted ref={myStream} autoPlay/> */}
           {!user.videoOn ? (
             <Paper className={classes.userPaper}>
               <Avatar
@@ -380,15 +364,16 @@ const CallPage = () => {
               </Avatar>
             </Paper>
           ) : null}
-          {/* </Paper> */}
         </div>
         <div className={classes.drawerHeader} />
         <CallPageFooter
           peopleOpen={peopleOpen}
           setPeopleOpen={setPeopleOpen}
           myStream={myStream}
+          setInfoOpen={setInfoOpen}
         />
       </Container>
+      <Info open={infoOpen} setDrawerOpen={setInfoOpen} />
       <People open={peopleOpen} setDrawerOpen={setPeopleOpen} />
       <Chat open={chatOpen} setDrawerOpen={setChatOpen} />
     </div>
