@@ -143,8 +143,9 @@ const CallPageFooter = ({
               <Button
                 className={user.micOn ? classes.buttonOn : classes.buttonOff}
                 variant="contained"
+                onClick={handleClickMute}
               >
-                <IconButton onClick={handleClickMute}>
+                <IconButton >
                   {user.micOn ? (
                     <MicNoneSharpIcon
                       fontSize="medium"
@@ -161,8 +162,9 @@ const CallPageFooter = ({
               <Button
                 className={user.videoOn ? classes.buttonOn : classes.buttonOff}
                 variant="contained"
+                onClick={handleClickVideo}
               >
-                <IconButton onClick={handleClickVideo}>
+                <IconButton >
                   {user.videoOn ? (
                     <VideocamIcon
                       fontSize="medium"
@@ -184,8 +186,8 @@ const CallPageFooter = ({
                   />
                 </IconButton>
               </Button>
-              <Button className={classes.buttonOff} variant="contained">
-                <IconButton onClick={handleEndCall}>
+              <Button className={classes.buttonOff} variant="contained" onClick={handleEndCall}>
+                <IconButton >
                   <CallEndIcon fontSize="medium" style={{ color: "white" }} />
                 </IconButton>
               </Button>

@@ -65,7 +65,7 @@ const People = ({ open, setDrawerOpen }) => {
       <Divider />
       <List>
         {peopleData.map((text, index) => (
-          <ListItem button key={text.name}>
+          <ListItem button key={index}>
             <ListItemIcon>
               <Avatar
                 src={profile?.profilePic}

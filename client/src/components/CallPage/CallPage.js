@@ -108,7 +108,7 @@ const CallPage = () => {
      * This Function Will Execute when one user gets "Message"(means description of other user as SDP) from the socket
        from ID : Whose description
        Message : Description SDP
-     */
+  */
 
   const gotMessageFromServer = (fromId, message) => {
     //since we emmitted message as string we parse it and store it in some object
@@ -371,6 +371,7 @@ const CallPage = () => {
           setPeopleOpen={setPeopleOpen}
           myStream={myStream}
           setInfoOpen={setInfoOpen}
+          setChatOpen={setChatOpen}
         />
       </Container>
       <Info open={infoOpen} setDrawerOpen={setInfoOpen} />
