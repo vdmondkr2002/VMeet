@@ -20,6 +20,7 @@ import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import {
   SET_STREAM,
+  SET_VIDEOTRACK,
   TOGGLE_MIC,
   TOGGLE_VIDEO,
 } from "../../../constants/actions";
@@ -30,33 +31,36 @@ const CallPageFooter = ({
   setInfoOpen,
   setChatOpen,
   setPeopleOpen,
+  infoOpen,
+  chatOpen,
+  peopleOpen,
 }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const [time, setTime] = useState(Date.now());
 
-  useEffect(() => {
-    console.log(user.micOn ? "mic On" : "mic Off");
-    if (user.micOn) {
-      initWebRTC();
-    } else {
-      const stream = user.stream;
-      stopAudioStream(stream);
-    }
-  }, [user.micOn]);
+  // useEffect(() => {
+  //   console.log(user.micOn ? "mic On" : "mic Off");
+  //   if (user.micOn) {
+  //     initWebRTC();
+  //   } else {
+  //     const stream = user.stream;
+  //     stopAudioStream(stream);
+  //   }
+  // }, [user.micOn]);
 
-  useEffect(() => {
-    console.log(user.videoOn ? "video On" : "video Off");
-    if (user.videoOn) {
-      initWebRTC();
-    } else {
-      if (user.stream) {
-        var stream = user.stream;
-        stopVideoStreams(stream);
-      }
-    }
-  }, [user.videoOn]);
+  // useEffect(() => {
+  //   console.log(user.videoOn ? "video On" : "video Off");
+  //   if (user.videoOn) {
+  //     initWebRTC();
+  //   } else {
+  //     if (user.stream) {
+  //       var stream = user.stream;
+  //       stopVideoStreams(stream);
+  //     }
+  //   }
+  // }, [user.videoOn]);
 
   const stopVideoStreams = (stream) => {
     try {
@@ -106,11 +110,40 @@ const CallPageFooter = ({
     };
   }, []);
 
-  const handleClickVideo = () => {
-    dispatch({ type: TOGGLE_VIDEO });
+  const handleClickVideo = async() => {
+    // dispatch({ type: TOGGLE_VIDEO });
+    if(user.videoTrack){
+      user.videoTrack.stop();
+      dispatch({type:SET_VIDEOTRACK,payload:null})
+      myStream.current.srcObject = null;
+      dispatch({ type: TOGGLE_VIDEO });
+      return;
+    }
+    try{
+      const vstream = await navigator.mediaDevices.getUserMedia({ video: true });
+      console.log(vstream);
+      if(vstream && vstream.getVideoTracks().length>0){
+        dispatch({type:SET_VIDEOTRACK,payload:vstream.getVideoTracks()[0]});
+        console.log(vstream.getVideoTracks());
+        myStream.current.srcObject = new MediaStream(vstream.getVideoTracks());
+        dispatch({ type: TOGGLE_VIDEO });
+      }
+    }catch(err){
+      console.log(err)
+    }
+  
   };
   const handleClickMute = () => {
-    dispatch({ type: TOGGLE_MIC });
+    // dispatch({ type: TOGGLE_MIC });
+    if(!user.audioTrack)
+      return;
+    if(!user.audioTrack.enabled){
+      user.audioTrack.enabled = true;
+    }else{
+      user.audioTrack.enabled = false;
+    }
+    console.log(user.audioTrack)
+    dispatch({type:TOGGLE_MIC})
   };
 
   const handleEndCall = () => {
@@ -119,13 +152,20 @@ const CallPageFooter = ({
 
   const handlePeopleDrawerToggle = () => {
     setPeopleOpen((prev) => !prev);
+    setChatOpen(false);
+    setInfoOpen(false);
   };
+
   const handleChatDrawerToggle = () => {
     setChatOpen((prev) => !prev);
+    setPeopleOpen(false);
+    setInfoOpen(false);
   };
 
   const handleInfoDrawerToggle = () => {
     setInfoOpen((prev) => !prev);
+    setChatOpen(false);
+    setPeopleOpen(false);
   };
 
   return (
@@ -140,78 +180,68 @@ const CallPageFooter = ({
             </Grid>
 
             <Grid item sm="6" className={classes.midCont}>
-              <Button
+              <IconButton
                 className={user.micOn ? classes.buttonOn : classes.buttonOff}
-                variant="contained"
                 onClick={handleClickMute}
               >
-                <IconButton >
-                  {user.micOn ? (
-                    <MicNoneSharpIcon
-                      fontSize="medium"
-                      style={{ color: "white" }}
-                    />
-                  ) : (
-                    <MicOffOutlinedIcon
-                      fontSize="medium"
-                      style={{ color: "white" }}
-                    />
-                  )}
-                </IconButton>
-              </Button>
-              <Button
-                className={user.videoOn ? classes.buttonOn : classes.buttonOff}
-                variant="contained"
-                onClick={handleClickVideo}
-              >
-                <IconButton >
-                  {user.videoOn ? (
-                    <VideocamIcon
-                      fontSize="medium"
-                      style={{ color: "white" }}
-                    />
-                  ) : (
-                    <VideocamOffIcon
-                      fontSize="medium"
-                      style={{ color: "white" }}
-                    />
-                  )}
-                </IconButton>
-              </Button>
-              <Button className={classes.buttonOn} variant="contained">
-                <IconButton>
-                  <PresentToAllIcon
+                {user.micOn ? (
+                  <MicNoneSharpIcon
                     fontSize="medium"
                     style={{ color: "white" }}
                   />
-                </IconButton>
-              </Button>
-              <Button className={classes.buttonOff} variant="contained" onClick={handleEndCall}>
-                <IconButton >
-                  <CallEndIcon fontSize="medium" style={{ color: "white" }} />
-                </IconButton>
-              </Button>
+                ) : (
+                  <MicOffOutlinedIcon
+                    fontSize="medium"
+                    style={{ color: "white" }}
+                  />
+                )}
+              </IconButton>
+
+              <IconButton
+                className={user.videoOn ? classes.buttonOn : classes.buttonOff}
+                onClick={handleClickVideo}
+              >
+                {user.videoOn ? (
+                  <VideocamIcon fontSize="medium" style={{ color: "white" }} />
+                ) : (
+                  <VideocamOffIcon
+                    fontSize="medium"
+                    style={{ color: "white" }}
+                  />
+                )}
+              </IconButton>
+
+              <IconButton className={classes.buttonOn}>
+                <PresentToAllIcon
+                  fontSize="medium"
+                  style={{ color: "white" }}
+                />
+              </IconButton>
+
+              <IconButton onClick={handleEndCall} className={classes.buttonOff}>
+                <CallEndIcon fontSize="medium" style={{ color: "white" }} />
+              </IconButton>
             </Grid>
 
             <Grid item sm="3" className={classes.rightCont}>
               <IconButton>
                 <InfoOutlinedIcon
-                  fontSize="large"
-                  style={{ color: "white" }}
+                  fontSize="medium"
+                  style={{ color: infoOpen ? "#00b4d8 " : "white" }}
                   onClick={handleInfoDrawerToggle}
                 />
               </IconButton>
               <IconButton>
                 <PeopleOutlinedIcon
-                  fontSize="large"
-                  style={{ color: "white" }}
+                  fontSize="medium"
+                  style={{ color: peopleOpen ? "#00b4d8 " : "white" }}
                   onClick={handlePeopleDrawerToggle}
                 />
               </IconButton>
               <IconButton>
                 <ChatIcon
-                  fontSize="large"
-                  style={{ color: "white" }}
+                  fontSize="medium"
+                  style={{ color: chatOpen ? "#00b4d8 " : "white" }}
                   onClick={handleChatDrawerToggle}
                 />
               </IconButton>

@@ -43,7 +43,6 @@ const People = ({ open, setDrawerOpen }) => {
 
   return (
     <Drawer
-      className={classes.drawer}
       variant="persistent"
       anchor="right"
       open={open}

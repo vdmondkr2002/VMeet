@@ -6,7 +6,7 @@ import JoiningPage from "../JoiningPage/JoiningPage.js"
 import clsx from "clsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { SET_STREAM } from "../../constants/actions";
+import { SET_AUDIOTRACK, SET_SOCKETID, SET_STREAM, SET_VIDEOTRACK } from "../../constants/actions";
 import People from "./PeopleDrawer/People";
 import Chat from "./ChatDrawer/Chat";
 import Info from "./InfoDrawer/Info";
@@ -27,8 +27,9 @@ const CallPage = () => {
   const server_url = "localhost:5000"; //URL Where room will be created
   var connections = {}; //Stores all the users(connections) joined
   var socket = null; //To initialize socket in the client Side
-  var socketId = null; //To store socket's Id ,later used for comparing
+  // var socketId = null; //To store socket's Id ,later used for comparing
   var elms = 0; //No. of users Joined the meet
+
   const [peopleOpen, setPeopleOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
@@ -43,15 +44,13 @@ const CallPage = () => {
     } catch (e) {
       console.log(e);
     }
-    // const [peopleOpen,setPeopleOpen] = useState(false)
-    // const [chatOpen,setChatOpen] = useState(false)
 
     window.localStream = stream; //store curremt stream to winow.localstream  (?)
     myStream.current.srcObject = stream;
 
     console.log(window.localStream);
     for (let id in connections) {
-      if (id === socketId) continue; //If one user is already in connections, then don't add him/her
+      if (id === user.socketId) continue; //If one user is already in connections, then don't add him/her
       console.log(window.localStream);
 
       window.localStream?.getTracks().forEach((track) => {
@@ -98,13 +97,17 @@ const CallPage = () => {
 
   const initWebRTC = async () => {
     const currStream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: true,
+      audio: user.micOn,
+      video: user.videoOn,
     });
     getUserMediaSuccess(currStream);
     dispatch({ type: SET_STREAM, payload: currStream });
+    const audioTrack = currStream.getAudioTracks()[0];
+    const videoTrack = currStream.getVideoTracks()[0];
+    dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
+    dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
   };
-
+  console.log(window.location.href)
   /*
    * Config required to make Peer Connection
    */
@@ -125,7 +128,7 @@ const CallPage = () => {
     //since we emmitted message as string we parse it and store it in some object
     var signal = JSON.parse(message);
 
-    if (fromId !== socketId) {
+    if (fromId !== user.socketId) {
       //Doubt about this check
 
       //If Message's sdp exists then set that Description as Remote Description of of curr user
@@ -192,7 +195,7 @@ const CallPage = () => {
       //emits join call event with the URL
       socket.emit("join-call", window.location.href);
       //Store Socket's Id as SocketId
-      socketId = socket.id;
+      dispatch({type:SET_SOCKETID,payload:socket.id})
 
       //Events when user is joined
       /**
@@ -286,10 +289,10 @@ const CallPage = () => {
          * following code does just that
          */
 
-        if (id === socketId) {
+        if (id === user.socketId) {
           console.log(connections);
           for (let id2 in connections) {
-            if (id2 === socketId) continue;
+            if (id2 === user.socketId) continue;
 
             try {
               window.localStream.getTracks().forEach((track) => {
@@ -327,11 +330,11 @@ const CallPage = () => {
     connectToSocketServer();
   };
 
-  useEffect(() => {
-    if (!user.isAdmin) {
-      history.push("/join");
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!user.isAdmin) {
+  //     history.push("/join");
+  //   }
+  // }, []);
 
   return (
     <div className={classes.root}>
@@ -347,7 +350,7 @@ const CallPage = () => {
         :
        (<Container
         className={clsx(classes.content, {
-          [classes.contentShift]: peopleOpen || chatOpen,
+          [classes.contentShift]: peopleOpen || chatOpen || infoOpen,
         })}
       >
         {/* {
@@ -383,16 +386,17 @@ const CallPage = () => {
         </div>
         <div className={classes.drawerHeader} />
         <CallPageFooter
-          peopleOpen={peopleOpen}
-          setPeopleOpen={setPeopleOpen}
           myStream={myStream}
+          peopleOpen={peopleOpen}
+          infoOpen={infoOpen}
+          chatOpen={chatOpen}
+          setPeopleOpen={setPeopleOpen}
           setInfoOpen={setInfoOpen}
           setChatOpen={setChatOpen}
         />
       </Container>
-       )}
-      <Info open={infoOpen} setDrawerOpen={setInfoOpen} />
       <People open={peopleOpen} setDrawerOpen={setPeopleOpen} />
+      <Info open={infoOpen} setDrawerOpen={setInfoOpen} />
       <Chat open={chatOpen} setDrawerOpen={setChatOpen} />
      
     </div>
