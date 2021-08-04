@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import { Container, Paper, Avatar, Button } from "@material-ui/core";
 import CallPageFooter from "./CallPageFooter/CallPageFooter";
+import JoiningPage from "../JoiningPage/JoiningPage.js"
 import clsx from "clsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
@@ -22,6 +23,7 @@ const CallPage = () => {
   const history = useHistory();
   const profile = useSelector((state) => state.profile);
   const user = useSelector((state) => state.user);
+  const [isJoined, setIsJoined] = useState(false);
   const server_url = "localhost:5000"; //URL Where room will be created
   var connections = {}; //Stores all the users(connections) joined
   var socket = null; //To initialize socket in the client Side
@@ -77,6 +79,15 @@ const CallPage = () => {
           .catch((e) => console.log(e));
       });
     }
+    stream.getTracks().forEach(track => track.onended = () => {
+        try {
+          let tracks = myStream.current.srcObject.getTracks()
+          tracks.forEach(track => track.stop())
+        } catch(e) { console.log(e) }
+
+        window.localStream = null
+        myStream.current.srcObject = window.localStream
+      })
   };
 
   /*
@@ -233,8 +244,10 @@ const CallPage = () => {
               elms = clients.length;
               let main = document.getElementById("main");
               let video = document.createElement("video");
-              video.style.setProperty("width", "300px");
-              video.style.setProperty("height", "200px");
+              video.style.setProperty("width", "400px");
+              video.style.setProperty("border", "5px solid #1a73e8");
+              video.style.setProperty("border-radius", "20px");
+              video.style.setProperty("margin", "1    0px");
               video.setAttribute("data-socket", socketListId);
               //Stream assigned to video
               video.srcObject = event.streams[0];
@@ -306,7 +319,10 @@ const CallPage = () => {
     });
   };
 
+ 
+
   const handleJoin = async () => {
+    setIsJoined(true);
     await initWebRTC();
     connectToSocketServer();
   };
@@ -319,10 +335,17 @@ const CallPage = () => {
 
   return (
     <div className={classes.root}>
-      <Button className={classes.btn} onClick={handleJoin}>
-        Join Now
-      </Button>
-      <Container
+      {!isJoined ?
+        (
+        <>
+          <Button className={classes.btn} onClick={handleJoin}>
+            Join Now
+          </Button>
+          <JoiningPage />
+        </>
+        )
+        :
+       (<Container
         className={clsx(classes.content, {
           [classes.contentShift]: peopleOpen || chatOpen,
         })}
@@ -344,16 +367,7 @@ const CallPage = () => {
                         } */}
         {/* <Paper className={classes.userPaper}> */}
         {/* User 1 */},{/* </Paper> */}
-        <video
-          playsInline
-          style={{ width: "100px", height: "200px" }}
-          muted
-          ref={myStream}
-          autoPlay
-        />
-        <div id="main">
-          <video id="my-video" ref={myStream} autoPlay muted></video>
-          {!user.videoOn ? (
+        {!user.videoOn ? (
             <Paper className={classes.userPaper}>
               <Avatar
                 src={profile?.profilePic}
@@ -363,7 +377,9 @@ const CallPage = () => {
                 {profile?.firstName?.charAt(0)} {profile?.lastName?.charAt(0)}
               </Avatar>
             </Paper>
-          ) : null}
+        ) : null}
+        <div id="main">
+          <video id="my-video" ref={myStream} className={classes.myVid} autoPlay muted></video>
         </div>
         <div className={classes.drawerHeader} />
         <CallPageFooter
@@ -373,10 +389,13 @@ const CallPage = () => {
           setInfoOpen={setInfoOpen}
         />
       </Container>
+       )}
       <Info open={infoOpen} setDrawerOpen={setInfoOpen} />
       <People open={peopleOpen} setDrawerOpen={setPeopleOpen} />
       <Chat open={chatOpen} setDrawerOpen={setChatOpen} />
+     
     </div>
+
   );
 };
 

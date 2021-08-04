@@ -294,7 +294,7 @@ const JoiningPage = () => {
                     display: "flex",
                   }}
                 >
-                  <Button className={classes.btn}>Join Now</Button>
+                  {/* <Button className={classes.btn}>Join Now</Button> */}
                   <Button
                     className={classes.btn}
                     style={{
