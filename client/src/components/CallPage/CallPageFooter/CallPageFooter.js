@@ -30,6 +30,9 @@ const CallPageFooter = ({
   setInfoOpen,
   setChatOpen,
   setPeopleOpen,
+  infoOpen,
+  chatOpen,
+  peopleOpen,
 }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -119,13 +122,20 @@ const CallPageFooter = ({
 
   const handlePeopleDrawerToggle = () => {
     setPeopleOpen((prev) => !prev);
+    setChatOpen(false);
+    setInfoOpen(false);
   };
+
   const handleChatDrawerToggle = () => {
     setChatOpen((prev) => !prev);
+    setPeopleOpen(false);
+    setInfoOpen(false);
   };
 
   const handleInfoDrawerToggle = () => {
     setInfoOpen((prev) => !prev);
+    setChatOpen(false);
+    setPeopleOpen(false);
   };
 
   return (
@@ -140,78 +150,68 @@ const CallPageFooter = ({
             </Grid>
 
             <Grid item sm="6" className={classes.midCont}>
-              <Button
+              <IconButton
                 className={user.micOn ? classes.buttonOn : classes.buttonOff}
-                variant="contained"
                 onClick={handleClickMute}
               >
-                <IconButton >
-                  {user.micOn ? (
-                    <MicNoneSharpIcon
-                      fontSize="medium"
-                      style={{ color: "white" }}
-                    />
-                  ) : (
-                    <MicOffOutlinedIcon
-                      fontSize="medium"
-                      style={{ color: "white" }}
-                    />
-                  )}
-                </IconButton>
-              </Button>
-              <Button
-                className={user.videoOn ? classes.buttonOn : classes.buttonOff}
-                variant="contained"
-                onClick={handleClickVideo}
-              >
-                <IconButton >
-                  {user.videoOn ? (
-                    <VideocamIcon
-                      fontSize="medium"
-                      style={{ color: "white" }}
-                    />
-                  ) : (
-                    <VideocamOffIcon
-                      fontSize="medium"
-                      style={{ color: "white" }}
-                    />
-                  )}
-                </IconButton>
-              </Button>
-              <Button className={classes.buttonOn} variant="contained">
-                <IconButton>
-                  <PresentToAllIcon
+                {user.micOn ? (
+                  <MicNoneSharpIcon
                     fontSize="medium"
                     style={{ color: "white" }}
                   />
-                </IconButton>
-              </Button>
-              <Button className={classes.buttonOff} variant="contained" onClick={handleEndCall}>
-                <IconButton >
-                  <CallEndIcon fontSize="medium" style={{ color: "white" }} />
-                </IconButton>
-              </Button>
+                ) : (
+                  <MicOffOutlinedIcon
+                    fontSize="medium"
+                    style={{ color: "white" }}
+                  />
+                )}
+              </IconButton>
+
+              <IconButton
+                className={user.videoOn ? classes.buttonOn : classes.buttonOff}
+                onClick={handleClickVideo}
+              >
+                {user.videoOn ? (
+                  <VideocamIcon fontSize="medium" style={{ color: "white" }} />
+                ) : (
+                  <VideocamOffIcon
+                    fontSize="medium"
+                    style={{ color: "white" }}
+                  />
+                )}
+              </IconButton>
+
+              <IconButton className={classes.buttonOn}>
+                <PresentToAllIcon
+                  fontSize="medium"
+                  style={{ color: "white" }}
+                />
+              </IconButton>
+
+              <IconButton onClick={handleEndCall} className={classes.buttonOff}>
+                <CallEndIcon fontSize="medium" style={{ color: "white" }} />
+              </IconButton>
             </Grid>
 
             <Grid item sm="3" className={classes.rightCont}>
               <IconButton>
                 <InfoOutlinedIcon
-                  fontSize="large"
-                  style={{ color: "white" }}
+                  fontSize="medium"
+                  style={{ color: infoOpen ? "#00b4d8 " : "white" }}
                   onClick={handleInfoDrawerToggle}
                 />
               </IconButton>
               <IconButton>
                 <PeopleOutlinedIcon
-                  fontSize="large"
-                  style={{ color: "white" }}
+                  fontSize="medium"
+                  style={{ color: peopleOpen ? "#00b4d8 " : "white" }}
                   onClick={handlePeopleDrawerToggle}
                 />
               </IconButton>
               <IconButton>
                 <ChatIcon
-                  fontSize="large"
-                  style={{ color: "white" }}
+                  fontSize="medium"
+                  style={{ color: chatOpen ? "#00b4d8 " : "white" }}
                   onClick={handleChatDrawerToggle}
                 />
               </IconButton>

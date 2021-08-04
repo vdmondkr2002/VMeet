@@ -5,6 +5,7 @@ import {
   Typography,
   Button,
   Grid,
+  Divider,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import useStyles from "./styles";
@@ -20,7 +21,6 @@ const Info = ({ open, setDrawerOpen }) => {
 
   return (
     <Drawer
-      className={classes.drawer}
       variant="persistent"
       anchor="right"
       open={open}
@@ -29,25 +29,18 @@ const Info = ({ open, setDrawerOpen }) => {
       }}
     >
       <div className={classes.drawerHeader}>
+        <Typography variant="h6">Meeting Details</Typography>
+        <IconButton onClick={handleDrawerClose}>
+          <CloseIcon />
+        </IconButton>
+      </div>
+      <div className={classes.subHeader}>
         <Grid
           container
           direction="column"
           justifyContent="flex-start"
           alignItems="flex-start"
         >
-          <Grid
-            container
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Typography variant="h6">Meeting Details</Typography>
-
-            <IconButton onClick={handleDrawerClose}>
-              <CloseIcon />
-            </IconButton>
-          </Grid>
-
           <Grid>
             <br />
             <Typography variant="subtitle1">Joining Info</Typography>
