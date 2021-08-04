@@ -20,6 +20,7 @@ import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import {
   SET_STREAM,
+  SET_VIDEOTRACK,
   TOGGLE_MIC,
   TOGGLE_VIDEO,
 } from "../../../constants/actions";
@@ -36,27 +37,27 @@ const CallPageFooter = ({
   const user = useSelector((state) => state.user);
   const [time, setTime] = useState(Date.now());
 
-  useEffect(() => {
-    console.log(user.micOn ? "mic On" : "mic Off");
-    if (user.micOn) {
-      initWebRTC();
-    } else {
-      const stream = user.stream;
-      stopAudioStream(stream);
-    }
-  }, [user.micOn]);
+  // useEffect(() => {
+  //   console.log(user.micOn ? "mic On" : "mic Off");
+  //   if (user.micOn) {
+  //     initWebRTC();
+  //   } else {
+  //     const stream = user.stream;
+  //     stopAudioStream(stream);
+  //   }
+  // }, [user.micOn]);
 
-  useEffect(() => {
-    console.log(user.videoOn ? "video On" : "video Off");
-    if (user.videoOn) {
-      initWebRTC();
-    } else {
-      if (user.stream) {
-        var stream = user.stream;
-        stopVideoStreams(stream);
-      }
-    }
-  }, [user.videoOn]);
+  // useEffect(() => {
+  //   console.log(user.videoOn ? "video On" : "video Off");
+  //   if (user.videoOn) {
+  //     initWebRTC();
+  //   } else {
+  //     if (user.stream) {
+  //       var stream = user.stream;
+  //       stopVideoStreams(stream);
+  //     }
+  //   }
+  // }, [user.videoOn]);
 
   const stopVideoStreams = (stream) => {
     try {
@@ -106,11 +107,40 @@ const CallPageFooter = ({
     };
   }, []);
 
-  const handleClickVideo = () => {
-    dispatch({ type: TOGGLE_VIDEO });
+  const handleClickVideo = async() => {
+    // dispatch({ type: TOGGLE_VIDEO });
+    if(user.videoTrack){
+      user.videoTrack.stop();
+      dispatch({type:SET_VIDEOTRACK,payload:null})
+      myStream.current.srcObject = null;
+      dispatch({ type: TOGGLE_VIDEO });
+      return;
+    }
+    try{
+      const vstream = await navigator.mediaDevices.getUserMedia({ video: true });
+      console.log(vstream);
+      if(vstream && vstream.getVideoTracks().length>0){
+        dispatch({type:SET_VIDEOTRACK,payload:vstream.getVideoTracks()[0]});
+        console.log(vstream.getVideoTracks());
+        myStream.current.srcObject = new MediaStream(vstream.getVideoTracks());
+        dispatch({ type: TOGGLE_VIDEO });
+      }
+    }catch(err){
+      console.log(err)
+    }
+  
   };
   const handleClickMute = () => {
-    dispatch({ type: TOGGLE_MIC });
+    // dispatch({ type: TOGGLE_MIC });
+    if(!user.audioTrack)
+      return;
+    if(!user.audioTrack.enabled){
+      user.audioTrack.enabled = true;
+    }else{
+      user.audioTrack.enabled = false;
+    }
+    console.log(user.audioTrack)
+    dispatch({type:TOGGLE_MIC})
   };
 
   const handleEndCall = () => {
