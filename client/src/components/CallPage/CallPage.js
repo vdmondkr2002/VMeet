@@ -26,9 +26,16 @@ const CallPage = () => {
   const [isJoined, setIsJoined] = useState(false);
   const server_url = "localhost:5000"; //URL Where room will be created
   var connections = {}; //Stores all the users(connections) joined
+// connection = Reducer
+
   var socket = null; //To initialize socket in the client Side
+//File
+
   var socketId = null; //To store socket's Id ,later used for comparing
+//User.sockerId
+
   var elms = 0; //No. of users Joined the meet
+//call.elems
   const [peopleOpen, setPeopleOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
@@ -109,7 +116,7 @@ const CallPage = () => {
    * Config required to make Peer Connection
    */
   const peerConnectionConfig = {
-    iceServers: [
+    'iceServers': [
       // { 'urls': 'stun:stun.services.mozilla.com' },
       { urls: "stun:stun.l.google.com:19302" },
     ],
@@ -120,7 +127,7 @@ const CallPage = () => {
        from ID : Whose description
        Message : Description SDP
   */
-
+//Message and FromId = Redux
   const gotMessageFromServer = (fromId, message) => {
     //since we emmitted message as string we parse it and store it in some object
     var signal = JSON.parse(message);
@@ -184,10 +191,11 @@ const CallPage = () => {
       gotMessageFromServer(fromId, message);
     });
 
+    
     //Events involved while connecting...
 
     socket.on("connect", () => {
-      console.log("Connecting... ");
+      // console.log("Connecting... ");
 
       //emits join call event with the URL
       socket.emit("join-call", window.location.href);
@@ -251,7 +259,6 @@ const CallPage = () => {
               video.setAttribute("data-socket", socketListId);
               //Stream assigned to video
               video.srcObject = event.streams[0];
-
               console.log(event.stream);
               video.autoplay = true;
               video.playsinline = true;
@@ -428,4 +435,4 @@ export default CallPage;
 //             track.stop();
 //         }
 //     });
-// }
+// }\
