@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
     bottom: "5%",
   },
   content: {
-    height: "90vh",
+    height: "80vh",
     flexGrow: 1,
     margin: "auto",
     // padding: theme.spacing(3),
@@ -60,8 +60,8 @@ const useStyles = makeStyles((theme) => ({
     }),
   },
   contentShift: {
-    height: "90vh",
-    width: `calc(100% - ${drawerWidth}px)`,
+    height: "80vh",
+    width: "77vw",
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,

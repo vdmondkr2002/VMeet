@@ -27,6 +27,7 @@ const CallPage = () => {
   var socket = null; //To initialize socket in the client Side
   // var socketId = null; //To store socket's Id ,later used for comparing
   var elms = 0; //No. of users Joined the meet
+
   const [peopleOpen, setPeopleOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
@@ -41,8 +42,6 @@ const CallPage = () => {
     } catch (e) {
       console.log(e);
     }
-    // const [peopleOpen,setPeopleOpen] = useState(false)
-    // const [chatOpen,setChatOpen] = useState(false)
 
     window.localStream = stream; //store curremt stream to winow.localstream  (?)
     myStream.current.srcObject = stream;
@@ -328,7 +327,7 @@ const CallPage = () => {
       </Button>
       <Container
         className={clsx(classes.content, {
-          [classes.contentShift]: peopleOpen || chatOpen,
+          [classes.contentShift]: peopleOpen || chatOpen || infoOpen,
         })}
       >
         {/* {
@@ -371,15 +370,17 @@ const CallPage = () => {
         </div>
         <div className={classes.drawerHeader} />
         <CallPageFooter
-          peopleOpen={peopleOpen}
-          setPeopleOpen={setPeopleOpen}
           myStream={myStream}
+          peopleOpen={peopleOpen}
+          infoOpen={infoOpen}
+          chatOpen={chatOpen}
+          setPeopleOpen={setPeopleOpen}
           setInfoOpen={setInfoOpen}
           setChatOpen={setChatOpen}
         />
       </Container>
-      <Info open={infoOpen} setDrawerOpen={setInfoOpen} />
       <People open={peopleOpen} setDrawerOpen={setPeopleOpen} />
+      <Info open={infoOpen} setDrawerOpen={setInfoOpen} />
       <Chat open={chatOpen} setDrawerOpen={setChatOpen} />
     </div>
   );
