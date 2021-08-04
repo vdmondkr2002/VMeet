@@ -25,8 +25,41 @@ app.get('/',(req,res)=>{
     res.send("Server is running")
 })
 
+
+connections = {}
+
 io.on("connection",(socket)=>{
-    console.log("new Connection "+socket.id)
+     
+    console.log("Connected To Server "+socket.id)
+
+    socket.on('join-call', (path) => {
+		if(connections[path] === undefined){
+			connections[path] = []
+		}
+        //const currCall =  await   Call.findOne({_id:path})
+        //connections[path] is equivalent to currCall.people
+        //currCall.people.push(socket.id)
+        //await Call.findOneAndUpdate({_id:path},{people:currCall.people},{new:true})
+		connections[path].push(socket.id)
+
+		for(let i = 0; i < connections[path].length; ++i){
+            
+			io.to(connections[path][i]).emit("user-joined", socket.id, connections[path])
+            //CurrCall.people
+		}
+
+		// console.log(path, connections[path])
+	})
+
+    socket.on('signal', (toId, message) => {
+        console.log("message")
+        console.log(message)
+        console.log(socket.id)
+        console.log(toId)
+		io.to(toId).emit('signal', socket.id, message)
+        console.log("EMMIITED")
+	})
+
     socket.on("disconnect",()=>{
         console.log("Connection left")
     })

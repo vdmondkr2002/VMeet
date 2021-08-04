@@ -1,103 +1,68 @@
-import React from 'react'
-import {Drawer,IconButton,ListItem,ListItemText,makeStyles,List,ListItemIcon,Divider,useTheme,Chip,Typography,Box,Paper,Avatar,ListItemSecondaryAction} from '@material-ui/core'
-import CloseIcon from '@material-ui/icons/Close';
-import MicNoneSharpIcon from '@material-ui/icons/MicNoneSharp';
-import MicOffOutlinedIcon from '@material-ui/icons/MicOffOutlined';
-import VideocamIcon from '@material-ui/icons/Videocam';
-import VideocamOffIcon from '@material-ui/icons/VideocamOff';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
-import { useSelector } from 'react-redux';
-import moment from 'moment'
-import clsx from 'clsx'
+import React from "react";
+import {
+  Drawer,
+  IconButton,
+  List,
+  Divider,
+  Chip,
+  Typography,
+  Paper,
+} from "@material-ui/core";
+import CloseIcon from "@material-ui/icons/Close";
+import { useSelector } from "react-redux";
+import moment from "moment";
+import useStyles from "./styles";
 
-const drawerWidth = 380;
+const Chat = ({ open, setDrawerOpen }) => {
+  const classes = useStyles();
+  const profile = useSelector((state) => state.profile);
+  const user = useSelector((state) => state.user);
 
-const useStyles = makeStyles((theme)=>({
-    drawer:{
-        width: drawerWidth,
-        flexShrink: 0,
-        height:800
-    },
-    drawerPaper: {
-        width: drawerWidth,
-        height:"90%",
-    },
-    innerPaper:{
-      height:"99%",
-      borderRadius:"40px"
-    },
-    drawerHeader: {
-        display: 'flex',
-        alignItems: 'center',
-        padding: theme.spacing(1, 1),
-        // necessary for content to be below app bar
-        ...theme.mixins.toolbar,
-        justifyContent: 'space-between',
-    },
-    subHeader:{
-      display: 'flex',
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+  };
 
-      alignItems: 'center',
-      padding: theme.spacing(1, 1),
-      justifyContent:"center"
+  const chatData = [
+    {
+      senderName: profile.name,
+      msgTime: moment(Date.now()).format(" h:mm a"),
+      text: "Hello",
     },
-    listIcon:{
-        width:"100%",
-        display:"flex",
-        alignItems:"baseline"
+    {
+      senderName: profile.name,
+      msgTime: moment(Date.now()).format(" h:mm a"),
+      text: "Hii",
     },
-    msgCont:{
-        padding:"0.6rem"
+    {
+      senderName: profile.name,
+      msgTime: moment(Date.now()).format(" h:mm a"),
+      text: "Are u fine?",
     },
-    senderName:{
-        fontWeight:"bold",
-        color:"#000",
-        paddingRight:"0.5rem"
+    {
+      senderName: profile.name,
+      msgTime: moment(Date.now()).format(" h:mm a"),
+      text: "No i am not!!!",
     },
-    // msgTime:{
-    //     display:"flex",
-    //     alignItems:"baseline"
-    // }
-}))
-
-
-const Chat = ({open,setDrawerOpen}) => {
-    const classes = useStyles();
-    const theme = useTheme();
-    const profile = useSelector(state=>state.profile)
-    const user=useSelector(state=>state.user)
-
-    const handleDrawerClose = ()=>{
-        setDrawerOpen(false)
-    }
-
-    const chatData = [{senderName:profile.name,msgTime:moment(Date.now()).format(' h:mm a'),text:"Hello"},
-                        {senderName:profile.name,msgTime:moment(Date.now()).format(' h:mm a'),text:"Hii"}, 
-                        {senderName:profile.name,msgTime:moment(Date.now()).format(' h:mm a'),text:'Are u fine?'}, 
-                        {senderName:profile.name,msgTime:moment(Date.now()).format(' h:mm a'),text:"No i am not!!!"}]
-    return (
-        <Drawer
-        className={classes.drawer}
-        variant="persistent"
-        anchor="right"
-        open={open}
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-      >
-        <Paper className={classes.innerPaper}>
+  ];
+  return (
+    <Drawer
+      className={classes.drawer}
+      variant="persistent"
+      anchor="right"
+      open={open}
+      classes={{
+        paper: classes.drawerPaper,
+      }}
+    >
+      <Paper className={classes.innerPaper}>
         <div className={classes.drawerHeader}>
-           <Typography variant="h6">
-            In Call Messages
-          </Typography>
+          <Typography variant="h6">In Call Messages</Typography>
           <IconButton onClick={handleDrawerClose}>
-            <CloseIcon/>
+            <CloseIcon />
           </IconButton>
-          
         </div>
         <div className={classes.subHeader}>
-            <Chip label="Messages can only be seen by the people in this call" />
+          <Chip label="Messages can only be seen by the people in this call" />
         </div>
         <Divider />
         <List>
@@ -118,28 +83,23 @@ const Chat = ({open,setDrawerOpen}) => {
               </ListItemSecondaryAction>
             </ListItem>
           ))} */}
-          {
-              chatData.map((msg,index)=>(
-                <div className={classes.msgCont}  key={msg.senderName}>
-                    <div className={classes.listIcon}>
-                        <Typography className={classes.senderName}>
-                            {msg.senderName}
-                        </Typography>
-                        <Typography variant="body2" className={classes.msgTime}>
-                            {msg.msgTime}
-                        </Typography>
-                    </div>
-                    <div>
-                        {msg.text}
-                    </div>
-                </div>
-              ))
-          }
+          {chatData.map((msg, index) => (
+            <div className={classes.msgCont} key={msg.senderName}>
+              <div className={classes.listIcon}>
+                <Typography className={classes.senderName}>
+                  {msg.senderName}
+                </Typography>
+                <Typography variant="body2" className={classes.msgTime}>
+                  {msg.msgTime}
+                </Typography>
+              </div>
+              <div>{msg.text}</div>
+            </div>
+          ))}
         </List>
-        </Paper>
-        
-      </Drawer>
-    )
-}
+      </Paper>
+    </Drawer>
+  );
+};
 
-export default Chat
+export default Chat;
