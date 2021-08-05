@@ -100,6 +100,16 @@ const CallPage = () => {
           .catch((e) => console.log(e));
       });
     }
+    stream.getTracks().forEach(track => track.onended = () => {
+        try {
+          let tracks = myStream.current.srcObject.getTracks()
+          tracks.forEach(track => track.stop())
+        } catch(e) { console.log(e) }
+
+        window.localStream = null
+        myStream.current.srcObject = window.localStream
+      })
+  };
 
     stream.getTracks().forEach(track => track.onended = () =>{
       console.log("stream ended")
