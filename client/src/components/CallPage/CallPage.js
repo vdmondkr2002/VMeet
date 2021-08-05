@@ -24,7 +24,8 @@ const CallPage = () => {
   const profile = useSelector((state) => state.profile);
   const user = useSelector((state) => state.user);
   const [isJoined, setIsJoined] = useState(false);
-  const server_url = "localhost:5000"; //URL Where room will be created
+  const server_url = "https://meetv-v1.herokuapp.com/";
+  // const server_url = "localhost:5000"; //URL Where room will be created
   var connections = {}; //Stores all the users(connections) joined
 // connection = Reducer
 
