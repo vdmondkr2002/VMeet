@@ -100,15 +100,19 @@ const CallPage = () => {
           .catch((e) => console.log(e));
       });
     }
-    stream.getTracks().forEach(track => track.onended = () => {
-        try {
-          let tracks = myStream.current.srcObject.getTracks()
-          tracks.forEach(track => track.stop())
-        } catch(e) { console.log(e) }
 
-        window.localStream = null
-        myStream.current.srcObject = window.localStream
-      })
+    stream.getTracks().forEach(track => track.onended = () =>{
+      console.log("stream ended")
+    })
+    // stream.getTracks().forEach(track => track.onended = () => {
+    //     try {
+    //       let tracks = myStream.current.srcObject.getTracks()
+    //       tracks.forEach(track => track.stop())
+    //     } catch(e) { console.log(e) }
+
+    //     window.localStream = null
+    //     myStream.current.srcObject = window.localStream
+    //   })
   };
   if(user.stream)
     console.log(user.stream.getAudioTracks())
@@ -118,18 +122,7 @@ const CallPage = () => {
         call getMediaSucccess which sets currStream as localStream i.e window.localStream and creates offer and set its Localdescription
      */
 
-  // const initWebRTC = async () => {
-  //   const currStream = await navigator.mediaDevices.getUserMedia({
-  //     audio: user.micOn,
-  //     video: user.videoOn,
-  //   });
-  //   getUserMediaSuccess(currStream);
-  //   dispatch({ type: SET_STREAM, payload: currStream });
-  //   const audioTrack = currStream.getAudioTracks()[0];
-  //   const videoTrack = currStream.getVideoTracks()[0];
-  //   dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
-  //   dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
-  // };
+  
   // console.log(window.location.href)
   /*
    * Config required to make Peer Connection
@@ -221,8 +214,7 @@ const CallPage = () => {
       
       //Store Socket's Id as SocketId
       socketId = socket.id;
-      // dispatch({type:SET_SOCKETID,payload:socket.id})
-      // console.log(user.socketId)
+
       //Events when user is joined
       /**
        * This event is emmited from server when user joins the call
@@ -436,3 +428,16 @@ const CallPage = () => {
 
 export default CallPage;
 
+
+// const initWebRTC = async () => {
+  //   const currStream = await navigator.mediaDevices.getUserMedia({
+  //     audio: user.micOn,
+  //     video: user.videoOn,
+  //   });
+  //   getUserMediaSuccess(currStream);
+  //   dispatch({ type: SET_STREAM, payload: currStream });
+  //   const audioTrack = currStream.getAudioTracks()[0];
+  //   const videoTrack = currStream.getVideoTracks()[0];
+  //   dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
+  //   dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
+  // };

@@ -113,6 +113,7 @@ const JoiningPage = () => {
   //   }
   // };
   const handleClickVideo = async() => {
+    
     if(user.videoTrack){
       user.videoTrack.stop();
       dispatch({type:SET_VIDEOTRACK,payload:null})

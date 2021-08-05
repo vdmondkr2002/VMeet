@@ -112,10 +112,19 @@ const CallPageFooter = ({
   }, []);
 
   const handleClickVideo = async() => {
+    // if(!user.videoTrack)
+    //   return;
+    // if(!user.videoTrack.enabled){
+    //   user.videoTrack.enabled = true;
+    // }else{
+    //   user.videoTrack.enabled = false;
+    // }
+    // console.log(user.videoTrack)
+    // dispatch({type:TOGGLE_VIDEO})
     if(user.videoTrack){
       user.videoTrack.stop();
       dispatch({type:SET_VIDEOTRACK,payload:null})
-      // myStream.current.srcObject = null;
+      myStream.current.srcObject = null;
       dispatch({ type: TOGGLE_VIDEO });
       return;
     }
