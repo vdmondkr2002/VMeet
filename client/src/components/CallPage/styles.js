@@ -8,7 +8,26 @@ const useStyles = makeStyles((theme) => ({
     right: 0,
     bottom: 0,
     left: 0,
-    overflow: "hidden",
+    overflow: "scroll",
+  },
+  btn:{
+    color: "white",
+    backgroundColor: "#1a73e8",
+    padding: "12px ",
+    borderRadius: "30px",
+    position:"absolute",
+    top:"400px",
+    right:"530px",
+    "&:hover": {
+      backgroundColor: "blue",
+    },
+  },
+  myVid: {
+    marginLeft:"20px",
+    width:"400px",
+    border:"4px solid #1a73e8",
+    borderRadius:"20px",
+    margin:"10px",
   },
   vidCont: {
     maxWidth: "100%",

@@ -12,3 +12,6 @@ export const CLEAR_ALERT = 'CLEAR_ALERT'
 export const SET_AUDIOTRACK = 'SET_AUDIOTRACK'
 export const SET_VIDEOTRACK = 'SET_VIDEOTRACK'
 export const SET_SOCKETID = 'SET_SOCKETID'
+
+export const ADD_CONN = 'ADD_CONN'
+export const UPDATE_CONN = 'UPDATE_CONN'

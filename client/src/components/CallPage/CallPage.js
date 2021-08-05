@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import { Container, Paper, Avatar, Button } from "@material-ui/core";
 import CallPageFooter from "./CallPageFooter/CallPageFooter";
+import JoiningPage from "../JoiningPage/JoiningPage.js"
 import clsx from "clsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
@@ -22,15 +23,33 @@ const CallPage = () => {
   const history = useHistory();
   const profile = useSelector((state) => state.profile);
   const user = useSelector((state) => state.user);
+  const [isJoined, setIsJoined] = useState(false);
   const server_url = "localhost:5000"; //URL Where room will be created
   var connections = {}; //Stores all the users(connections) joined
-  var socket = null; //To initialize socket in the client Side
-  // var socketId = null; //To store socket's Id ,later used for comparing
-  var elms = 0; //No. of users Joined the meet
+// connection = Reducer
 
+  var socket = null; //To initialize socket in the client Side
+//File
+
+  var socketId = null; //To store socket's Id ,later used for comparing
+//User.sockerId
+
+  var elms = 0; //No. of users Joined the meet
+//call.elems
   const [peopleOpen, setPeopleOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+
+
+
+  useEffect(()=>{
+    console.log("Hello")
+    if(isJoined){
+      console.log("adding video")
+      myStream.current.srcObject = user.stream
+    }
+      
+  },[isJoined])
   /* 
      * Following Function takes the currStream, 
         Stops previous streams if any and add currstreams all the tracks to all the connections (people) by using for loop 
@@ -38,17 +57,21 @@ const CallPage = () => {
      */
   const getUserMediaSuccess = (stream) => {
     try {
-      window.localStream?.getTracks().forEach((track) => track.stop());
+      if(window.localStream){
+        console.log("devices found")
+        window.localStream.getTracks().forEach((track) => track.stop());
+      }
+        
     } catch (e) {
       console.log(e);
     }
 
     window.localStream = stream; //store curremt stream to winow.localstream  (?)
-    myStream.current.srcObject = stream;
+    // myStream.current.srcObject = stream;
 
     console.log(window.localStream);
     for (let id in connections) {
-      if (id === user.socketId) continue; //If one user is already in connections, then don't add him/her
+      // if (id === socketId) continue; //If one user is already in connections, then don't add him/her
       console.log(window.localStream);
 
       window.localStream?.getTracks().forEach((track) => {
@@ -76,32 +99,42 @@ const CallPage = () => {
           .catch((e) => console.log(e));
       });
     }
-  };
+    stream.getTracks().forEach(track => track.onended = () => {
+        try {
+          let tracks = myStream.current.srcObject.getTracks()
+          tracks.forEach(track => track.stop())
+        } catch(e) { console.log(e) }
 
+        window.localStream = null
+        myStream.current.srcObject = window.localStream
+      })
+  };
+  if(user.stream)
+    console.log(user.stream.getAudioTracks())
   /*
      * This function will be called when page refreshed  and when new user joins
         Takes Users Media and set it as curr Stream 
         call getMediaSucccess which sets currStream as localStream i.e window.localStream and creates offer and set its Localdescription
      */
 
-  const initWebRTC = async () => {
-    const currStream = await navigator.mediaDevices.getUserMedia({
-      audio: user.micOn,
-      video: user.videoOn,
-    });
-    getUserMediaSuccess(currStream);
-    dispatch({ type: SET_STREAM, payload: currStream });
-    const audioTrack = currStream.getAudioTracks()[0];
-    const videoTrack = currStream.getVideoTracks()[0];
-    dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
-    dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
-  };
-  console.log(window.location.href)
+  // const initWebRTC = async () => {
+  //   const currStream = await navigator.mediaDevices.getUserMedia({
+  //     audio: user.micOn,
+  //     video: user.videoOn,
+  //   });
+  //   getUserMediaSuccess(currStream);
+  //   dispatch({ type: SET_STREAM, payload: currStream });
+  //   const audioTrack = currStream.getAudioTracks()[0];
+  //   const videoTrack = currStream.getVideoTracks()[0];
+  //   dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
+  //   dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
+  // };
+  // console.log(window.location.href)
   /*
    * Config required to make Peer Connection
    */
   const peerConnectionConfig = {
-    iceServers: [
+    'iceServers': [
       // { 'urls': 'stun:stun.services.mozilla.com' },
       { urls: "stun:stun.l.google.com:19302" },
     ],
@@ -112,12 +145,12 @@ const CallPage = () => {
        from ID : Whose description
        Message : Description SDP
   */
-
+//Message and FromId = Redux
   const gotMessageFromServer = (fromId, message) => {
     //since we emmitted message as string we parse it and store it in some object
     var signal = JSON.parse(message);
 
-    if (fromId !== user.socketId) {
+    if (fromId !== socketId) {
       //Doubt about this check
 
       //If Message's sdp exists then set that Description as Remote Description of of curr user
@@ -176,16 +209,19 @@ const CallPage = () => {
       gotMessageFromServer(fromId, message);
     });
 
+    
     //Events involved while connecting...
 
     socket.on("connect", () => {
-      console.log("Connecting... ");
+      // console.log("Connecting... ");
 
       //emits join call event with the URL
       socket.emit("join-call", window.location.href);
+      
       //Store Socket's Id as SocketId
-      dispatch({type:SET_SOCKETID,payload:socket.id})
-
+      socketId = socket.id;
+      // dispatch({type:SET_SOCKETID,payload:socket.id})
+      // console.log(user.socketId)
       //Events when user is joined
       /**
        * This event is emmited from server when user joins the call
@@ -209,10 +245,11 @@ const CallPage = () => {
 
           connections[socketListId].onicecandidate = async function (event) {
             if (event.candidate != null) {
+              console.log(event.candidate)
               await socket.emit(
                 "signal",
                 socketListId,
-                JSON.stringify({ ice: event.candidate })
+                JSON.stringify({ "ice": event.candidate })
               );
             }
           };
@@ -236,12 +273,13 @@ const CallPage = () => {
               elms = clients.length;
               let main = document.getElementById("main");
               let video = document.createElement("video");
-              video.style.setProperty("width", "300px");
-              video.style.setProperty("height", "200px");
+              video.style.setProperty("width", "400px");
+              video.style.setProperty("border", "5px solid #1a73e8");
+              video.style.setProperty("border-radius", "20px");
+              video.style.setProperty("margin", "1    0px");
               video.setAttribute("data-socket", socketListId);
               //Stream assigned to video
               video.srcObject = event.streams[0];
-
               console.log(event.stream);
               video.autoplay = true;
               video.playsinline = true;
@@ -275,11 +313,12 @@ const CallPage = () => {
          * Now what every other user will see ?
          * following code does just that
          */
-
-        if (id === user.socketId) {
+        console.log(socketId)
+        console.log(user)
+        if (id === socketId) {
           console.log(connections);
           for (let id2 in connections) {
-            if (id2 === user.socketId) continue;
+            if (id2 === socketId) continue;
 
             try {
               window.localStream.getTracks().forEach((track) => {
@@ -309,8 +348,12 @@ const CallPage = () => {
     });
   };
 
+ 
+
   const handleJoin = async () => {
-    await initWebRTC();
+    setIsJoined(true);
+    // await initWebRTC();
+    getUserMediaSuccess(user.stream);
     connectToSocketServer();
   };
 
@@ -322,10 +365,17 @@ const CallPage = () => {
 
   return (
     <div className={classes.root}>
-      <Button className={classes.btn} onClick={handleJoin}>
-        Join Now
-      </Button>
-      <Container
+      {!isJoined ?
+        (
+        <>
+          <Button className={classes.btn} onClick={handleJoin}>
+            Join Now
+          </Button>
+          <JoiningPage />
+        </>
+        )
+        :
+       (<Container
         className={clsx(classes.content, {
           [classes.contentShift]: peopleOpen || chatOpen || infoOpen,
         })}
@@ -347,16 +397,7 @@ const CallPage = () => {
                         } */}
         {/* <Paper className={classes.userPaper}> */}
         {/* User 1 */},{/* </Paper> */}
-        <video
-          playsInline
-          style={{ width: "100px", height: "200px" }}
-          muted
-          ref={myStream}
-          autoPlay
-        />
-        <div id="main">
-          <video id="my-video" ref={myStream} autoPlay muted></video>
-          {!user.videoOn ? (
+        {!user.videoOn ? (
             <Paper className={classes.userPaper}>
               <Avatar
                 src={profile?.profilePic}
@@ -366,7 +407,9 @@ const CallPage = () => {
                 {profile?.firstName?.charAt(0)} {profile?.lastName?.charAt(0)}
               </Avatar>
             </Paper>
-          ) : null}
+        ) : null}
+        <div id="main">
+          <video id="my-video" ref={myStream} className={classes.myVid} autoPlay muted></video>
         </div>
         <div className={classes.drawerHeader} />
         <CallPageFooter
@@ -379,39 +422,16 @@ const CallPage = () => {
           setChatOpen={setChatOpen}
         />
       </Container>
-      <People open={peopleOpen} setDrawerOpen={setPeopleOpen} />
+       )}
       <Info open={infoOpen} setDrawerOpen={setInfoOpen} />
+      <People open={peopleOpen} setDrawerOpen={setPeopleOpen} />
+      {/* <Info open={infoOpen} setDrawerOpen={setInfoOpen} /> */}
       <Chat open={chatOpen} setDrawerOpen={setChatOpen} />
+     
     </div>
+
   );
 };
 
 export default CallPage;
 
-// stop both mic and camera
-// function stopBothVideoAndAudio(stream) {
-//     stream.getTracks().forEach(function(track) {
-
-//         if (track.readyState == 'live') {
-//             track.stop();
-//         }
-//     });
-// }
-
-// // stop only camera
-// function stopVideoOnly(stream) {
-//     stream.getTracks().forEach(function(track) {
-//         if (track.readyState == 'live' && track.kind === 'video') {
-//             track.stop();
-//         }
-//     });
-// }
-
-// // stop only mic
-// function stopAudioOnly(stream) {
-//     stream.getTracks().forEach(function(track) {
-//         if (track.readyState == 'live' && track.kind === 'audio') {
-//             track.stop();
-//         }
-//     });
-// }
