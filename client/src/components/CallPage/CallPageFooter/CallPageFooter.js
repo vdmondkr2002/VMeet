@@ -23,7 +23,8 @@ import {
   SET_VIDEOTRACK,
   TOGGLE_MIC,
   TOGGLE_VIDEO,
-  SET_AUDIOTRACK
+  SET_AUDIOTRACK,
+  SET_CLICKED
 } from "../../../constants/actions";
 import useStyles from "./styles";
 
@@ -125,7 +126,9 @@ const CallPageFooter = ({
       user.videoTrack.stop();
       dispatch({type:SET_VIDEOTRACK,payload:null})
       myStream.current.srcObject = null;
+      // window.localStream=null;
       dispatch({ type: TOGGLE_VIDEO });
+      dispatch({type:SET_CLICKED})
       return;
     }
     try{
@@ -139,13 +142,16 @@ const CallPageFooter = ({
         const audioTrack = vstream.getAudioTracks()[0];
         const videoTrack = vstream.getVideoTracks()[0];
         dispatch({ type: SET_STREAM, payload: vstream });
+        window.localStream = vstream;
         dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
         dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
         dispatch({ type: TOGGLE_VIDEO });
+        dispatch({type:SET_CLICKED})
         if(!user.micOn){
           audioTrack.enabled = false;
         }
       }
+      
     }catch(err){
       console.log(err)
     }

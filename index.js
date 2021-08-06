@@ -50,20 +50,37 @@ io.on("connection",(socket)=>{
 		// for(let i = 0; i < connections[path].length; ++i){   
 		// 	io.to(connections[path][i]).emit("user-joined", socket.id, connections[path])
         //     //CurrCall.people
-		// }
+		// } 
         console.log(connections)
 		// console.log(path, connections[path])
 	})
 
     socket.on('signal', (toId, message) => {
-        console.log("message")
-        console.log(message)
-        console.log(socket.id)
-        console.log(toId)
+        console.log("signal received from "+socket.id+"sending to"+toId)
+        // console.log(message)
+        // console.log(socket.id)
+        // console.log(toId)
 		io.to(toId).emit('signal', socket.id, message)
         console.log("EMMIITED")
 	})
 
+    socket.on("video-off",(path)=>{
+        console.log("video off by:"+socket.id)
+        // io.to(socket.id).emit("video-off",socket.id,connections[path])
+        for(const socketId of connections[path]){
+            if(socketId!==socket.id)
+                io.to(socketId).emit("video-off",socket.id,connections[path]);
+        }
+    })
+
+    socket.on("video-on",(path)=>{
+        console.log("video-on by:"+socket.id)
+        io.to(socket.id).emit("video-on",socket.id,connections[path])
+        // for(const socketId of connections[path]){
+        //     if(socketId!==socket.id)
+        //         io.to(socketId).emit("video-on",socket.id,connections[path]);
+        // }
+    })
     socket.on("disconnect",()=>{
         const path = meetJoined[socket.id]
         console.log(path)
