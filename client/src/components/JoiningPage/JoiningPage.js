@@ -34,9 +34,9 @@ const JoiningPage = () => {
     console.log("initWebRTC called");
     const currStream = await navigator.mediaDevices.getUserMedia({
       audio: user.micOn,
-      video: user.videoOn,
+      video: user.videoOn
     });
-    dispatch({ type: SET_STREAM, payload: currStream });
+    // dispatch({ type: SET_STREAM, payload: currStream });
 
     myStream.current.srcObject = currStream;
   };

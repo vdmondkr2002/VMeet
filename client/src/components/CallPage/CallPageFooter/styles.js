@@ -27,6 +27,8 @@ const useStyles = makeStyles((theme) => ({
   },
 
   buttonOn: {
+    width: "50px",
+    height: "50px",
     borderRadius: "50%",
     margin: "10px 5px",
     padding: "5px",
@@ -38,6 +40,8 @@ const useStyles = makeStyles((theme) => ({
   },
 
   buttonOff: {
+    width: "50px",
+    height: "50px",
     borderRadius: "50%",
     margin: "10px 5px",
     padding: "5px",

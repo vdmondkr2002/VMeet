@@ -6,7 +6,7 @@ import JoiningPage from "../JoiningPage/JoiningPage.js"
 import clsx from "clsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { SET_STREAM } from "../../constants/actions";
+import { SET_AUDIOTRACK, SET_SOCKETID, SET_STREAM, SET_VIDEOTRACK } from "../../constants/actions";
 import People from "./PeopleDrawer/People";
 import Chat from "./ChatDrawer/Chat";
 import Info from "./InfoDrawer/Info";
@@ -50,8 +50,6 @@ const CallPage = () => {
     } catch (e) {
       console.log(e);
     }
-    // const [peopleOpen,setPeopleOpen] = useState(false)
-    // const [chatOpen,setChatOpen] = useState(false)
 
     window.localStream = stream; //store curremt stream to winow.localstream  (?)
     myStream.current.srcObject = stream;
@@ -105,13 +103,17 @@ const CallPage = () => {
 
   const initWebRTC = async () => {
     const currStream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: true,
+      audio: user.micOn,
+      video: user.videoOn
     });
     getUserMediaSuccess(currStream);
     dispatch({ type: SET_STREAM, payload: currStream });
+    const audioTrack = currStream.getAudioTracks()[0];
+    const videoTrack = currStream.getVideoTracks()[0];
+    dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
+    dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
   };
-
+  console.log(window.location.href)
   /*
    * Config required to make Peer Connection
    */
@@ -199,8 +201,10 @@ const CallPage = () => {
 
       //emits join call event with the URL
       socket.emit("join-call", window.location.href);
+      
       //Store Socket's Id as SocketId
       socketId = socket.id;
+      // dispatch({type:SET_SOCKETID,payload:socket.id})
 
       //Events when user is joined
       /**
@@ -225,10 +229,11 @@ const CallPage = () => {
 
           connections[socketListId].onicecandidate = async function (event) {
             if (event.candidate != null) {
+              console.log(event.candidate)
               await socket.emit(
                 "signal",
                 socketListId,
-                JSON.stringify({ ice: event.candidate })
+                JSON.stringify({ "ice": event.candidate })
               );
             }
           };
@@ -334,11 +339,11 @@ const CallPage = () => {
     connectToSocketServer();
   };
 
-  useEffect(() => {
-    if (!user.isAdmin) {
-      history.push("/join");
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!user.isAdmin) {
+  //     history.push("/join");
+  //   }
+  // }, []);
 
   return (
     <div className={classes.root}>
@@ -354,7 +359,7 @@ const CallPage = () => {
         :
        (<Container
         className={clsx(classes.content, {
-          [classes.contentShift]: peopleOpen || chatOpen,
+          [classes.contentShift]: peopleOpen || chatOpen || infoOpen,
         })}
       >
         {/* {
@@ -390,9 +395,11 @@ const CallPage = () => {
         </div>
         <div className={classes.drawerHeader} />
         <CallPageFooter
-          peopleOpen={peopleOpen}
-          setPeopleOpen={setPeopleOpen}
           myStream={myStream}
+          peopleOpen={peopleOpen}
+          infoOpen={infoOpen}
+          chatOpen={chatOpen}
+          setPeopleOpen={setPeopleOpen}
           setInfoOpen={setInfoOpen}
           setChatOpen={setChatOpen}
         />
@@ -400,6 +407,7 @@ const CallPage = () => {
        )}
       <Info open={infoOpen} setDrawerOpen={setInfoOpen} />
       <People open={peopleOpen} setDrawerOpen={setPeopleOpen} />
+      {/* <Info open={infoOpen} setDrawerOpen={setInfoOpen} /> */}
       <Chat open={chatOpen} setDrawerOpen={setChatOpen} />
      
     </div>
