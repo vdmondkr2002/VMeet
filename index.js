@@ -27,6 +27,7 @@ app.get('/',(req,res)=>{
 
 
 connections = {}
+meetJoined = {}
 
 io.on("connection",(socket)=>{
      
@@ -36,18 +37,21 @@ io.on("connection",(socket)=>{
 		if(connections[path] === undefined){
 			connections[path] = []
 		}
+        
         //const currCall =  await   Call.findOne({_id:path})
         //connections[path] is equivalent to currCall.people
         //currCall.people.push(socket.id)
         //await Call.findOneAndUpdate({_id:path},{people:currCall.people},{new:true})
 		connections[path].push(socket.id)
-
-		for(let i = 0; i < connections[path].length; ++i){
-            
-			io.to(connections[path][i]).emit("user-joined", socket.id, connections[path])
-            //CurrCall.people
-		}
-
+        meetJoined[socket.id] = path;
+        for(const socketId of connections[path]){
+            io.to(socketId).emit("user-joined",socket.id,connections[path]);
+        }
+		// for(let i = 0; i < connections[path].length; ++i){   
+		// 	io.to(connections[path][i]).emit("user-joined", socket.id, connections[path])
+        //     //CurrCall.people
+		// }
+        console.log(connections)
 		// console.log(path, connections[path])
 	})
 
@@ -61,6 +65,11 @@ io.on("connection",(socket)=>{
 	})
 
     socket.on("disconnect",()=>{
+        const path = meetJoined[socket.id]
+        console.log(path)
+        connections[path] = connections[path].filter(id=>id!==socket.id)
+        // delete connections[path][socket.id]
+        console.log(connections)
         console.log("Connection left")
     })
 })

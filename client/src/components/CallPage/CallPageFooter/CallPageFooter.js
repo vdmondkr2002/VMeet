@@ -23,6 +23,7 @@ import {
   SET_VIDEOTRACK,
   TOGGLE_MIC,
   TOGGLE_VIDEO,
+  SET_AUDIOTRACK
 } from "../../../constants/actions";
 import useStyles from "./styles";
 
@@ -62,44 +63,44 @@ const CallPageFooter = ({
   //   }
   // }, [user.videoOn]);
 
-  const stopVideoStreams = (stream) => {
-    try {
-      console.log("100");
-      console.log(stream.getVideoTracks());
-      console.log("102");
-      stream.getVideoTracks()[0].stop();
-      console.log("107");
-      console.log("after");
-      dispatch({ type: SET_STREAM, payload: stream });
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  // const stopVideoStreams = (stream) => {
+  //   try {
+  //     console.log("100");
+  //     console.log(stream.getVideoTracks());
+  //     console.log("102");
+  //     stream.getVideoTracks()[0].stop();
+  //     console.log("107");
+  //     console.log("after");
+  //     dispatch({ type: SET_STREAM, payload: stream });
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
-  const stopAudioStream = async (stream) => {
-    try {
-      console.log("before");
-      console.log(stream.getAudioTracks());
-      await stream.getAudioTracks().forEach((track) => {
-        track.stop();
-      });
-      console.log("after");
-      dispatch({ type: SET_STREAM, payload: stream });
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  // const stopAudioStream = async (stream) => {
+  //   try {
+  //     console.log("before");
+  //     console.log(stream.getAudioTracks());
+  //     await stream.getAudioTracks().forEach((track) => {
+  //       track.stop();
+  //     });
+  //     console.log("after");
+  //     dispatch({ type: SET_STREAM, payload: stream });
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
-  const initWebRTC = async () => {
-    console.log("initWebRTC called");
-    const currStream = await navigator.mediaDevices.getUserMedia({
-      audio: user.micOn,
-      video: user.videoOn,
-    });
-    dispatch({ type: SET_STREAM, payload: currStream });
+  // const initWebRTC = async () => {
+  //   console.log("initWebRTC called");
+  //   const currStream = await navigator.mediaDevices.getUserMedia({
+  //     audio: user.micOn,
+  //     video: user.videoOn,
+  //   });
+  //   dispatch({ type: SET_STREAM, payload: currStream });
 
-    myStream.current.srcObject = currStream;
-  };
+  //   myStream.current.srcObject = currStream;
+  // };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -111,7 +112,21 @@ const CallPageFooter = ({
   }, []);
 
   const handleClickVideo = async() => {
-    // dispatch({ type: TOGGLE_VIDEO });
+
+    // console.log(myStream);
+    // // myStream.getTracks()[0].stop();
+    // // if(!user.videoTrack)
+    // //   return;
+    // console.log(user.videoTrack);
+    // if(!user.videoTrack.enabled){
+    //   user.videoTrack.enabled = true;
+    // }else{
+    //   user.videoTrack.stop();
+    //   myStream = null;
+    //   user.videoTrack.enabled = false;
+    // }
+    console.log(user.videoTrack)
+    dispatch({type:TOGGLE_VIDEO})
     if(user.videoTrack){
       user.videoTrack.stop();
       dispatch({type:SET_VIDEOTRACK,payload:null})
@@ -120,18 +135,26 @@ const CallPageFooter = ({
       return;
     }
     try{
-      const vstream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const vstream = await navigator.mediaDevices.getUserMedia({ video: true,audio:true });
       console.log(vstream);
       if(vstream && vstream.getVideoTracks().length>0){
         dispatch({type:SET_VIDEOTRACK,payload:vstream.getVideoTracks()[0]});
         console.log(vstream.getVideoTracks());
-        myStream.current.srcObject = new MediaStream(vstream.getVideoTracks());
+        
+        myStream.current.srcObject = new MediaStream(vstream);
+        const audioTrack = vstream.getAudioTracks()[0];
+        const videoTrack = vstream.getVideoTracks()[0];
+        dispatch({ type: SET_STREAM, payload: vstream });
+        dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
+        dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
         dispatch({ type: TOGGLE_VIDEO });
+        if(!user.micOn){
+          audioTrack.enabled = false;
+        }
       }
     }catch(err){
       console.log(err)
     }
-  
   };
   const handleClickMute = () => {
     // dispatch({ type: TOGGLE_MIC });
