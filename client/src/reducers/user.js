@@ -11,6 +11,7 @@ const userReducer = (userData={isAdmin:false,stream:null,micOn:true,videoOn:true
         case SET_VIDEOTRACK:
             return {...userData,videoTrack:action.payload}
         case SET_SOCKETID:
+            console.log(action.payload)
             return {...userData,socketId:action.payload}
         case TOGGLE_MIC:
             const micOn = userData.micOn;

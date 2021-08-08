@@ -8,7 +8,8 @@ const useStyles = makeStyles((theme) => ({
     right: 0,
     bottom: 0,
     left: 0,
-    overflow: "scroll",
+    maxHeight:"100vh",
+    overflow: "hidden",
   },
   btn:{
     color: "white",

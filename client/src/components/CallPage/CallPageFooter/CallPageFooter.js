@@ -29,6 +29,7 @@ import {
 import useStyles from "./styles";
 
 const CallPageFooter = ({
+  handleEndCall,
   myStream,
   setInfoOpen,
   setChatOpen,
@@ -41,7 +42,7 @@ const CallPageFooter = ({
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const [time, setTime] = useState(Date.now());
-
+  const server_url = "https://meetv-v1.herokuapp.com/";
   // useEffect(() => {
   //   console.log(user.micOn ? "mic On" : "mic Off");
   //   if (user.micOn) {
@@ -169,10 +170,7 @@ const CallPageFooter = ({
     dispatch({type:TOGGLE_MIC})
   };
 
-  const handleEndCall = () => {
-    console.log("call ended");
-  };
-
+ 
   const handlePeopleDrawerToggle = () => {
     setPeopleOpen((prev) => !prev);
     setChatOpen(false);

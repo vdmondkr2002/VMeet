@@ -11,6 +11,8 @@ import People from "./PeopleDrawer/People";
 import Chat from "./ChatDrawer/Chat";
 import Info from "./InfoDrawer/Info";
 import useStyles from "./styles";
+import { useBeforeunload } from 'react-beforeunload';
+
 
 const CallPage = () => {
     /*
@@ -25,14 +27,14 @@ const CallPage = () => {
     const profile = useSelector((state) => state.profile);
     const user = useSelector((state) => state.user);
     const [isJoined, setIsJoined] = useState(false);
-    const server_url = "https://meetv-v1.herokuapp.com/";
+    const server_url = "localhost:5000";
     // const server_url = "localhost:5000"; //URL Where room will be created
     var connections = {}; //Stores all the users(connections) joined
     var senders={};
     // connection = Reducer
     var socket=null; //To initialize socket in the client Side
     //File
-
+    
     var socketId = null; //To store socket's Id ,later used for comparing
     //User.sockerId
 
@@ -68,7 +70,7 @@ const CallPage = () => {
     },[isJoined,user.videoOn])
     
 
-   
+ 
 
     useEffect(() => {
         if (isJoined) {
@@ -76,10 +78,17 @@ const CallPage = () => {
         }
 
     }, [isJoined])
-
+    useBeforeunload(() =>{
+        "Are you sure to End this Call?"
+         handleEndCall(); 
+    });
+    // window.addEventListener("beforeunload", (ev) => 
+    // {  
+    //     handleEndCall();
+    // });
     const connectToSocketServer = async () => {
         //connects to the socket
-        socket = io.connect(server_url, { secure: true });;
+        socket = io.connect(server_url, { secure: true });
         mySocket.current = socket;
         //Whenver signal event is emmitted from server fire gotMessageServer with sender's Id and his/her localDescription
         socket.on("signal", (fromId, message) => {
@@ -102,7 +111,14 @@ const CallPage = () => {
             socketId = socket.id;
 
 
-            
+            socket.on('user-left', (id) => {
+              console.log("userLeft")
+              let video = document.querySelector(`[data-socket="${id}"]`)
+              if (video !== null) {
+                elms--;
+                video.parentNode.removeChild(video)
+              }
+            })
             //Events when user is joined
             /**
              * This event is emmited from server when user joins the call
@@ -161,7 +177,7 @@ const CallPage = () => {
                             video.style.setProperty("width", "400px");
                             video.style.setProperty("border", "5px solid #1a73e8");
                             video.style.setProperty("border-radius", "20px");
-                            video.style.setProperty("margin", "1    0px");
+                            video.style.setProperty("margin", "10px");
                             video.setAttribute("data-socket", socketListId);
                             //Stream assigned to video
                             video.srcObject = event.streams[0];
@@ -378,14 +394,8 @@ const CallPage = () => {
             myStream.current.srcObject = window.localStream
         })
     };
-
-
-
-
-
-    /*
-    * Config required to make Peer Connection
-    */
+    
+    /*Config required to make Peer Connection */
     const peerConnectionConfig = {
         'iceServers': [
             // { 'urls': 'stun:stun.services.mozilla.com' },
@@ -393,8 +403,7 @@ const CallPage = () => {
         ],
     };
 
-    /**
-       * This Function Will Execute when one user gets "Message"(means description of other user as SDP) from the socket
+    /*  This Function Will Execute when one user gets "Message"(means description of other user as SDP) from the socket
          from ID : Whose description
         Message : Description SDP
     */
@@ -448,10 +457,18 @@ const CallPage = () => {
             }
         }
     };
-    /**
-     * Main Function to handle socket Events
-     */
-
+    /*  Main Function to handle socket Events */
+  
+    const handleEndCall = () => {
+     
+      try {
+        let tracks = myStream.current.srcObject.getTracks()
+        tracks.forEach(track => track.stop())
+        
+      } catch (e) {}
+       window.location.reload(); 
+      console.log("call ended");
+    };
 
 
 
@@ -468,10 +485,7 @@ const CallPage = () => {
             {!isJoined ?
                 (
                     <>
-                        <Button className={classes.btn} onClick={handleJoin}>
-                            Join Now
-                        </Button>
-                        <JoiningPage />
+                        <JoiningPage handleJoin={handleJoin} />
                     </>
                 )
                 :
@@ -512,7 +526,13 @@ const CallPage = () => {
                         <video id="my-video" ref={myStream} className={classes.myVid} autoPlay muted></video>
                     </div>
                     <div className={classes.drawerHeader} />
+                    {/* <div>
+                      <Button style={{fontSize:"30px",padding:"10px"}} color="secondary" onClick={handleEndCall}>
+                        Leave
+                      </Button>
+                    </div> */}
                     <CallPageFooter
+                        handleEndCall={handleEndCall}
                         myStream={myStream}
                         peopleOpen={peopleOpen}
                         infoOpen={infoOpen}
