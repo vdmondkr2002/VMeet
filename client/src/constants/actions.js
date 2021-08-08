@@ -15,3 +15,4 @@ export const SET_SOCKETID = 'SET_SOCKETID'
 
 export const ADD_CONN = 'ADD_CONN'
 export const UPDATE_CONN = 'UPDATE_CONN'
+export const SET_CLICKED = 'SET_CLICKED'

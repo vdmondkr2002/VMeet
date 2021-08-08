@@ -21,7 +21,7 @@ import { useDispatch, useSelector } from "react-redux";
 import logo from "../../assests/logo.png";
 import { SET_STREAM, TOGGLE_MIC, TOGGLE_VIDEO,SET_AUDIOTRACK,SET_VIDEOTRACK } from "../../constants/actions";
 
-const JoiningPage = () => {
+const JoiningPage = ({handleJoin}) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const myStream = useRef();
@@ -113,46 +113,34 @@ const JoiningPage = () => {
   //   }
   // };
   const handleClickVideo = async() => {
-    // if(!myStream.getVideoracks[0].enabled){
-    //     user.videoTrack.enabled = true;
-    //   }else{
-    //     user.videoTrack.enabled = false;
-    //   }
-    console.log(myStream.getTracks());
-    console.log(myStream.getVideoTracks());
-  
-    // if(user.videoTrack){
-    //   user.videoTrack.enabled = false;
-
-
-    //   return;
-
-    // }
-    // try{
-    //   // if(!user.videoTrack.enabled){
-    //   //   user.videoTrack.enabled = true;
-    //   // }else{
-    //   //   user.videoTrack.enabled = false;
-    //   // }
-    //   const vstream = await navigator.mediaDevices.getUserMedia({ video: true,audio:true });
-    //   console.log(vstream);
-    //   if(vstream && vstream.getVideoTracks().length>0){
-    //     console.log(vstream.getVideoTracks());
+    
+    if(user.videoTrack){
+      user.videoTrack.stop();
+      dispatch({type:SET_VIDEOTRACK,payload:null})
+      // myStream.current.srcObject = null;
+      dispatch({ type: TOGGLE_VIDEO });
+      return;
+    }
+    try{
+      const vstream = await navigator.mediaDevices.getUserMedia({ video: true,audio:true });
+      console.log(vstream);
+      if(vstream && vstream.getVideoTracks().length>0){
+        console.log(vstream.getVideoTracks());
         
-    //     myStream.current.srcObject = new MediaStream(vstream);
-    //     const audioTrack = vstream.getAudioTracks()[0];
-    //     const videoTrack = vstream.getVideoTracks()[0];
-    //     dispatch({ type: SET_STREAM, payload: vstream });
-    //     dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
-    //     dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
-    //     dispatch({ type: TOGGLE_VIDEO });
-    //     if(!user.micOn){
-    //       audioTrack.enabled = false;
-    //     }
-    //   }
-    // }catch(err){
-    //   console.log(err)
-    // }
+        myStream.current.srcObject = new MediaStream(vstream);
+        const audioTrack = vstream.getAudioTracks()[0];
+        const videoTrack = vstream.getVideoTracks()[0];
+        dispatch({ type: SET_STREAM, payload: vstream });
+        dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
+        dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
+        dispatch({ type: TOGGLE_VIDEO });
+        if(!user.micOn){
+          audioTrack.enabled = false;
+        }
+      }
+    }catch(err){
+      console.log(err)
+    }
   };
   const handleClickMute = () => {
     // dispatch({ type: TOGGLE_MIC });
@@ -335,7 +323,7 @@ const JoiningPage = () => {
                     display: "flex",
                   }}
                 >
-                  {/* <Button className={classes.btn}>Join Now</Button> */}
+                  <Button className={classes.btn} onClick={handleJoin}>Join Now</Button>
                   <Button
                     className={classes.btn}
                     style={{

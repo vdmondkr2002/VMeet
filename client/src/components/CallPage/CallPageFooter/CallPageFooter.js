@@ -23,11 +23,13 @@ import {
   SET_VIDEOTRACK,
   TOGGLE_MIC,
   TOGGLE_VIDEO,
-  SET_AUDIOTRACK
+  SET_AUDIOTRACK,
+  SET_CLICKED
 } from "../../../constants/actions";
 import useStyles from "./styles";
 
 const CallPageFooter = ({
+  handleEndCall,
   myStream,
   setInfoOpen,
   setChatOpen,
@@ -40,7 +42,7 @@ const CallPageFooter = ({
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const [time, setTime] = useState(Date.now());
-
+  const server_url = "https://meetv-v1.herokuapp.com/";
   // useEffect(() => {
   //   console.log(user.micOn ? "mic On" : "mic Off");
   //   if (user.micOn) {
@@ -112,26 +114,22 @@ const CallPageFooter = ({
   }, []);
 
   const handleClickVideo = async() => {
-
-    // console.log(myStream);
-    // // myStream.getTracks()[0].stop();
-    // // if(!user.videoTrack)
-    // //   return;
-    // console.log(user.videoTrack);
+    // if(!user.videoTrack)
+    //   return;
     // if(!user.videoTrack.enabled){
     //   user.videoTrack.enabled = true;
     // }else{
-    //   user.videoTrack.stop();
-    //   myStream = null;
     //   user.videoTrack.enabled = false;
     // }
-    console.log(user.videoTrack)
-    dispatch({type:TOGGLE_VIDEO})
+    // console.log(user.videoTrack)
+    // dispatch({type:TOGGLE_VIDEO})
     if(user.videoTrack){
       user.videoTrack.stop();
       dispatch({type:SET_VIDEOTRACK,payload:null})
       myStream.current.srcObject = null;
+      // window.localStream=null;
       dispatch({ type: TOGGLE_VIDEO });
+      dispatch({type:SET_CLICKED})
       return;
     }
     try{
@@ -145,13 +143,16 @@ const CallPageFooter = ({
         const audioTrack = vstream.getAudioTracks()[0];
         const videoTrack = vstream.getVideoTracks()[0];
         dispatch({ type: SET_STREAM, payload: vstream });
+        window.localStream = vstream;
         dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
         dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
         dispatch({ type: TOGGLE_VIDEO });
+        dispatch({type:SET_CLICKED})
         if(!user.micOn){
           audioTrack.enabled = false;
         }
       }
+      
     }catch(err){
       console.log(err)
     }
@@ -169,10 +170,7 @@ const CallPageFooter = ({
     dispatch({type:TOGGLE_MIC})
   };
 
-  const handleEndCall = () => {
-    console.log("call ended");
-  };
-
+ 
   const handlePeopleDrawerToggle = () => {
     setPeopleOpen((prev) => !prev);
     setChatOpen(false);
