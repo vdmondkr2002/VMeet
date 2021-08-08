@@ -21,7 +21,7 @@ export const joinCall1 = (history,code,userId)=>async(dispatch)=>{
         if(data.adminId===userId){
             dispatch({type:SET_ISADMIN})
         }
-        // history.push(`/join/${code}`);
+        history.push(`/join/${code}`);
     }catch(err){ 
         // console.log(err.data.msg)
         if(err.response){
