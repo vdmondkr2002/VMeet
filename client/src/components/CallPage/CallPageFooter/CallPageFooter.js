@@ -36,72 +36,13 @@ const CallPageFooter = ({
   infoOpen,
   chatOpen,
   peopleOpen,
+  socketId
 }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const [time, setTime] = useState(Date.now());
 
-  // useEffect(() => {
-  //   console.log(user.micOn ? "mic On" : "mic Off");
-  //   if (user.micOn) {
-  //     initWebRTC();
-  //   } else {
-  //     const stream = user.stream;
-  //     stopAudioStream(stream);
-  //   }
-  // }, [user.micOn]);
-
-  // useEffect(() => {
-  //   console.log(user.videoOn ? "video On" : "video Off");
-  //   if (user.videoOn) {
-  //     initWebRTC();
-  //   } else {
-  //     if (user.stream) {
-  //       var stream = user.stream;
-  //       stopVideoStreams(stream);
-  //     }
-  //   }
-  // }, [user.videoOn]);
-
-  // const stopVideoStreams = (stream) => {
-  //   try {
-  //     console.log("100");
-  //     console.log(stream.getVideoTracks());
-  //     console.log("102");
-  //     stream.getVideoTracks()[0].stop();
-  //     console.log("107");
-  //     console.log("after");
-  //     dispatch({ type: SET_STREAM, payload: stream });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
-
-  // const stopAudioStream = async (stream) => {
-  //   try {
-  //     console.log("before");
-  //     console.log(stream.getAudioTracks());
-  //     await stream.getAudioTracks().forEach((track) => {
-  //       track.stop();
-  //     });
-  //     console.log("after");
-  //     dispatch({ type: SET_STREAM, payload: stream });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
-
-  // const initWebRTC = async () => {
-  //   console.log("initWebRTC called");
-  //   const currStream = await navigator.mediaDevices.getUserMedia({
-  //     audio: user.micOn,
-  //     video: user.videoOn,
-  //   });
-  //   dispatch({ type: SET_STREAM, payload: currStream });
-
-  //   myStream.current.srcObject = currStream;
-  // };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -113,20 +54,14 @@ const CallPageFooter = ({
   }, []);
 
   const handleClickVideo = async() => {
-    // if(!user.videoTrack)
-    //   return;
-    // if(!user.videoTrack.enabled){
-    //   user.videoTrack.enabled = true;
-    // }else{
-    //   user.videoTrack.enabled = false;
-    // }
-    // console.log(user.videoTrack)
-    // dispatch({type:TOGGLE_VIDEO})
+
     if(user.videoTrack){
       user.videoTrack.stop();
       dispatch({type:SET_VIDEOTRACK,payload:null})
-      myStream.current.srcObject = null;
-      // window.localStream=null;
+      const searchVideo = document.getElementById(socketId)
+      searchVideo.srcObject = null;
+      // myStream.current.srcObject = null;
+      window.localStream=null;
       dispatch({ type: TOGGLE_VIDEO });
       dispatch({type:SET_CLICKED})
       return;
@@ -137,8 +72,9 @@ const CallPageFooter = ({
       if(vstream && vstream.getVideoTracks().length>0){
         dispatch({type:SET_VIDEOTRACK,payload:vstream.getVideoTracks()[0]});
         console.log(vstream.getVideoTracks());
-        
-        myStream.current.srcObject = new MediaStream(vstream);
+        const searchVideo = document.getElementById(socketId)
+        searchVideo.srcObject = new MediaStream(vstream);
+        // myStream.current.srcObject = new MediaStream(vstream);
         const audioTrack = vstream.getAudioTracks()[0];
         const videoTrack = vstream.getVideoTracks()[0];
         dispatch({ type: SET_STREAM, payload: vstream });

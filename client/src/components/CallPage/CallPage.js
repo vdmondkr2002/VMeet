@@ -1,16 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
-import { Container, Paper, Avatar, Button } from "@material-ui/core";
+import { Container, Paper, Avatar, Button,Typography,Grid } from "@material-ui/core";
 import CallPageFooter from "./CallPageFooter/CallPageFooter";
 import JoiningPage from "../JoiningPage/JoiningPage.js"
+import ReactPlayer from 'react-player'
 import clsx from "clsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { SET_AUDIOTRACK, SET_SOCKETID, SET_STREAM, SET_VIDEOTRACK } from "../../constants/actions";
+import { ADD_CONN, SET_AUDIOTRACK, SET_SOCKETID, SET_STREAM, SET_VIDEOTRACK } from "../../constants/actions";
 import People from "./PeopleDrawer/People";
 import Chat from "./ChatDrawer/Chat";
 import Info from "./InfoDrawer/Info";
 import useStyles from "./styles";
+import { letterSpacing } from "@material-ui/system";
 
 const CallPage = () => {
     /*
@@ -25,9 +27,12 @@ const CallPage = () => {
     const profile = useSelector((state) => state.profile);
     const user = useSelector((state) => state.user);
     const [isJoined, setIsJoined] = useState(false);
-    const server_url = "https://meetv-v1.herokuapp.com/";
-    // const server_url = "localhost:5000"; //URL Where room will be created
+    const [videoStreams,setVideoStreams] = useState([])
+    const [usersInCall,setUsersInCall] = useState([])
+    // const server_url = "https://meetv-v1.herokuapp.com/";
+    const server_url = "localhost:5000"; //URL Where room will be created
     var connections = {}; //Stores all the users(connections) joined
+    // const connections = useSelector(state=>state.connections)
     var senders={};
     // connection = Reducer
     var socket=null; //To initialize socket in the client Side
@@ -42,7 +47,7 @@ const CallPage = () => {
     const [chatOpen, setChatOpen] = useState(false);
     const [infoOpen, setInfoOpen] = useState(false);
     
-
+    
     useEffect(()=>{
         if(mySocket.current && isJoined){
             if(!user.videoOn){
@@ -67,16 +72,23 @@ const CallPage = () => {
         }
     },[isJoined,user.videoOn])
     
-
-   
+  
 
     useEffect(() => {
-        if (isJoined) {
-            myStream.current.srcObject = user.stream
+        if (isJoined && mySocket.current) {
+            // myStream.current.srcObject = user.stream
+            setVideoStreams([...videoStreams,user.stream])
+            setUsersInCall([...usersInCall,socketId])
         }
-
     }, [isJoined])
 
+    useEffect(()=>{
+        var vid = document.getElementById(usersInCall[0]);
+        if(isJoined && usersInCall.length===1 && vid){
+            vid.srcObject = user.stream  
+        }
+    },[usersInCall])
+    
     const connectToSocketServer = async () => {
         //connects to the socket
         socket = io.connect(server_url, { secure: true });;
@@ -109,10 +121,17 @@ const CallPage = () => {
              * which sends id of the user joined and all the people present in the meet
              */
             socket.on("user-joined", async (id, clients) => {
+                
                 console.log(id);
                 console.log(clients);
+                setUsersInCall([...usersInCall,id]);
+                usersInCall.push(id);
                 //For every Client/person in the meet make a new RTCPeerConnection
                 clients.forEach((socketListId) => {
+                    
+                    // dispatch({type:ADD_CONN,payload:{socketId:socketListId,peer:new RTCPeerConnection(
+                    //     peerConnectionConfig
+                    // )}})
                     connections[socketListId] = new RTCPeerConnection(
                         peerConnectionConfig
                     );
@@ -124,7 +143,7 @@ const CallPage = () => {
                     * Once connection is established between two peers ,they communicate through ice candidates
                     */
 
-                    connections[socketListId].onicecandidate = async function (event) {
+                    connections[socketListId].onicecandidate = async(event)=>{
                         if (event.candidate != null) {
                             console.log(event.candidate)
                             await socket.emit(
@@ -144,37 +163,51 @@ const CallPage = () => {
                         var searchVideo = document.querySelector(
                             `[data-socket="${socketListId}"]`
                         );
+                            
                         if (searchVideo !== null) {
+                            console.log("Not null")
                             // if i don't do this check it make an empyt square
-                            console.log(searchVideo);
+                            // console.log(searchVideo);
                             searchVideo.srcObject = event.streams[0]; //currStream
-                            searchVideo.autoplay = true;
-                            searchVideo.playsinline = true;
-                            searchVideo.style.removeProperty("background");
-                            searchVideo.style.setProperty("border", "5px solid #1a73e8");
-                            console.log(searchVideo);
+                            console.log(event.streams[0].getAudioTracks())
+                            // searchVideo.autoplay = true;
+                            // searchVideo.playsinline = true;
+                            // searchVideo.style.removeProperty("background");
+                            // searchVideo.style.setProperty("border", "5px solid #1a73e8");
+                            // console.log(searchVideo);
                         } else {
+                            console.log("null")
+                            setVideoStreams([...videoStreams,event.streams[0]])
+                            setUsersInCall([...usersInCall,socketListId]);
+                            usersInCall.push(socketListId)
+                            videoStreams.push(event.streams[0])
                             console.log("creating new video....");
-                            elms = clients.length;
-                            let main = document.getElementById("main");
-                            let video = document.createElement("video");
-                            video.style.setProperty("width", "400px");
-                            video.style.setProperty("border", "5px solid #1a73e8");
-                            video.style.setProperty("border-radius", "20px");
-                            video.style.setProperty("margin", "1    0px");
-                            video.setAttribute("data-socket", socketListId);
+                            
+                            let video = document.getElementById(socketListId);
                             //Stream assigned to video
-                            video.srcObject = event.streams[0];
-                            video.autoplay = true;
-                            video.playsinline = true;
-                            main.style.setProperty("display", "grid");
-                            main.style.setProperty("width", "1000px");
-                            main.style.setProperty("grid-template-columns", "auto auto auto");
-                            main.appendChild(video);
-                            console.log(video);
+                            // video.srcObject = event.streams[0];
+                            video.srcObject = videoStreams[videoStreams.length-1];
+                            console.log(event.streams[0].getAudioTracks())
+                            // console.log(video);
+                            // elms = clients.length;
+                            // let main = document.getElementById("main");
+                            // let video = document.createElement("video");
+                            // video.style.setProperty("width", "400px");
+                            // video.style.setProperty("border", "5px solid #1a73e8");
+                            // video.style.setProperty("border-radius", "20px");
+                            // video.style.setProperty("margin", "1    0px");
+                            // video.setAttribute("data-socket", socketListId);
+                            // //Stream assigned to video
+                            // video.srcObject = event.streams[0];
+                            // video.autoplay = true;
+                            // video.playsinline = true;
+                            // main.style.setProperty("display", "grid");
+                            // main.style.setProperty("width", "1000px");
+                            // main.style.setProperty("grid-template-columns", "auto auto auto");
+                            // main.appendChild(video);
+                            // console.log(video);
                         }
                     };
-                    const a = new RTCPeerConnection();
                 
                     connections[socketListId].onremoveTrack = (e)=>{
                         console.log("event happened")
@@ -208,9 +241,17 @@ const CallPage = () => {
 
                 if (id === socketId) {
                     console.log(connections);
+                    // for(let id in connections){
+                    //     if(id===socketId) continue;
+                    //     try {
+                    //         connections[id].removeTrack(senders[id])
+                    //     } catch (e) {
+                    //         console.log(e.message);
+                    //     }
+                    // }
                     for (let id2 in connections) {
                         if (id2 === socketId) continue;
-
+                        console.log(window.localStream.getAudioTracks())
                         try {
                             window.localStream.getTracks().forEach((track) => {
                                 connections[id2].addTrack(track, window.localStream);
@@ -242,15 +283,13 @@ const CallPage = () => {
                 console.log(connections)
                 // connections[id].removeTrack(senders[id])
                 // connections[id]=null;
-                var searchVideo = document.querySelector(
-                    `[data-socket="${id}"]`
-                );
+                var searchVideo = document.getElementById(id);
                 console.log(searchVideo)
                 searchVideo.srcObject = null
                 searchVideo.style.setProperty("background", "black");
-                searchVideo.style.setProperty("border", "1px solid green");
-                searchVideo.style.setProperty("height","300px")
                 searchVideo.style.setProperty("border", "5px solid #1a73e8");
+                searchVideo.style.setProperty("width","100%");
+                searchVideo.style.setProperty("height","100%");
             })
 
             socket.on("video-on",async(id,clients)=>{
@@ -274,7 +313,7 @@ const CallPage = () => {
                     if (id2 === socketId) continue;
 
                     try {
-                        window.localStream.getVideoTracks().forEach((track) => {
+                        window.localStream.getTracks().forEach((track) => {
                             senders[id2]=connections[id2].addTrack(track, window.localStream);
                             console.log(connections[id2]);
                         });
@@ -312,6 +351,7 @@ const CallPage = () => {
        *  
        */
     const getUserMediaSuccess = (stream) => {
+        console.log("I am in getUserMedia success")
         try {
             if (window.localStream) {
                 console.log("devices found")
@@ -329,7 +369,7 @@ const CallPage = () => {
         for (let id in connections) {
             // if (id === socketId) continue; //If one user is already in connections, then don't add him/her
             console.log(window.localStream);
-
+            console.log("I am here")
             window.localStream?.getTracks().forEach((track) => {
                 //Add Audio and videoTracks to all the connections
                 connections[id].addTrack(track);
@@ -355,28 +395,16 @@ const CallPage = () => {
                     .catch((e) => console.log(e));
             });
         }
-        stream.getTracks().forEach(track => track.onended = () => {
-            try {
-                let tracks = myStream.current.srcObject.getTracks()
-                tracks.forEach(track => track.stop())
-            } catch (e) { console.log(e) }
-
-            window.localStream = null
-            myStream.current.srcObject = window.localStream
-        })
-
         // stream.getTracks().forEach(track => track.onended = () => {
-        //   console.log("stream ended")
+        //     try {
+        //         let tracks = myStream.current.srcObject.getTracks()
+        //         tracks.forEach(track => track.stop())
+        //     } catch (e) { console.log(e) }
+        //     console.log("Now here")
+        //     window.localStream = null
+        //     myStream.current.srcObject = window.localStream
         // })
-        stream.getTracks().forEach(track => track.onended = () => {
-            try {
-                let tracks = myStream.current.srcObject.getTracks()
-                tracks.forEach(track => track.stop())
-            } catch (e) { console.log(e) }
 
-            window.localStream = null
-            myStream.current.srcObject = window.localStream
-        })
     };
 
 
@@ -480,7 +508,36 @@ const CallPage = () => {
                         [classes.contentShift]: peopleOpen || chatOpen || infoOpen,
                     })}
                 >
+
+                    {/* <ReactPlayer playsinline muted className={user.videoOn?classes.myVid:classes.offvideo} autoPlay url={videoStreams[0]}/> */}
+                    {/* <video playsInline className={user.videoOn?classes.myVid:classes.offvideo} muted srcObject={...videoStreams[0]} autoPlay/> */}
+                    <Grid container className={classes.usersCont} spacing={2}>
+                    {
+                        usersInCall.map((socId,index)=>(
+                            <Grid item sm={6} xs={12} className={classes.userCont}>
+                                {/* <ReactPlayer playsinline muted className={user.videoOn?classes.myVid:classes.offvideo} autoPlay url={stream}/> */}
+                                <video data-socket={socId} id={socId} playsInline className={user.videoOn?classes.video:classes.offvideo} muted={socId===mySocket.current.id} autoPlay/>
+                                {
+                                    !user.videoOn?(
+                                        <Paper className={classes.userPaper}>
+                                            <Avatar src={profile?.profilePic} className={clsx(classes.largeAvatar)} alt={profile?.userName}>
+                                                    {profile?.firstName?.charAt(0)} {profile?.lastName?.charAt(0)}
+                                            </Avatar>
+                                            <div className={classes.bottomline}>
+                                                <Typography variant="body1">
+                                                    {profile.name}
+                                                </Typography>
+                                            </div>
+                                            
+                                        </Paper>
+                                    ):null
+                                }
+                            </Grid>
+                        ))
+                    }
+                    </Grid> 
                     {/* {
+
                               !user.videoOn?(
                                   <Paper className={classes.userPaper}>
                                       <Avatar src={profile?.profilePic} className={clsx(classes.largeAvatar)} alt={profile?.userName}>
@@ -497,7 +554,7 @@ const CallPage = () => {
                           } */}
                     {/* <Paper className={classes.userPaper}> */}
                     {/* User 1 */},{/* </Paper> */}
-                    {!user.videoOn ? (
+                    {/* {!user.videoOn ? (
                         <Paper className={classes.userPaper}>
                             <Avatar
                                 src={profile?.profilePic}
@@ -510,7 +567,7 @@ const CallPage = () => {
                     ) : null}
                     <div id="main">
                         <video id="my-video" ref={myStream} className={classes.myVid} autoPlay muted></video>
-                    </div>
+                    </div> */}
                     <div className={classes.drawerHeader} />
                     <CallPageFooter
                         myStream={myStream}
@@ -520,6 +577,7 @@ const CallPage = () => {
                         setPeopleOpen={setPeopleOpen}
                         setInfoOpen={setInfoOpen}
                         setChatOpen={setChatOpen}
+                        socketId={mySocket.current.id}
                     />
                 </Container>
                 )}
