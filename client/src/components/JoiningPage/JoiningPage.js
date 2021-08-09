@@ -21,7 +21,7 @@ import { useDispatch, useSelector } from "react-redux";
 import logo from "../../assests/logo.png";
 import { SET_STREAM, TOGGLE_MIC, TOGGLE_VIDEO,SET_AUDIOTRACK,SET_VIDEOTRACK } from "../../constants/actions";
 
-const JoiningPage = () => {
+const JoiningPage = ({handleJoin}) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const myStream = useRef();
@@ -326,7 +326,7 @@ const JoiningPage = () => {
                     display: "flex",
                   }}
                 >
-                  {/* <Button className={classes.btn}>Join Now</Button> */}
+                  <Button className={classes.btn} onClick={handleJoin}>Join Now</Button>
                   <Button
                     className={classes.btn}
                     style={{

@@ -55,7 +55,10 @@ const Description = () => {
 
   const handleClickJoinMeet = ()=>{
     console.log("Joining...")
+    history.push(`${code}`);
+    window.location.reload();
     dispatch(joinCall1(history,code,profile._id))
+    
   }
 
   const Item = (props) => {

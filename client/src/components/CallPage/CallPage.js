@@ -13,6 +13,8 @@ import Chat from "./ChatDrawer/Chat";
 import Info from "./InfoDrawer/Info";
 import useStyles from "./styles";
 import { letterSpacing } from "@material-ui/system";
+import { useBeforeunload } from 'react-beforeunload';
+
 
 const CallPage = () => {
     /*
@@ -37,7 +39,7 @@ const CallPage = () => {
     // connection = Reducer
     var socket=null; //To initialize socket in the client Side
     //File
-
+    
     var socketId = null; //To store socket's Id ,later used for comparing
     //User.sockerId
 
@@ -74,10 +76,12 @@ const CallPage = () => {
     
   
 
+ 
+
     useEffect(() => {
         if (isJoined && mySocket.current) {
             // myStream.current.srcObject = user.stream
-            setVideoStreams([...videoStreams,user.stream])
+            // setVideoStreams([...videoStreams,user.stream])
             setUsersInCall([...usersInCall,socketId])
         }
     }, [isJoined])
@@ -89,9 +93,17 @@ const CallPage = () => {
         }
     },[usersInCall])
     
+    useBeforeunload(() =>{
+        "Are you sure to End this Call?"
+         handleEndCall(); 
+    });
+    // window.addEventListener("beforeunload", (ev) => 
+    // {  
+    //     handleEndCall();
+    // });
     const connectToSocketServer = async () => {
         //connects to the socket
-        socket = io.connect(server_url, { secure: true });;
+        socket = io.connect(server_url, { secure: true });
         mySocket.current = socket;
         //Whenver signal event is emmitted from server fire gotMessageServer with sender's Id and his/her localDescription
         socket.on("signal", (fromId, message) => {
@@ -114,7 +126,17 @@ const CallPage = () => {
             socketId = socket.id;
 
 
-            
+            socket.on('user-left', (id) => {
+              console.log("userLeftL "+id)
+              const users = [...usersInCall]
+              const index = users.indexOf(id)
+              if(index!==-1){
+                  users.splice(index,1);
+                  setUsersInCall(users)
+              }
+              delete connections[id];
+              delete senders[id];
+            })
             //Events when user is joined
             /**
              * This event is emmited from server when user joins the call
@@ -177,16 +199,16 @@ const CallPage = () => {
                             // console.log(searchVideo);
                         } else {
                             console.log("null")
-                            setVideoStreams([...videoStreams,event.streams[0]])
+                            // setVideoStreams([...videoStreams,event.streams[0]])
                             setUsersInCall([...usersInCall,socketListId]);
                             usersInCall.push(socketListId)
-                            videoStreams.push(event.streams[0])
+                            // videoStreams.push(event.streams[0])
                             console.log("creating new video....");
                             
                             let video = document.getElementById(socketListId);
                             //Stream assigned to video
-                            // video.srcObject = event.streams[0];
-                            video.srcObject = videoStreams[videoStreams.length-1];
+                            video.srcObject = event.streams[0];
+                            // video.srcObject = videoStreams[videoStreams.length-1];
                             console.log(event.streams[0].getAudioTracks())
                             // console.log(video);
                             // elms = clients.length;
@@ -406,14 +428,8 @@ const CallPage = () => {
         // })
 
     };
-
-
-
-
-
-    /*
-    * Config required to make Peer Connection
-    */
+    
+    /*Config required to make Peer Connection */
     const peerConnectionConfig = {
         'iceServers': [
             // { 'urls': 'stun:stun.services.mozilla.com' },
@@ -421,8 +437,7 @@ const CallPage = () => {
         ],
     };
 
-    /**
-       * This Function Will Execute when one user gets "Message"(means description of other user as SDP) from the socket
+    /*  This Function Will Execute when one user gets "Message"(means description of other user as SDP) from the socket
          from ID : Whose description
         Message : Description SDP
     */
@@ -476,10 +491,18 @@ const CallPage = () => {
             }
         }
     };
-    /**
-     * Main Function to handle socket Events
-     */
-
+    /*  Main Function to handle socket Events */
+  
+    const handleEndCall = () => {
+     
+      try {
+        let tracks = myStream.current.srcObject.getTracks()
+        tracks.forEach(track => track.stop())
+        
+      } catch (e) {}
+       window.location.reload(); 
+      console.log("call ended");
+    };
 
 
 
@@ -496,10 +519,7 @@ const CallPage = () => {
             {!isJoined ?
                 (
                     <>
-                        <Button className={classes.btn} onClick={handleJoin}>
-                            Join Now
-                        </Button>
-                        <JoiningPage />
+                        <JoiningPage handleJoin={handleJoin} />
                     </>
                 )
                 :
@@ -509,8 +529,6 @@ const CallPage = () => {
                     })}
                 >
 
-                    {/* <ReactPlayer playsinline muted className={user.videoOn?classes.myVid:classes.offvideo} autoPlay url={videoStreams[0]}/> */}
-                    {/* <video playsInline className={user.videoOn?classes.myVid:classes.offvideo} muted srcObject={...videoStreams[0]} autoPlay/> */}
                     <Grid container className={classes.usersCont} spacing={2}>
                     {
                         usersInCall.map((socId,index)=>(
@@ -553,7 +571,7 @@ const CallPage = () => {
                               ):null
                           } */}
                     {/* <Paper className={classes.userPaper}> */}
-                    {/* User 1 */},{/* </Paper> */}
+                    {/* User 1 */}{/* </Paper> */}
                     {/* {!user.videoOn ? (
                         <Paper className={classes.userPaper}>
                             <Avatar
@@ -569,7 +587,13 @@ const CallPage = () => {
                         <video id="my-video" ref={myStream} className={classes.myVid} autoPlay muted></video>
                     </div> */}
                     <div className={classes.drawerHeader} />
+                    {/* <div>
+                      <Button style={{fontSize:"30px",padding:"10px"}} color="secondary" onClick={handleEndCall}>
+                        Leave
+                      </Button>
+                    </div> */}
                     <CallPageFooter
+                        handleEndCall={handleEndCall}
                         myStream={myStream}
                         peopleOpen={peopleOpen}
                         infoOpen={infoOpen}
