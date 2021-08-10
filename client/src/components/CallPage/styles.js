@@ -24,8 +24,9 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   myVid: {
+    marginLeft: "20px",
     width: "400px",
-    border: "5px solid rgb(26, 115, 232)",
+    border: "4px solid #1a73e8",
     borderRadius: "20px",
     margin: "10px",
   },
@@ -51,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: "100%",
     // height:"100&",
     borderRadius: "5%",
-    border:"5px solid #1a73e8"
+    border: "5px solid #1a73e8",
   },
   offvideo: {
     display: "none",
@@ -70,9 +71,10 @@ const useStyles = makeStyles((theme) => ({
     bottom: "5%",
   },
   content: {
-    height: "70vh",
+    height: "80vh",
     flexGrow: 1,
     margin: "auto",
+    // padding: theme.spacing(3),
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -80,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
   },
   contentShift: {
     height: "80vh",
-
+    width: "77vw",
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
