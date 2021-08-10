@@ -83,7 +83,7 @@ io.on("connection",(socket)=>{
     })
     socket.on("disconnect",()=>{
         // const path = meetJoined[socket.id]
-        console.log("Disconnected USER LEFT |||")
+        console.log(socket.id+" left the meet")
         // connections[path] = connections[path].filter(id=>id!==socket.id)
         // // delete connections[path][socket.id]
         // console.log(connections)
@@ -111,6 +111,7 @@ io.on("connection",(socket)=>{
 				}
 			}
 		}
+        console.log(connections)
     })
 })
 

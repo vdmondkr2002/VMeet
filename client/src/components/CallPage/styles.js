@@ -51,6 +51,7 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: "100%",
     // height:"100&",
     borderRadius: "5%",
+    border:"5px solid #1a73e8"
   },
   offvideo: {
     display: "none",

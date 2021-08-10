@@ -40,6 +40,7 @@ const JoiningPage = ({handleJoin}) => {
     dispatch({ type: SET_STREAM, payload: currStream })
     const audioTrack = currStream.getAudioTracks()[0];
     const videoTrack = currStream.getVideoTracks()[0];
+    // window.localStream = currStream;
     dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
     dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
     myStream.current.srcObject = currStream;
@@ -118,6 +119,7 @@ const JoiningPage = ({handleJoin}) => {
       user.videoTrack.stop();
       dispatch({type:SET_VIDEOTRACK,payload:null})
       // myStream.current.srcObject = null;
+      // window.localStream=null;
       dispatch({ type: TOGGLE_VIDEO });
       return;
     }
@@ -131,6 +133,7 @@ const JoiningPage = ({handleJoin}) => {
         const audioTrack = vstream.getAudioTracks()[0];
         const videoTrack = vstream.getVideoTracks()[0];
         dispatch({ type: SET_STREAM, payload: vstream });
+        // window.localStream = vstream;
         dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
         dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
         dispatch({ type: TOGGLE_VIDEO });
