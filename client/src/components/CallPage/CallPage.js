@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState,useMemo } from "react";
 import io from "socket.io-client";
 import { Container, Paper, Avatar, Button, Typography, Grid } from "@material-ui/core";
 import CallPageFooter from "./CallPageFooter/CallPageFooter";
@@ -26,13 +26,14 @@ const CallPage = () => {
     const myStream = useRef();
     const mySocket = useRef()
     const history = useHistory();
-    var users = []
     const profile = useSelector((state) => state.profile);
     const user = useSelector((state) => state.user);
     const [isJoined, setIsJoined] = useState(false);
     const [usersInCall, setUsersInCall] = useState([])
-    // const server_url = "https://meetv-v1.herokuapp.com/";
-    const server_url = "localhost:5000"; //URL Where room will be created
+    const [userVidToChange,setUserVidToChange] = useState("")
+    const server_url = "https://meetv-v1.herokuapp.com/";
+    var users = []
+    // const server_url = "localhost:5000"; //URL Where room will be created
     var connections = {}; //Stores all the users(connections) joined
     // const connections = useSelector(state=>state.connections)
     var senders = {};
@@ -48,7 +49,14 @@ const CallPage = () => {
     const [peopleOpen, setPeopleOpen] = useState(false);
     const [chatOpen, setChatOpen] = useState(false);
     const [infoOpen, setInfoOpen] = useState(false);
- 
+    
+
+    // useEffect(() => {
+    //     if(userVidToChange!==""){
+    //         const vidOn = usersInCall.filter(user=>user.id===userVidToChange)[0].videoOn
+    //         setUsersInCall(usersInCall.map(user=>user.id===userVidToChange?{...user,videoOn:!vidOn}:user))
+    //     }
+    // }, [userVidToChange]);
  
     useEffect(() => {
         if (mySocket.current && isJoined) {
@@ -58,46 +66,76 @@ const CallPage = () => {
                 // connections[mySocket.current.id].removeTrack(senders[mySocket.current.id])
                 console.log("video turning off request sent")
                 mySocket.current.emit("video-off", window.location.href)
+                console.log(user.videoOn)
+                // setUserVidToChange(mySocket.current.id)
+                console.log(usersInCall.map(user=>user.id===mySocket.current.id?{...user,videoOn:false}:user))
+                setUsersInCall(usersInCall.map(user=>user.id===mySocket.current.id?{...user,videoOn:false}:user))
+                // let ind= users.findIndex(user=>user.id===mySocket.current.id)
+                // console.log(users)
+                // users[ind].videoOn = false
             } else {
                 if (user.clicked !== 0) {
                     console.log(user.clicked)
                     console.log("video turn on request sent")
                     mySocket.current.emit("video-on", window.location.href)
- 
+                    // setUserVidToChange(mySocket.current.id)
+                    // let ind = users.findIndex(user=>user.id===mySocket.current.id)
+                    setUsersInCall(usersInCall.map(user=>user.id===mySocket.current.id?{...user,videoOn:true}:user))
+                    // users[ind].videoOn = true
                 }
- 
- 
-                // console.log(mySocket.current.id)
-                // console.log("video turning on request sent")
  
             }
         }
     }, [isJoined, user.videoOn])
  
- 
- 
- 
- 
+
+    
+    // useEffect(()=>{
+    //     console.log("setting user")
+    //     console.log(user.videoOn)
+    //     // setUsersInCall(usersInCall.map(user=>user.id===id?{...user,videoOn:true}:user))
+    //     if(mySocket.current){
+    //         if(user.videoOn){
+    //             setUsersInCall(usersInCall.map(user=>user.id===mySocket.current.id?{...user,videoOn:true}:user))
+    //         }else{
+    //             setUsersInCall(usersInCall.map(user=>user.id===mySocket.current.id?{...user,videoOn:false}:user))
+    //         }
+    //     }
+            
+    // },[usersInCall])
+
     useEffect(() => {
         if (isJoined && mySocket.current) {
             console.log("i am called1")
             // myStream.current.srcObject = user.stream
             // setVideoStreams([...videoStreams,user.stream])
-            setUsersInCall([...users, mySocket.current.id])
-            users.push(mySocket.current.id)
+            setUsersInCall([...users,{id:mySocket.current.id,name:profile.name,profilePic:profile.profilePic,videoOn:user.videoOn}])
+            // setUsersInCall([...users, mySocket.current.id])
+            users.push({id:mySocket.current.id,name:profile.name,profilePic:profile.profilePic,videoOn:user.videoOn})
+            // users.push(mySocket.current.id)
         }
     }, [isJoined])
  
     useEffect(() => {
         console.log(usersInCall)
+        console.log(users)
     }, [usersInCall])
- 
+    
+
     useEffect(() => {
         console.log("i am called2")
         var vid;
-        if(mySocket.current)
-            vid = document.getElementById(usersInCall[usersInCall.indexOf(mySocket.current.id)]);
+        
+        if(mySocket.current){
+            var ind = usersInCall.findIndex(user=>user.id===mySocket.current.id)
+            if(ind!==-1){
+                vid = document.getElementById(usersInCall[ind].id);
+            }
+        }
+            
+        console.log(vid)
         if (isJoined && usersInCall.length === 1 && vid) {
+            console.log(user.stream)
             vid.srcObject = user.stream
         }
     }, [usersInCall])
@@ -129,7 +167,7 @@ const CallPage = () => {
  
         socket.on("connect", () => {
             //emits join call event with the URL
-            socket.emit("join-call", window.location.href);
+            socket.emit("join-call", window.location.href,profile.name,profile.profilePic,user.videoOn);
  
             //Store Socket's Id as SocketId
             socketId = socket.id;
@@ -137,8 +175,7 @@ const CallPage = () => {
  
             socket.on('user-left', (id) => {
                 console.log("userLeftL " + id)
-                users = [...usersInCall]
-                const index = users.indexOf(id)
+                const index = users.indexOf({id:id})
                 if (index !== -1) {
                     users.splice(index, 1);
                     setUsersInCall(users)
@@ -148,9 +185,7 @@ const CallPage = () => {
                 // var video = document.getElementById(id)
                 // video.parentNode.parentNode.removeChild(video.parentNode)
                 //   console.log(usersInCall)
-                //   console.log(connections)
                 //   delete connections[id];
-                //   console.log(connections)
                 //   delete senders[id];
  
             })
@@ -159,21 +194,24 @@ const CallPage = () => {
              * This event is emmited from server when user joins the call
              * which sends id of the user joined and all the people present in the meet
              */
-            socket.on("user-joined", async (id, clients) => {
+            socket.on("user-joined", async (id, clients,name,profilePic,videoOn) => {
                 console.log("user joined :" + id)
                 console.log(clients);
+                
                 console.log(usersInCall)
                 console.log("i am called4")
-                setUsersInCall([...users, id]);
-                users.push(id)
-                usersInCall.push(id);
+                // setUsersInCall([...users,id])
+                setUsersInCall([...users, {id,name,profilePic,videoOn}]);
+                users.push({id,name,profilePic,videoOn})
+                // users.push(id)
+                usersInCall.push({id,name,profilePic,videoOn});
+                // usersInCall.push(id)
                 //For every Client/person in the meet make a new RTCPeerConnection
-                clients.forEach((socketListId) => {
- 
+                clients.forEach(({socketListId,name,profilePic,videoOn}) => {
+                    console.log(socketListId,name,profilePic,videoOn)
                     connections[socketListId] = new RTCPeerConnection(
                         peerConnectionConfig
                     );
-                    // console.log(connections[socketListId]);
                     // Wait for their ice candidate
                     /*
                     * This happens whenever the local ICE agent needs to deliver a message to the other peer
@@ -196,6 +234,7 @@ const CallPage = () => {
                      * Now Showing Video Stream of all the users in on my screen
                     */
                     connections[socketListId].ontrack = (event) => {
+                        console.log(event)
                         console.log("ontrack function called" + socketListId)
                         console.log(event.streams[0]);
                         var searchVideo = document.querySelector(
@@ -204,6 +243,10 @@ const CallPage = () => {
                         console.log(usersInCall)
                         if (searchVideo !== null) {
                             console.log("Not null")
+                            setUsersInCall(usersInCall.map(user=>user.id===socketListId?{...user,videoOn:true}:user))
+                            //  setUserVidToChange(socketListId);
+                            // var ind= users.findIndex(user=>user.id===mySocket.current.id)
+                            // users[ind].videoOn = true
                             // if i don't do this check it make an empyt square
                             // console.log(searchVideo);
                             searchVideo.srcObject = event.streams[0]; //currStream
@@ -211,9 +254,9 @@ const CallPage = () => {
                             console.log("null")
                             // setVideoStreams([...videoStreams,event.streams[0]])
                             console.log("i am called3")
-                            setUsersInCall([...users, socketListId]);
-                            users.push(socketListId)
-                            usersInCall.push(socketListId)
+                            setUsersInCall([...users, {id:socketListId,name,profilePic,videoOn}]);
+                            users.push({id:socketListId,name,profilePic,videoOn})
+                            usersInCall.push({id:socketListId,name,profilePic,videoOn})
                             // videoStreams.push(event.streams[0])
                             console.log("creating new video....");
  
@@ -239,9 +282,6 @@ const CallPage = () => {
                         }
                     };
  
-                    connections[socketListId].onremoveTrack = (e) => {
-                        console.log("event happened")
-                    }
  
                     // Add the local video stream
                     if (window.localStream !== undefined && window.localStream !== null) {
@@ -310,14 +350,21 @@ const CallPage = () => {
             });
  
  
-        socket.on("video-off", async (id, clients) => {
+        socket.on("video-off", async (id) => {
+            console.log(id+"turned off video")
             console.log(connections)
+            console.log(usersInCall)
             // connections[id].removeTrack(senders[id])
             // connections[id]=null;
             var searchVideo = document.getElementById(id);
             console.log(searchVideo)
             searchVideo.srcObject = null
-            searchVideo.style.setProperty("background", "black");
+            setUsersInCall(usersInCall.map(user=>user.id===id?{...user,videoOn:false}:user))
+            // setUserVidToChange(id);
+            // var ind= users.findIndex(user=>user.id===mySocket.current.id)
+            // users[ind].videoOn = false
+            // usersInCall.filter(user=>user.id===id)[0].videoOn =false
+            // searchVideo.style.setProperty("background", "black");
             searchVideo.style.setProperty("border", "5px solid #1a73e8");
             searchVideo.style.setProperty("width", "100%");
             searchVideo.style.setProperty("height", "100%");
@@ -326,6 +373,7 @@ const CallPage = () => {
         socket.on("video-on", async (id, clients) => {
             console.log(connections)
             console.log(senders)
+            
             // window.localStream = user.stream;
             console.log(window.localStream)
             for (let id in connections) {
@@ -539,19 +587,20 @@ return (
             >
                 <Grid container className={classes.usersCont} spacing={2}>
                     {
-                        usersInCall.map((socId, index) => (
+                        usersInCall.map(({id:socId,name,profilePic,videoOn}, index) => (
                             <Grid item sm={6} xs={12} className={classes.userCont}>
                                 {/* <ReactPlayer playsinline muted className={user.videoOn?classes.myVid:classes.offvideo} autoPlay url={stream}/> */}
-                                <video data-socket={socId} id={socId} playsInline className={user.videoOn ? classes.video : classes.offvideo} muted={socId === mySocket.current.id} autoPlay />
+                                <video data-socket={socId} id={socId} playsInline className={videoOn ? classes.video : classes.offvideo} muted={socId === mySocket.current.id} autoPlay />
                                 {
-                                    !user.videoOn ? (
+                                    !videoOn ? (
                                         <Paper className={classes.userPaper}>
-                                            <Avatar src={profile?.profilePic} className={clsx(classes.largeAvatar)} alt={profile?.userName}>
-                                                {profile?.firstName?.charAt(0)} {profile?.lastName?.charAt(0)}
+                                            <Avatar src={profilePic} className={clsx(classes.largeAvatar)} alt={name}>
+                                                {/* {profile?.firstName?.charAt(0)} {profile?.lastName?.charAt(0)} */}
+                                                {name}
                                             </Avatar>
                                             <div className={classes.bottomline}>
                                                 <Typography variant="body1">
-                                                    {profile.name}
+                                                    {name}
                                                 </Typography>
                                             </div>
  
