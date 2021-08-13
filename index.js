@@ -26,7 +26,7 @@ app.get('/',(req,res)=>{
 })
 
 
-connections = {}
+var connections = {}
 meetJoined = {}
 
 io.on("connection",(socket)=>{
@@ -65,6 +65,8 @@ io.on("connection",(socket)=>{
 
     socket.on("video-off",(path)=>{
         console.log("video off by:"+socket.id)
+        connections[path] = connections[path].map(user=>user.socketListId===socket.id?{...user,videoOn:false}:user);
+        console.log(connections)
         // io.to(socket.id).emit("video-off",socket.id,connections[path])
         for(const {socketListId} of connections[path]){
             if(socketListId!==socket.id)
@@ -83,18 +85,22 @@ io.on("connection",(socket)=>{
     socket.on("disconnect",()=>{
         // const path = meetJoined[socket.id]
         console.log( socket.id+" left the meet")
+        socket.emit("user-left",socket.id)
         // var diffTime = Math.abs(timeOnline[socket.id] - new Date())
 		const path=meetJoined[socket.id];
-		for(const user of connections[path]){
-            if(socket.id!=user.socketListId)
-			    io.to(user.socketListId).emit("user-left", socket.id)
-		}
-        connections[path] = connections[path].filter(user=>user.socketListId!==socket.id)
-
-		if(connections[path].length === 0){
-			delete connections[path]
-		}
-        console.log(connections)
+        if(connections[path]){
+            for(const user of connections[path]){
+                if(socket.id!=user.socketListId)
+                    io.to(user.socketListId).emit("user-left", socket.id)
+            }
+            connections[path] = connections[path].filter(user=>user.socketListId!==socket.id)
+    
+            if(connections[path].length === 0){
+                delete connections[path]
+            }
+            console.log(connections)
+        }
+		
     })
 })
 

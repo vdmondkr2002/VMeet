@@ -16,3 +16,9 @@ export const SET_SOCKETID = 'SET_SOCKETID'
 export const ADD_CONN = 'ADD_CONN'
 export const UPDATE_CONN = 'UPDATE_CONN'
 export const SET_CLICKED = 'SET_CLICKED'
+
+
+export const SET_USERS = 'SET_USERS'
+export const SET_VIDEO_ON = 'SET_VIDEO_ON'
+export const SET_VIDEO_OFF = 'SET_VIDEO_OFF'
+export const SET_USER_LEFT = 'SET_USER_LEFT'

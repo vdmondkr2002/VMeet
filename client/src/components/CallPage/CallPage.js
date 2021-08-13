@@ -7,7 +7,7 @@ import ReactPlayer from 'react-player'
 import clsx from "clsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { ADD_CONN, SET_AUDIOTRACK, SET_SOCKETID, SET_STREAM, SET_VIDEOTRACK } from "../../constants/actions";
+import { ADD_CONN, SET_AUDIOTRACK, SET_SOCKETID, SET_STREAM, SET_USERS, SET_USER_LEFT, SET_VIDEOTRACK, SET_VIDEO_OFF, SET_VIDEO_ON } from "../../constants/actions";
 import People from "./PeopleDrawer/People";
 import Chat from "./ChatDrawer/Chat";
 import Info from "./InfoDrawer/Info";
@@ -29,11 +29,12 @@ const CallPage = () => {
     const profile = useSelector((state) => state.profile);
     const user = useSelector((state) => state.user);
     const [isJoined, setIsJoined] = useState(false);
-    const [usersInCall, setUsersInCall] = useState([])
+    // const [usersInCall, setUsersInCall] = useState([])
+    const usersInCall = useSelector(state=>state.usersInCall)
     const [userVidToChange,setUserVidToChange] = useState("")
-    const server_url = "https://meetv-v1.herokuapp.com/";
-    var users = []
-    // const server_url = "localhost:5000"; //URL Where room will be created
+    // const server_url = "https://meetv-v1.herokuapp.com/";
+    // var users = []
+    const server_url = "localhost:5000"; //URL Where room will be created
     var connections = {}; //Stores all the users(connections) joined
     // const connections = useSelector(state=>state.connections)
     var senders = {};
@@ -69,7 +70,8 @@ const CallPage = () => {
                 console.log(user.videoOn)
                 // setUserVidToChange(mySocket.current.id)
                 console.log(usersInCall.map(user=>user.id===mySocket.current.id?{...user,videoOn:false}:user))
-                setUsersInCall(usersInCall.map(user=>user.id===mySocket.current.id?{...user,videoOn:false}:user))
+                // setUsersInCall(usersInCall.map(user=>user.id===mySocket.current.id?{...user,videoOn:false}:user))
+                dispatch({type:SET_VIDEO_OFF,payload:mySocket.current.id})
                 // let ind= users.findIndex(user=>user.id===mySocket.current.id)
                 // console.log(users)
                 // users[ind].videoOn = false
@@ -80,7 +82,8 @@ const CallPage = () => {
                     mySocket.current.emit("video-on", window.location.href)
                     // setUserVidToChange(mySocket.current.id)
                     // let ind = users.findIndex(user=>user.id===mySocket.current.id)
-                    setUsersInCall(usersInCall.map(user=>user.id===mySocket.current.id?{...user,videoOn:true}:user))
+                    // setUsersInCall(usersInCall.map(user=>user.id===mySocket.current.id?{...user,videoOn:true}:user))
+                    dispatch({type:SET_VIDEO_ON,payload:mySocket.current.id})
                     // users[ind].videoOn = true
                 }
  
@@ -104,21 +107,22 @@ const CallPage = () => {
             
     // },[usersInCall])
 
-    useEffect(() => {
-        if (isJoined && mySocket.current) {
-            console.log("i am called1")
-            // myStream.current.srcObject = user.stream
-            // setVideoStreams([...videoStreams,user.stream])
-            setUsersInCall([...users,{id:mySocket.current.id,name:profile.name,profilePic:profile.profilePic,videoOn:user.videoOn}])
-            // setUsersInCall([...users, mySocket.current.id])
-            users.push({id:mySocket.current.id,name:profile.name,profilePic:profile.profilePic,videoOn:user.videoOn})
-            // users.push(mySocket.current.id)
-        }
-    }, [isJoined])
+    // useEffect(() => {
+    //     if (isJoined && mySocket.current) {
+    //         console.log("i am called1")
+    //         // myStream.current.srcObject = user.stream
+    //         // setVideoStreams([...videoStreams,user.stream])
+    //         // setUsersInCall([...users,{id:mySocket.current.id,name:profile.name,profilePic:profile.profilePic,videoOn:user.videoOn}])
+    //         dispatch({type:SET_USERS,payload:{id:mySocket.current.id,name:profile.name,profilePic:profile.profilePic,videoOn:user.videoOn}})
+    //         // setUsersInCall([...users, mySocket.current.id])
+    //         // users.push({id:mySocket.current.id,name:profile.name,profilePic:profile.profilePic,videoOn:user.videoOn})
+    //         // users.push(mySocket.current.id)
+    //     }
+    // }, [isJoined])
  
     useEffect(() => {
         console.log(usersInCall)
-        console.log(users)
+        // console.log(users)
     }, [usersInCall])
     
 
@@ -174,19 +178,20 @@ const CallPage = () => {
  
  
             socket.on('user-left', (id) => {
-                console.log("userLeftL " + id)
-                const index = users.indexOf({id:id})
-                if (index !== -1) {
-                    users.splice(index, 1);
-                    setUsersInCall(users)
-                }
+                console.log("userLeft: " + id)
+                // const index = users.indexOf({id:id})
+                // if (index !== -1) {
+                //     users.splice(index, 1);
+                //     setUsersInCall(users)
+                // }
+                dispatch({type:SET_USER_LEFT,payload:id})
                 
                 // setUsersInCall(usersInCall=>usersInCall.filter(socId=>socId!==id))
                 // var video = document.getElementById(id)
                 // video.parentNode.parentNode.removeChild(video.parentNode)
                 //   console.log(usersInCall)
-                //   delete connections[id];
-                //   delete senders[id];
+                  delete connections[id];
+                  delete senders[id];
  
             })
             //Events when user is joined
@@ -201,10 +206,11 @@ const CallPage = () => {
                 console.log(usersInCall)
                 console.log("i am called4")
                 // setUsersInCall([...users,id])
-                setUsersInCall([...users, {id,name,profilePic,videoOn}]);
-                users.push({id,name,profilePic,videoOn})
+                // setUsersInCall([...users, {id,name,profilePic,videoOn}]);
+                dispatch({type:SET_USERS,payload:{id,name,profilePic,videoOn}})
+                // users.push({id,name,profilePic,videoOn})
                 // users.push(id)
-                usersInCall.push({id,name,profilePic,videoOn});
+                // usersInCall.push({id,name,profilePic,videoOn});
                 // usersInCall.push(id)
                 //For every Client/person in the meet make a new RTCPeerConnection
                 clients.forEach(({socketListId,name,profilePic,videoOn}) => {
@@ -243,7 +249,8 @@ const CallPage = () => {
                         console.log(usersInCall)
                         if (searchVideo !== null) {
                             console.log("Not null")
-                            setUsersInCall(usersInCall.map(user=>user.id===socketListId?{...user,videoOn:true}:user))
+                            // setUsersInCall(usersInCall.map(user=>user.id===socketListId?{...user,videoOn:true}:user))
+                            dispatch({type:SET_VIDEO_ON,payload:socketListId})
                             //  setUserVidToChange(socketListId);
                             // var ind= users.findIndex(user=>user.id===mySocket.current.id)
                             // users[ind].videoOn = true
@@ -254,9 +261,10 @@ const CallPage = () => {
                             console.log("null")
                             // setVideoStreams([...videoStreams,event.streams[0]])
                             console.log("i am called3")
-                            setUsersInCall([...users, {id:socketListId,name,profilePic,videoOn}]);
-                            users.push({id:socketListId,name,profilePic,videoOn})
-                            usersInCall.push({id:socketListId,name,profilePic,videoOn})
+                            // setUsersInCall([...users, {id:socketListId,name,profilePic,videoOn}]);
+                            dispatch({type:SET_USERS,payload:{id:socketListId,name,profilePic,videoOn}})
+                            // users.push({id:socketListId,name,profilePic,videoOn})
+                            // usersInCall.push({id:socketListId,name,profilePic,videoOn})
                             // videoStreams.push(event.streams[0])
                             console.log("creating new video....");
  
@@ -359,7 +367,8 @@ const CallPage = () => {
             var searchVideo = document.getElementById(id);
             console.log(searchVideo)
             searchVideo.srcObject = null
-            setUsersInCall(usersInCall.map(user=>user.id===id?{...user,videoOn:false}:user))
+            // setUsersInCall(usersInCall.map(user=>user.id===id?{...user,videoOn:false}:user))
+            dispatch({type:SET_VIDEO_OFF,payload:id})
             // setUserVidToChange(id);
             // var ind= users.findIndex(user=>user.id===mySocket.current.id)
             // users[ind].videoOn = false
