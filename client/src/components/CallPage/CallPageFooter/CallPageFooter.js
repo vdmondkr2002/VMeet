@@ -30,7 +30,6 @@ import useStyles from "./styles";
 
 const CallPageFooter = ({
   handleEndCall,
-  myStream,
   setInfoOpen,
   setChatOpen,
   setPeopleOpen,
@@ -59,22 +58,22 @@ const CallPageFooter = ({
       user.videoTrack.stop();
       dispatch({type:SET_VIDEOTRACK,payload:null})
       const searchVideo = document.getElementById(socketId)
+      
+      dispatch({type:SET_CLICKED})
       searchVideo.srcObject = null;
-      // myStream.current.srcObject = null;
       window.localStream=null;
       dispatch({ type: TOGGLE_VIDEO });
-      dispatch({type:SET_CLICKED})
       return;
     }
     try{
       const vstream = await navigator.mediaDevices.getUserMedia({ video: true,audio:true });
       console.log(vstream);
       if(vstream && vstream.getVideoTracks().length>0){
+        dispatch({type:SET_CLICKED})
         dispatch({type:SET_VIDEOTRACK,payload:vstream.getVideoTracks()[0]});
         console.log(vstream.getVideoTracks());
         const searchVideo = document.getElementById(socketId)
         searchVideo.srcObject = new MediaStream(vstream);
-        // myStream.current.srcObject = new MediaStream(vstream);
         const audioTrack = vstream.getAudioTracks()[0];
         const videoTrack = vstream.getVideoTracks()[0];
         dispatch({ type: SET_STREAM, payload: vstream });
@@ -82,7 +81,7 @@ const CallPageFooter = ({
         dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
         dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
         dispatch({ type: TOGGLE_VIDEO });
-        dispatch({type:SET_CLICKED})
+        
         if(!user.micOn){
           audioTrack.enabled = false;
         }

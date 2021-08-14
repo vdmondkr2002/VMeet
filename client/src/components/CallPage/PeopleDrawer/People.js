@@ -29,17 +29,18 @@ const People = ({ open, setDrawerOpen }) => {
   const theme = useTheme();
   const profile = useSelector((state) => state.profile);
   const user = useSelector((state) => state.user);
+  const usersInCall = useSelector(state=>state.usersInCall)
 
   const handleDrawerClose = () => {
     setDrawerOpen(false);
   };
 
-  const peopleData = [
-    { name: profile.name, micOn: user.micOn, videoOn: user.videoOn },
-    { name: profile.name, micOn: user.micOn, videoOn: user.videoOn },
-    { name: profile.name, micOn: user.micOn, videoOn: user.videoOn },
-    { name: profile.name, micOn: user.micOn, videoOn: user.videoOn },
-  ];
+  // const peopleData = [
+  //   { name: profile.name, micOn: user.micOn, videoOn: user.videoOn },
+  //   { name: profile.name, micOn: user.micOn, videoOn: user.videoOn },
+  //   { name: profile.name, micOn: user.micOn, videoOn: user.videoOn },
+  //   { name: profile.name, micOn: user.micOn, videoOn: user.videoOn },
+  // ];
 
   return (
     <Drawer
@@ -63,24 +64,24 @@ const People = ({ open, setDrawerOpen }) => {
       </div>
       <Divider />
       <List>
-        {peopleData.map((text, index) => (
-          <ListItem button key={index}>
+        {usersInCall.map(({id,name,profilePic,videoOn}, index)  => (
+          <ListItem button key={id}>
             <ListItemIcon>
               <Avatar
-                src={profile?.profilePic}
+                src={profilePic}
                 className={clsx(classes.largeAvatar)}
-                alt={profile?.userName}
+                alt={name}
               >
-                {profile?.firstName?.charAt(0)} {profile?.lastName?.charAt(0)}
+                {name.charAt(0)} 
               </Avatar>
             </ListItemIcon>
-            <ListItemText primary={text.name} />
+            <ListItemText primary={name} />
             <ListItemSecondaryAction>
-              <IconButton edge="end" aria-label="delete">
+              {/* <IconButton edge="end" aria-label="delete">
                 {text.micOn ? <MicNoneSharpIcon /> : <MicOffOutlinedIcon />}
-              </IconButton>
+              </IconButton> */}
               <IconButton edge="end" aria-label="delete">
-                {text.videoOn ? <VideocamIcon /> : <VideocamOffIcon />}
+                {videoOn ? <VideocamIcon /> : <VideocamOffIcon />}
               </IconButton>
             </ListItemSecondaryAction>
           </ListItem>

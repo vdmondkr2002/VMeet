@@ -23,8 +23,8 @@ const CallPage = () => {
  
     const classes = useStyles();
     const dispatch = useDispatch();
-    const myStream = useRef();
-    const mySocket = useRef()
+    // const myStream = useRef(null);
+    const mySocket = useRef(null)
     const history = useHistory();
     const profile = useSelector((state) => state.profile);
     const user = useSelector((state) => state.user);
@@ -52,16 +52,13 @@ const CallPage = () => {
     const [infoOpen, setInfoOpen] = useState(false);
     
 
-    // useEffect(() => {
-    //     if(userVidToChange!==""){
-    //         const vidOn = usersInCall.filter(user=>user.id===userVidToChange)[0].videoOn
-    //         setUsersInCall(usersInCall.map(user=>user.id===userVidToChange?{...user,videoOn:!vidOn}:user))
-    //     }
-    // }, [userVidToChange]);
  
     useEffect(() => {
-        if (mySocket.current && isJoined) {
+        console.log("Handling my video")
+        console.log(mySocket.current)
+        if (mySocket.current!==null && isJoined) {
             if (!user.videoOn) {
+                console.log("Helo")
                 console.log(mySocket.current.id)
                 // console.log(connections)
                 // connections[mySocket.current.id].removeTrack(senders[mySocket.current.id])
@@ -76,6 +73,7 @@ const CallPage = () => {
                 // console.log(users)
                 // users[ind].videoOn = false
             } else {
+                console.log("Helo")
                 if (user.clicked !== 0) {
                     console.log(user.clicked)
                     console.log("video turn on request sent")
@@ -92,40 +90,14 @@ const CallPage = () => {
     }, [isJoined, user.videoOn])
  
 
-    
-    // useEffect(()=>{
-    //     console.log("setting user")
-    //     console.log(user.videoOn)
-    //     // setUsersInCall(usersInCall.map(user=>user.id===id?{...user,videoOn:true}:user))
-    //     if(mySocket.current){
-    //         if(user.videoOn){
-    //             setUsersInCall(usersInCall.map(user=>user.id===mySocket.current.id?{...user,videoOn:true}:user))
-    //         }else{
-    //             setUsersInCall(usersInCall.map(user=>user.id===mySocket.current.id?{...user,videoOn:false}:user))
-    //         }
-    //     }
-            
-    // },[usersInCall])
 
-    // useEffect(() => {
-    //     if (isJoined && mySocket.current) {
-    //         console.log("i am called1")
-    //         // myStream.current.srcObject = user.stream
-    //         // setVideoStreams([...videoStreams,user.stream])
-    //         // setUsersInCall([...users,{id:mySocket.current.id,name:profile.name,profilePic:profile.profilePic,videoOn:user.videoOn}])
-    //         dispatch({type:SET_USERS,payload:{id:mySocket.current.id,name:profile.name,profilePic:profile.profilePic,videoOn:user.videoOn}})
-    //         // setUsersInCall([...users, mySocket.current.id])
-    //         // users.push({id:mySocket.current.id,name:profile.name,profilePic:profile.profilePic,videoOn:user.videoOn})
-    //         // users.push(mySocket.current.id)
-    //     }
-    // }, [isJoined])
  
     useEffect(() => {
         console.log(usersInCall)
         // console.log(users)
     }, [usersInCall])
     
-
+    
     useEffect(() => {
         console.log("i am called2")
         var vid;
@@ -241,22 +213,22 @@ const CallPage = () => {
                     */
                     connections[socketListId].ontrack = (event) => {
                         console.log(event)
+                        console.log(event.track)
+                        console.log(event.track.muted)
                         console.log("ontrack function called" + socketListId)
-                        console.log(event.streams[0]);
+                        // console.log(event.streams[0]);
+                        // console.log(event.streams[0].getVideoTracks()[0])
+                        let muted = event.streams[0].getVideoTracks()[0].muted
                         var searchVideo = document.querySelector(
                             `[data-socket="${socketListId}"]`
                         );
-                        console.log(usersInCall)
                         if (searchVideo !== null) {
                             console.log("Not null")
-                            // setUsersInCall(usersInCall.map(user=>user.id===socketListId?{...user,videoOn:true}:user))
-                            dispatch({type:SET_VIDEO_ON,payload:socketListId})
-                            //  setUserVidToChange(socketListId);
-                            // var ind= users.findIndex(user=>user.id===mySocket.current.id)
-                            // users[ind].videoOn = true
-                            // if i don't do this check it make an empyt square
-                            // console.log(searchVideo);
-                            searchVideo.srcObject = event.streams[0]; //currStream
+                            console.log(muted)
+                            if(!muted)
+                            dispatch({type:SET_VIDEO_ON,payload:socketListId})  
+                            
+                            searchVideo.srcObject = event.streams[0];//currStream
                         } else {
                             console.log("null")
                             // setVideoStreams([...videoStreams,event.streams[0]])
@@ -289,6 +261,10 @@ const CallPage = () => {
                             // console.log(video);
                         }
                     };
+
+                    connections[socketListId].onmute = (e)=>{
+                        console.log("muted")
+                    }
  
  
                     // Add the local video stream
@@ -299,12 +275,12 @@ const CallPage = () => {
                         });
                     } else {
                         console.log("local stream is stopped")
-                        let video = document.getElementsById("my-id");
-                        video.style.setProperty("background", "black");
-                        video.style.setProperty("border", "1px solid green");
-                        // window.localStream?.getTracks().forEach((track) => {
-                        //     connections[socketListId].addTrack(track, window.localStream);
-                        // });
+                        // let video = document.getElementById("my-id");
+                        // video.style.setProperty("background", "black");
+                        // video.style.setProperty("border", "1px solid green");
+                        // // window.localStream?.getTracks().forEach((track) => {
+                        // //     connections[socketListId].addTrack(track, window.localStream);
+                        // // });
  
                     }
  
@@ -329,7 +305,7 @@ const CallPage = () => {
                     // }
                     for (let id2 in connections) {
                         if (id2 === socketId) continue;
-                        console.log(window.localStream.getAudioTracks())
+                        // console.log(window.localStream.getAudioTracks())
                         try {
                             window.localStream.getTracks().forEach((track) => {
                                 connections[id2].addTrack(track, window.localStream);
@@ -361,22 +337,25 @@ const CallPage = () => {
         socket.on("video-off", async (id) => {
             console.log(id+"turned off video")
             console.log(connections)
-            console.log(usersInCall)
-            // connections[id].removeTrack(senders[id])
-            // connections[id]=null;
-            var searchVideo = document.getElementById(id);
-            console.log(searchVideo)
-            searchVideo.srcObject = null
-            // setUsersInCall(usersInCall.map(user=>user.id===id?{...user,videoOn:false}:user))
-            dispatch({type:SET_VIDEO_OFF,payload:id})
-            // setUserVidToChange(id);
-            // var ind= users.findIndex(user=>user.id===mySocket.current.id)
-            // users[ind].videoOn = false
-            // usersInCall.filter(user=>user.id===id)[0].videoOn =false
-            // searchVideo.style.setProperty("background", "black");
-            searchVideo.style.setProperty("border", "5px solid #1a73e8");
-            searchVideo.style.setProperty("width", "100%");
-            searchVideo.style.setProperty("height", "100%");
+                console.log(usersInCall)
+                // connections[id].removeTrack(senders[id])
+                // connections[id]=null;
+                var searchVideo = document.getElementById(id);
+                console.log(searchVideo)
+                if(searchVideo){
+                    searchVideo.srcObject = null
+                    // setUsersInCall(usersInCall.map(user=>user.id===id?{...user,videoOn:false}:user))
+                    dispatch({type:SET_VIDEO_OFF,payload:id})
+                    // setUserVidToChange(id);
+                    // var ind= users.findIndex(user=>user.id===mySocket.current.id)
+                    // users[ind].videoOn = false
+                    // usersInCall.filter(user=>user.id===id)[0].videoOn =false
+                    // searchVideo.style.setProperty("background", "black");
+                    searchVideo.style.setProperty("border", "5px solid #1a73e8");
+                    searchVideo.style.setProperty("width", "100%");
+                    searchVideo.style.setProperty("height", "100%");
+                }
+                
         })
  
         socket.on("video-on", async (id, clients) => {
@@ -384,7 +363,7 @@ const CallPage = () => {
             console.log(senders)
             
             // window.localStream = user.stream;
-            console.log(window.localStream)
+            console.log(window.localStream.getVideoTracks()[0])
             for (let id in connections) {
                 if (id === socketId) continue;
                 try {
@@ -402,6 +381,7 @@ const CallPage = () => {
  
                 try {
                     window.localStream.getTracks().forEach((track) => {
+                        console.log(track)
                         senders[id2] = connections[id2].addTrack(track, window.localStream);
                         console.log(connections[id2]);
                     });
@@ -433,6 +413,7 @@ const CallPage = () => {
     });
 };
  
+
 /* 
    * Following Function takes the currStream, 
       Stops previous streams if any and add currstreams all the tracks to all the connections (people) by using for loop 
@@ -449,11 +430,13 @@ const getUserMediaSuccess = (stream) => {
     } catch (e) {
         console.log(e);
     }
- 
+    
     window.localStream = stream; //store curremt stream to winow.localstream  (?)
+
+    // window.localStream = stream; //store curremt stream to winow.localstream  (?)
     // myStream.current.srcObject = stream;
  
-    console.log(window.localStream);
+    
     for (let id in connections) {
         // if (id === socketId) continue; //If one user is already in connections, then don't add him/her
         console.log(window.localStream);
@@ -561,11 +544,11 @@ const gotMessageFromServer = (fromId, message) => {
  
 const handleEndCall = () => {
  
-    try {
-        let tracks = myStream.current.srcObject.getTracks()
-        tracks.forEach(track => track.stop())
+    // try {
+    //     // let tracks = myStream.current.srcObject.getTracks()
+    //     tracks.forEach(track => track.stop())
  
-    } catch (e) { }
+    // } catch (e) { }
     window.location.reload();
     console.log("call ended");
 };
@@ -625,7 +608,6 @@ return (
                
                 <CallPageFooter
                     handleEndCall={handleEndCall}
-                    myStream={myStream}
                     peopleOpen={peopleOpen}
                     infoOpen={infoOpen}
                     chatOpen={chatOpen}

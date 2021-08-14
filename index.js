@@ -65,18 +65,25 @@ io.on("connection",(socket)=>{
 
     socket.on("video-off",(path)=>{
         console.log("video off by:"+socket.id)
-        connections[path] = connections[path].map(user=>user.socketListId===socket.id?{...user,videoOn:false}:user);
-        console.log(connections)
-        // io.to(socket.id).emit("video-off",socket.id,connections[path])
-        for(const {socketListId} of connections[path]){
-            if(socketListId!==socket.id)
-                io.to(socketListId).emit("video-off",socket.id,connections[path]);
+        if(connections[path]){
+            connections[path] = connections[path].map(user=>user.socketListId===socket.id?{...user,videoOn:false}:user);
+            console.log(connections)
+            // io.to(socket.id).emit("video-off",socket.id,connections[path])
+            for(const {socketListId} of connections[path]){
+                if(socketListId!==socket.id)
+                    io.to(socketListId).emit("video-off",socket.id,connections[path]);
+            }
         }
+       
     })
 
     socket.on("video-on",(path)=>{
         console.log("video-on by:"+socket.id)
         io.to(socket.id).emit("video-on",socket.id,connections[path])
+        if(connections[path]){
+            connections[path] = connections[path].map(user=>user.socketListId===socket.id?{...user,videoOn:true}:user);
+        }
+       
         // for(const socketId of connections[path]){
         //     if(socketId!==socket.id)
         //         io.to(socketId).emit("video-on",socket.id,connections[path]);
