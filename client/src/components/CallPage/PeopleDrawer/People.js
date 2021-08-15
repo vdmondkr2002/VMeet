@@ -4,14 +4,11 @@ import {
   IconButton,
   ListItem,
   ListItemText,
-  makeStyles,
   List,
   ListItemIcon,
   Divider,
   useTheme,
   Typography,
-  Box,
-  Paper,
   Avatar,
   ListItemSecondaryAction,
 } from "@material-ui/core";
@@ -29,19 +26,11 @@ const People = ({ open, setDrawerOpen }) => {
   const theme = useTheme();
   const profile = useSelector((state) => state.profile);
   const user = useSelector((state) => state.user);
-  const usersInCall = useSelector(state=>state.usersInCall)
+  const usersInCall = useSelector((state) => state.usersInCall);
 
   const handleDrawerClose = () => {
     setDrawerOpen(false);
   };
-
-  // const peopleData = [
-  //   { name: profile.name, micOn: user.micOn, videoOn: user.videoOn },
-  //   { name: profile.name, micOn: user.micOn, videoOn: user.videoOn },
-  //   { name: profile.name, micOn: user.micOn, videoOn: user.videoOn },
-  //   { name: profile.name, micOn: user.micOn, videoOn: user.videoOn },
-  // ];
-
   return (
     <Drawer
       variant="persistent"
@@ -64,7 +53,7 @@ const People = ({ open, setDrawerOpen }) => {
       </div>
       <Divider />
       <List>
-        {usersInCall.map(({id,name,profilePic,videoOn}, index)  => (
+        {usersInCall.map(({ id, name, profilePic, videoOn }, index) => (
           <ListItem button key={id}>
             <ListItemIcon>
               <Avatar
@@ -72,7 +61,7 @@ const People = ({ open, setDrawerOpen }) => {
                 className={clsx(classes.largeAvatar)}
                 alt={name}
               >
-                {name.charAt(0)} 
+                {name.charAt(0)}
               </Avatar>
             </ListItemIcon>
             <ListItemText primary={name} />
@@ -80,7 +69,7 @@ const People = ({ open, setDrawerOpen }) => {
               {/* <IconButton edge="end" aria-label="delete">
                 {text.micOn ? <MicNoneSharpIcon /> : <MicOffOutlinedIcon />}
               </IconButton> */}
-              <IconButton edge="end" aria-label="delete">
+              <IconButton edge="end" aria-label="delete" disableRipple>
                 {videoOn ? <VideocamIcon /> : <VideocamOffIcon />}
               </IconButton>
             </ListItemSecondaryAction>

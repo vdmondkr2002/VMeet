@@ -54,6 +54,7 @@ const useStyles = makeStyles((theme) => ({
 
   time: {
     fontWeight: "bold",
+    color: "#ffffff",
   },
 }));
 
