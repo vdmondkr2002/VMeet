@@ -117,6 +117,7 @@ const styles = makeStyles((theme) => ({
   readyToJoin: {
     fontSize: "30px",
     fontWeight: "500",
+    color: "white",
   },
 
   descText: {

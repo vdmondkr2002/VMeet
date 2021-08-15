@@ -19,15 +19,21 @@ import VideocamOffIcon from "@material-ui/icons/VideocamOff";
 import Tooltip from "@material-ui/core/Tooltip";
 import { useDispatch, useSelector } from "react-redux";
 import logo from "../../assests/logo.png";
-import { SET_STREAM, TOGGLE_MIC, TOGGLE_VIDEO,SET_AUDIOTRACK,SET_VIDEOTRACK } from "../../constants/actions";
+import {
+  SET_STREAM,
+  TOGGLE_MIC,
+  TOGGLE_VIDEO,
+  SET_AUDIOTRACK,
+  SET_VIDEOTRACK,
+} from "../../constants/actions";
 
-const JoiningPage = ({handleJoin}) => {
+const JoiningPage = ({ handleJoin }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const myStream = useRef();
   const user = useSelector((state) => state.user);
   const displayuser = useSelector((state) => state.profile);
-  
+
   const [changed, setChanged] = useState(false);
   const [time, setTime] = useState(Date.now());
 
@@ -37,18 +43,18 @@ const JoiningPage = ({handleJoin}) => {
       audio: true,
       video: true,
     });
-    dispatch({ type: SET_STREAM, payload: currStream })
+    dispatch({ type: SET_STREAM, payload: currStream });
     const audioTrack = currStream.getAudioTracks()[0];
     const videoTrack = currStream.getVideoTracks()[0];
     // window.localStream = currStream;
-    dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
-    dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
+    dispatch({ type: SET_VIDEOTRACK, payload: videoTrack });
+    dispatch({ type: SET_AUDIOTRACK, payload: audioTrack });
     myStream.current.srcObject = currStream;
   };
 
-  useEffect(()=>{
-    initWebRTC()
-  },[])
+  useEffect(() => {
+    initWebRTC();
+  }, []);
 
   // useEffect(() => {
   //   console.log(user.micOn ? "mic On" : "mic Off");
@@ -113,54 +119,51 @@ const JoiningPage = ({handleJoin}) => {
   //     console.log(err);
   //   }
   // };
-  const handleClickVideo = async() => {
-    
-    if(user.videoTrack){
+  const handleClickVideo = async () => {
+    if (user.videoTrack) {
       user.videoTrack.stop();
-      dispatch({type:SET_VIDEOTRACK,payload:null})
+      dispatch({ type: SET_VIDEOTRACK, payload: null });
       // myStream.current.srcObject = null;
       // window.localStream=null;
       dispatch({ type: TOGGLE_VIDEO });
       return;
     }
-    try{
-      const vstream = await navigator.mediaDevices.getUserMedia({ video: true,audio:true });
+    try {
+      const vstream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
       console.log(vstream);
-      if(vstream && vstream.getVideoTracks().length>0){
+      if (vstream && vstream.getVideoTracks().length > 0) {
         console.log(vstream.getVideoTracks());
-        
+
         myStream.current.srcObject = new MediaStream(vstream);
         const audioTrack = vstream.getAudioTracks()[0];
         const videoTrack = vstream.getVideoTracks()[0];
         dispatch({ type: SET_STREAM, payload: vstream });
         // window.localStream = vstream;
-        dispatch({type:SET_VIDEOTRACK,payload:videoTrack})
-        dispatch({type:SET_AUDIOTRACK,payload:audioTrack})
+        dispatch({ type: SET_VIDEOTRACK, payload: videoTrack });
+        dispatch({ type: SET_AUDIOTRACK, payload: audioTrack });
         dispatch({ type: TOGGLE_VIDEO });
-        if(!user.micOn){
+        if (!user.micOn) {
           audioTrack.enabled = false;
         }
       }
-    }catch(err){
-      console.log(err)
+    } catch (err) {
+      console.log(err);
     }
   };
   const handleClickMute = () => {
     // dispatch({ type: TOGGLE_MIC });
-    if(!user.audioTrack)
-      return;
-    if(!user.audioTrack.enabled){
+    if (!user.audioTrack) return;
+    if (!user.audioTrack.enabled) {
       user.audioTrack.enabled = true;
-    }else{
+    } else {
       user.audioTrack.enabled = false;
     }
-    console.log(user.audioTrack)
-    dispatch({type:TOGGLE_MIC})
-    
+    console.log(user.audioTrack);
+    dispatch({ type: TOGGLE_MIC });
   };
-
-
-  
 
   return (
     <>
@@ -317,7 +320,7 @@ const JoiningPage = ({handleJoin}) => {
                   Ready To Join?
                 </Typography>
                 <br />
-                <Typography variant="subtitle1">
+                <Typography variant="subtitle1" style={{ color: "white" }}>
                   You will join when someone lets you in
                 </Typography>
                 <br />
@@ -326,7 +329,9 @@ const JoiningPage = ({handleJoin}) => {
                     display: "flex",
                   }}
                 >
-                  <Button className={classes.btn} onClick={handleJoin}>Join Now</Button>
+                  <Button className={classes.btn} onClick={handleJoin}>
+                    Join Now
+                  </Button>
                   <Button
                     className={classes.btn}
                     style={{
