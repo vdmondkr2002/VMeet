@@ -6,6 +6,7 @@ import {
   Typography,
   IconButton,
   withStyles,
+  Box
 } from "@material-ui/core";
 import MuiDialogTitle from "@material-ui/core/DialogTitle";
 import MuiDialogContent from "@material-ui/core/DialogContent";
@@ -83,10 +84,10 @@ const MeetDialog = ({ open, setOpen, code }) => {
         </DialogTitle>
         <DialogContent dividers>
           <Typography gutterBottom>
-            Copy this link and send it to people you want to have a meet with.
+            Copy this link or code and send it to people you want to have a meet with.
             Be sure to save it, so that you can use it later to:
           </Typography>
-
+          <Typography>Copy this Code:</Typography>
           <CopyToClipboard text={`${code}`}>
             <Button
               variant="contained"
@@ -95,6 +96,22 @@ const MeetDialog = ({ open, setOpen, code }) => {
             >
               <Typography variant="body1" className={classes.small}>
                 {code}
+              </Typography>
+            </Button>
+          </CopyToClipboard>
+          <Box display="flex" justifyContent="center">
+            <Typography variant="h6">OR</Typography>
+          </Box>
+          
+          <Typography>Copy this Link:</Typography>
+          <CopyToClipboard text={`http://localhost:3000/${code}`}>
+            <Button
+              variant="contained"
+              fullWidth
+              endIcon={<AssignmentOutlinedIcon fontSize="large" />}
+            >
+              <Typography variant="body1" className={classes.small}>
+                http://localhost:3000/{code}
               </Typography>
             </Button>
           </CopyToClipboard>

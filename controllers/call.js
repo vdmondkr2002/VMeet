@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const createLink = async(req,res)=>{
     try{
         const newCall = await Call.create({people:[],adminId:req.userId});
+        console.log("Created New Link")
         console.log(newCall);
         return res.status(200).json({code:newCall._id})
     }catch(err){

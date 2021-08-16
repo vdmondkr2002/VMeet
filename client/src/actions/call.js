@@ -1,4 +1,4 @@
-import { SET_ALERT, SET_ISADMIN, SET_LINK } from '../constants/actions';
+import { SET_ADMINID, SET_ALERT, SET_ISADMIN, SET_LINK } from '../constants/actions';
 const api = require('../api/index')
 
 
@@ -16,12 +16,13 @@ export const joinCall1 = (history,code,userId)=>async(dispatch)=>{
     try{
         console.log("Hello")
         const {data}=await api.joinCall1(code);
-        
+        console.log(userId)
         console.log(data)
         if(data.adminId===userId){
             dispatch({type:SET_ISADMIN})
         }
-        history.push(`/join/${code}`);
+        dispatch({type:SET_ADMINID,payload:data.adminId})
+        history.push(`/${code}`);
     }catch(err){ 
         // console.log(err.data.msg)
         if(err.response){

@@ -7,6 +7,7 @@ export const LOGOUT = 'LOGOUT'
 
 
 export const SET_LINK = 'SET_LINK'
+export const SET_ADMINID = 'SET_ADMINID'
 export const SET_ALERT = 'SET_ALERT'
 export const CLEAR_ALERT = 'CLEAR_ALERT'
 export const SET_AUDIOTRACK = 'SET_AUDIOTRACK'
@@ -22,3 +23,4 @@ export const SET_USERS = 'SET_USERS'
 export const SET_VIDEO_ON = 'SET_VIDEO_ON'
 export const SET_VIDEO_OFF = 'SET_VIDEO_OFF'
 export const SET_USER_LEFT = 'SET_USER_LEFT'
+
