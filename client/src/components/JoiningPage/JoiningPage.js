@@ -27,7 +27,7 @@ import {
     SET_VIDEOTRACK,
 } from "../../constants/actions";
 
-const JoiningPage = ({ handleJoin}) => {
+const JoiningPage = ({denied, handleJoin}) => {
     const classes = useStyles();
     // console.log(match.params)
     const dispatch = useDispatch();
@@ -320,13 +320,24 @@ const JoiningPage = ({ handleJoin}) => {
                                 <br />
                                 <br />
                                 <br />
-                                <Typography variant="h5" className={classes.readyToJoin}>
-                                    Ready To Join?
-                                </Typography>
-                                <br />
-                                <Typography variant="subtitle1" style={{ color: "white" }}>
-                                    You will join when someone lets you in
-                                </Typography>
+                                {
+                                    denied?(
+                                        <Typography variant="subtitle1" style={{ color: "white" }}>
+                                            Admin didn't let you join in meet
+                                        </Typography>
+                                    ):(
+                                        <>
+                                        <Typography variant="h5" className={classes.readyToJoin}>
+                                            Ready To Join?
+                                        </Typography>
+                                        <br />
+                                        <Typography variant="subtitle1" style={{ color: "white" }}>
+                                            You will join when someone lets you in
+                                        </Typography>
+                                        </>
+                                    )
+                                }
+                                
                                 <br />
                                 <div
                                     style={{

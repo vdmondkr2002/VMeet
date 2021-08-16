@@ -24,3 +24,8 @@ export const SET_VIDEO_ON = 'SET_VIDEO_ON'
 export const SET_VIDEO_OFF = 'SET_VIDEO_OFF'
 export const SET_USER_LEFT = 'SET_USER_LEFT'
 
+export const SET_USERS_JOIN = 'SET_USERS_JOIN'
+export const REMOVE_USERS_JOIN = 'REMOVE_USERS_JOIN'
+
+export const SET_ADMITID = 'SET_ADMITID'
+

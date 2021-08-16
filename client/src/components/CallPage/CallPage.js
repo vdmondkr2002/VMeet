@@ -22,6 +22,7 @@ import {
   SET_SOCKETID,
   SET_STREAM,
   SET_USERS,
+  SET_USERS_JOIN,
   SET_USER_LEFT,
   SET_VIDEOTRACK,
   SET_VIDEO_OFF,
@@ -32,6 +33,7 @@ import Chat from "./ChatDrawer/Chat";
 import Info from "./InfoDrawer/Info";
 import useStyles from "./styles";
 import {joinCall1} from '../../actions/call'
+import UsersToJoinDialog from "./UsersToJoinDialog/UsersToJoinDialog";
 import { letterSpacing } from "@material-ui/system";
 import { useBeforeunload } from "react-beforeunload";
 
@@ -49,13 +51,14 @@ const CallPage = ({match}) => {
   const history = useHistory();
   const profile = useSelector((state) => state.profile);
   const call = useSelector(state=>state.call)
+  const usersToJoin = useSelector(state=>state.usersToJoin)
   const user = useSelector((state) => state.user);
   const [isJoined, setIsJoined] = useState(false);
-  // const [usersInCall, setUsersInCall] = useState([])
+  const [openJoinQueueDialog,setOpenJoinQueueDialog] = useState(false)
   const usersInCall = useSelector((state) => state.usersInCall);
-  const [userVidToChange, setUserVidToChange] = useState("");
+  
+  
   // const server_url = "https://meetv-v1.herokuapp.com/";
-  // var users = []
   const server_url = "localhost:5000"; //URL Where room will be created
   var connections = {}; //Stores all the users(connections) joined
   // const connections = useSelector(state=>state.connections)
@@ -72,6 +75,9 @@ const CallPage = ({match}) => {
   const [peopleOpen, setPeopleOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [denied,setDenied] = useState(false)
+
+
 
   //   let participantKey = Object.keys(props.participants);
   //   let gridCol =
@@ -88,6 +94,25 @@ const CallPage = ({match}) => {
         }
         
   },[profile._id])
+
+  useEffect(()=>{
+    if(user.toAdmitId && mySocket.current){
+      console.log(user.toAdmitId)
+      if(user.toAdmitId.allow){
+        mySocket.current.emit("accept-join",code,user.toAdmitId.id)
+      }else{
+        mySocket.current.emit("deny-join",code,user.toAdmitId.id)
+      }
+      
+    }
+  },[user.toAdmitId])
+  
+  useEffect(()=>{
+    if(usersToJoin.length>0){
+      setOpenJoinQueueDialog(true)
+    }
+  },[usersToJoin])
+
   
   useEffect(() => {
     console.log("Handling my video");
@@ -134,23 +159,26 @@ const CallPage = ({match}) => {
   }, [usersInCall]);
 
   useEffect(() => {
-    console.log("i am called2");
-    var vid;
+    if(usersInCall.length===1){
+      console.log("i am called2");
+      var vid;
 
-    if (mySocket.current) {
-      var ind = usersInCall.findIndex(
-        (user) => user.id === mySocket.current.id
-      );
-      if (ind !== -1) {
-        vid = document.getElementById(usersInCall[ind].id);
+      if (mySocket.current) {
+        var ind = usersInCall.findIndex(
+          (user) => user.id === mySocket.current.id
+        );
+        if (ind !== -1) {
+          vid = document.getElementById(usersInCall[ind].id);
+        }
+      }
+
+      console.log(vid);
+      if (isJoined && usersInCall.length === 1 && vid) {
+        console.log(user.stream);
+        vid.srcObject = user.stream;
       }
     }
-
-    console.log(vid);
-    if (isJoined && usersInCall.length === 1 && vid) {
-      console.log(user.stream);
-      vid.srcObject = user.stream;
-    }
+    
   }, [usersInCall]);
 
   useBeforeunload(() => {
@@ -178,31 +206,49 @@ const CallPage = ({match}) => {
       socketId = socket.id;
 
       //emits join call event with the URL
-      socket.emit(
-        "join-call",
-        code,
-        profile.name,
-        profile.profilePic,
-        user.videoOn,
-        profile._id
-      );
+      // socket.emit(
+      //   "join-call",
+      //   code,
+      //   profile.name,
+      //   profile.profilePic,
+      //   user.videoOn,
+      //   profile._id
+      // );
       
 
-      // if(user.isAdmin){
-      //   socket.emit(
-      //     "join-call",
-      //     code,
-      //     profile.name,
-      //     profile.profilePic,
-      //     user.videoOn,
-      //     profile._id
-      //   );
+      if(user.isAdmin){
+        socket.emit(
+          "join-call",
+          code,
+          profile.name,
+          profile.profilePic,
+          user.videoOn,
+          profile._id
+        );
         
-      // }else{
-      //   console.log("Sending request not an admin")
-      //   socket.emit("req-to-join",code,socketId,call.adminId)
-      // }
+      }else{
+        console.log("Sending request not an admin")
+        socket.emit("req-to-join",code,socketId, profile.name,profile.profilePic,user.videoOn,profile._id)
+      }
+
+      socket.on("req-to-join",(id,name,profilePic,videoOn,userId)=>{
+        console.log(name+" is requesting to join")
+        console.log(id,name,profilePic,videoOn,userId)
+        dispatch({
+          type: SET_USERS_JOIN,
+          payload: { id, name, profilePic, videoOn,userId },
+        });
+      })
+
+      socket.on("join-accepted",()=>{
+        setIsJoined(true)
+        socket.emit("join-call",code,profile.name,profile.profilePic,user.videoOn,profile._id);
+      })
       
+      socket.on('join-denied',()=>{
+        console.log("denied from call")
+        setDenied(true)
+      })
 
       
       
@@ -400,6 +446,8 @@ const CallPage = ({match}) => {
         }
       );
 
+      
+
       socket.on("video-off", async (id) => {
         console.log(id + "turned off video");
         console.log(connections);
@@ -479,49 +527,49 @@ const CallPage = ({match}) => {
    */
   const getUserMediaSuccess = (stream) => {
     console.log("I am in getUserMedia success");
-    try {
-      if (window.localStream) {
-        console.log("devices found");
-        window.localStream.getTracks().forEach((track) => track.stop());
-      }
-    } catch (e) {
-      console.log(e);
-    }
+    // try {
+    //   if (window.localStream) {
+    //     console.log("devices found");
+    //     window.localStream.getTracks().forEach((track) => track.stop());
+    //   }
+    // } catch (e) {
+    //   console.log(e);
+    // }
 
     window.localStream = stream; //store curremt stream to winow.localstream  (?)
 
     // window.localStream = stream; //store curremt stream to winow.localstream  (?)
     // myStream.current.srcObject = stream;
 
-    for (let id in connections) {
-      // if (id === socketId) continue; //If one user is already in connections, then don't add him/her
-      console.log(window.localStream);
-      console.log("I am here");
-      window.localStream?.getTracks().forEach((track) => {
-        //Add Audio and videoTracks to all the connections
-        connections[id].addTrack(track);
-        console.log(connections[id]);
-      });
+    // for (let id in connections) {
+    //   // if (id === socketId) continue; //If one user is already in connections, then don't add him/her
+    //   console.log(window.localStream);
+    //   console.log("I am here");
+    //   window.localStream?.getTracks().forEach((track) => {
+    //     //Add Audio and videoTracks to all the connections
+    //     connections[id].addTrack(track);
+    //     console.log(connections[id]);
+    //   });
 
-      //Creating a Offer/Call and settting description of that offer as the local Descritio.
-      //emit my local Information to the socket and eventually to all the users as a SDP (session Description Protocol)
+    //   //Creating a Offer/Call and settting description of that offer as the local Descritio.
+    //   //emit my local Information to the socket and eventually to all the users as a SDP (session Description Protocol)
 
-      // Change : Call Back Async Await
+    //   // Change : Call Back Async Await
 
-      connections[id].createOffer().then((description) => {
-        connections[id]
-          .setLocalDescription(description)
-          .then(() => {
-            //Sends every Peer Current user's Description
-            socket.emit(
-              "signal",
-              id,
-              JSON.stringify({ sdp: connections[id].localDescription })
-            );
-          })
-          .catch((e) => console.log(e));
-      });
-    }
+    //   connections[id].createOffer().then((description) => {
+    //     connections[id]
+    //       .setLocalDescription(description)
+    //       .then(() => {
+    //         //Sends every Peer Current user's Description
+    //         socket.emit(
+    //           "signal",
+    //           id,
+    //           JSON.stringify({ sdp: connections[id].localDescription })
+    //         );
+    //       })
+    //       .catch((e) => console.log(e));
+    //   });
+    // }
     // stream.getTracks().forEach(track => track.onended = () => {
     //     try {
     //         let tracks = myStream.current.srcObject.getTracks()
@@ -608,7 +656,8 @@ const CallPage = ({match}) => {
   };
 
   const handleJoin = async () => {
-    setIsJoined(true);
+    if(user.isAdmin)
+      setIsJoined(true);
     // await initWebRTC();
     getUserMediaSuccess(user.stream);
     connectToSocketServer();
@@ -618,10 +667,11 @@ const CallPage = ({match}) => {
     <div className={classes.root}>
       {!isJoined ? (
         <>
-          <JoiningPage handleJoin={handleJoin} />
+          <JoiningPage denied={denied} handleJoin={handleJoin} />
         </>
       ) : (
         <>
+          <UsersToJoinDialog open={openJoinQueueDialog} setOpen={setOpenJoinQueueDialog}/>
           <Container
             className={clsx(classes.content, {
               [classes.contentShift]: peopleOpen || chatOpen || infoOpen,

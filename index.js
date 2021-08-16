@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const Call = require('./models/Call')
 const server = require('http').createServer(app);
 const dotenv = require('dotenv')
 const cors = require('cors');
@@ -33,12 +34,25 @@ io.on("connection",(socket)=>{
      
     console.log("Connected To Server "+socket.id)
 
-    socket.on("req-to-join",async(path,socketId,adminId)=>{
-        console.log("requesting to join by: "+socketId+" "+path+" "+adminId);
-        
+    socket.on("req-to-join",(path,socketId,name,profilePic,videoOn,userId)=>{
+        console.log("requesting to join by: "+socketId+" "+path);
+        if(connections[path]===undefined){
+            io.to(socket.id).emit("deny-req","No one in this call")
+        }else{
+            io.to(connections[path].id).emit("req-to-join",socketId,name,profilePic,videoOn,userId);
+        }
     })
 
-    socket.on('join-call', (path,name,profilePic,videoOn,userId) => {
+    socket.on("accept-join",(code,socId)=>{
+        console.log("Join accepted for "+socId)
+        io.to(socId).emit("join-accepted")
+    })
+
+    socket.on("deny-join",(code,socId)=>{
+        console.log("Join denied for "+socId)
+        io.to(socId).emit("join-denied")
+    })
+    socket.on('join-call', async(path,name,profilePic,videoOn,userId) => {
 		// if(connections[path] === undefined){
 		// 	connections[path] = []
 		// }
@@ -46,6 +60,12 @@ io.on("connection",(socket)=>{
             connections[path] = {id:'',users:[]}
         }
         
+        const currCall = await Call.findById(path)
+        console.log(typeof userId, typeof currCall.adminId)
+        if(userId==currCall.adminId){
+            console.log(`Admin ${name} Joined`)
+            connections[path].id=socket.id
+        }
         // console.log(name+" Joined meet!")
         //const currCall =  await   Call.findOne({_id:path})
         //connections[path] is equivalent to currCall.people
@@ -104,6 +124,9 @@ io.on("connection",(socket)=>{
         socket.emit("user-left",socket.id)
         // var diffTime = Math.abs(timeOnline[socket.id] - new Date())
 		const path=meetJoined[socket.id];
+        if(connections[path]===undefined){
+            return;
+        }
         if(connections[path].users){
             for(const user of connections[path].users){
                 if(socket.id!=user.socketListId)
