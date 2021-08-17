@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const Call = require('./models/Call')
 const server = require('http').createServer(app);
 const dotenv = require('dotenv')
 const cors = require('cors');
@@ -33,19 +34,47 @@ io.on("connection",(socket)=>{
      
     console.log("Connected To Server "+socket.id)
 
-    socket.on('join-call', (path,name,profilePic,videoOn) => {
-		if(connections[path] === undefined){
-			connections[path] = []
-		}
+    socket.on("req-to-join",(path,socketId,name,profilePic,videoOn,userId)=>{
+        console.log("requesting to join by: "+socketId+" "+path);
+        if(connections[path]===undefined){
+            io.to(socket.id).emit("deny-req","No one in this call")
+        }else{
+            io.to(connections[path].id).emit("req-to-join",socketId,name,profilePic,videoOn,userId);
+        }
+    })
+
+    socket.on("accept-join",(code,socId)=>{
+        console.log("Join accepted for "+socId)
+        io.to(socId).emit("join-accepted")
+    })
+
+    socket.on("deny-join",(code,socId)=>{
+        console.log("Join denied for "+socId)
+        io.to(socId).emit("join-denied")
+    })
+    socket.on('join-call', async(path,name,profilePic,videoOn,userId) => {
+		// if(connections[path] === undefined){
+		// 	connections[path] = []
+		// }
+        if(connections[path] === undefined){
+            connections[path] = {id:'',users:[]}
+        }
+        
+        const currCall = await Call.findById(path)
+        console.log(typeof userId, typeof currCall.adminId)
+        if(userId==currCall.adminId){
+            console.log(`Admin ${name} Joined`)
+            connections[path].id=socket.id
+        }
         // console.log(name+" Joined meet!")
         //const currCall =  await   Call.findOne({_id:path})
         //connections[path] is equivalent to currCall.people
         //currCall.people.push(socket.id)
         //await Call.findOneAndUpdate({_id:path},{people:currCall.people},{new:true})
-		connections[path].push({socketListId:socket.id,name,profilePic,videoOn})
+		connections[path].users.push({socketListId:socket.id,name,profilePic,videoOn,userId})
         meetJoined[socket.id] = path;
-        for(const {socketListId} of connections[path]){
-            io.to(socketListId).emit("user-joined",socket.id,connections[path],name,profilePic,videoOn);
+        for(const {socketListId} of connections[path].users){
+            io.to(socketListId).emit("user-joined",socket.id,connections[path].users,name,profilePic,videoOn,userId);
         }
 		// for(let i = 0; i < connections[path].length; ++i){   
 		// 	io.to(connections[path][i]).emit("user-joined", socket.id, connections[path])
@@ -65,13 +94,13 @@ io.on("connection",(socket)=>{
 
     socket.on("video-off",(path)=>{
         console.log("video off by:"+socket.id)
-        if(connections[path]){
-            connections[path] = connections[path].map(user=>user.socketListId===socket.id?{...user,videoOn:false}:user);
+        if(connections[path].users){
+            connections[path].users = connections[path].users.map(user=>user.socketListId===socket.id?{...user,videoOn:false}:user);
             console.log(connections)
             // io.to(socket.id).emit("video-off",socket.id,connections[path])
-            for(const {socketListId} of connections[path]){
+            for(const {socketListId} of connections[path].users){
                 if(socketListId!==socket.id)
-                    io.to(socketListId).emit("video-off",socket.id,connections[path]);
+                    io.to(socketListId).emit("video-off",socket.id,connections[path].users);
             }
         }
        
@@ -79,9 +108,9 @@ io.on("connection",(socket)=>{
 
     socket.on("video-on",(path)=>{
         console.log("video-on by:"+socket.id)
-        io.to(socket.id).emit("video-on",socket.id,connections[path])
-        if(connections[path]){
-            connections[path] = connections[path].map(user=>user.socketListId===socket.id?{...user,videoOn:true}:user);
+        io.to(socket.id).emit("video-on",socket.id,connections[path].users)
+        if(connections[path].users){
+            connections[path].users = connections[path].users.map(user=>user.socketListId===socket.id?{...user,videoOn:true}:user);
         }
        
         // for(const socketId of connections[path]){
@@ -95,14 +124,17 @@ io.on("connection",(socket)=>{
         socket.emit("user-left",socket.id)
         // var diffTime = Math.abs(timeOnline[socket.id] - new Date())
 		const path=meetJoined[socket.id];
-        if(connections[path]){
-            for(const user of connections[path]){
+        if(connections[path]===undefined){
+            return;
+        }
+        if(connections[path].users){
+            for(const user of connections[path].users){
                 if(socket.id!=user.socketListId)
                     io.to(user.socketListId).emit("user-left", socket.id)
             }
-            connections[path] = connections[path].filter(user=>user.socketListId!==socket.id)
+            connections[path].users = connections[path].users.filter(user=>user.socketListId!==socket.id)
     
-            if(connections[path].length === 0){
+            if(connections[path].users.length === 0){
                 delete connections[path]
             }
             console.log(connections)
