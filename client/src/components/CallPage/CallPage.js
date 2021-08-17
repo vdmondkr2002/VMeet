@@ -8,6 +8,7 @@ import {
   Typography,
   Grid,
   Card,
+  Grow
 } from "@material-ui/core";
 import CallPageFooter from "./CallPageFooter/CallPageFooter";
 import JoiningPage from "../JoiningPage/JoiningPage.js";
@@ -27,6 +28,7 @@ import {
   SET_VIDEOTRACK,
   SET_VIDEO_OFF,
   SET_VIDEO_ON,
+  SET_MESSAGE_DATA
 } from "../../constants/actions";
 import People from "./PeopleDrawer/People";
 import Chat from "./ChatDrawer/Chat";
@@ -54,10 +56,12 @@ const CallPage = ({match}) => {
   const usersToJoin = useSelector(state=>state.usersToJoin)
   const user = useSelector((state) => state.user);
   const [isJoined, setIsJoined] = useState(false);
-  const [openJoinQueueDialog,setOpenJoinQueueDialog] = useState(false)
+
+  // const [usersInCall, setUsersInCall] = useState([])
   const usersInCall = useSelector((state) => state.usersInCall);
-  
-  
+  const [userVidToChange, setUserVidToChange] = useState("");
+  const messageData = useSelector((state) => state.messageData);
+  const [openJoinQueueDialog,setOpenJoinQueueDialog] = useState(false)
   // const server_url = "https://meetv-v1.herokuapp.com/";
   const server_url = "localhost:5000"; //URL Where room will be created
   var connections = {}; //Stores all the users(connections) joined
@@ -76,7 +80,7 @@ const CallPage = ({match}) => {
   const [chatOpen, setChatOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [denied,setDenied] = useState(false)
-
+  const username = JSON.stringify(localStorage.getItem('user'));
 
 
   //   let participantKey = Object.keys(props.participants);
@@ -661,7 +665,47 @@ const CallPage = ({match}) => {
     // await initWebRTC();
     getUserMediaSuccess(user.stream);
     connectToSocketServer();
+    // setIsJoined(false);
   };
+
+const [joinMsg,setJoinMsg] = useState("");
+const [joinTimeout,setJoinTimeout] = useState(true);
+
+  const sendMessage = () => {
+		// socket.emit('chat-message', message, username)
+    console.log(username)
+		dispatch({type:SET_MESSAGE_DATA,payload : { message: "", sender: username }})
+    console.log(messageData);
+	}
+
+  const showJoinedPopUp = (a) =>{
+    if(a[a?.length-1]?.name !== undefined){
+      setJoinMsg(`${a[a?.length-1]?.name} has joined the meet`);
+    }
+  } 
+
+useEffect(() => {
+  setJoinTimeout(true);
+  showJoinedPopUp(usersInCall);
+
+
+},[usersInCall.length])
+
+
+  const [grid, setGrid] = useState({ rows: 2, cols: 3 });
+  const [videoStyles, setVideoStyles] = useState({});
+  const [videoParentStyles, setVideoParentStyles] = useState({});
+  useEffect(() => {
+    if (usersInCall.length == 1) {
+      setGrid({ rows: 1, cols: 1 });
+    } else if (usersInCall.length == 2) {
+      setGrid({ rows: 1, cols: 2 });
+    } else if (usersInCall.length == 3) {
+      setGrid({ rows: 2, cols: 2 });
+    } else if (usersInCall.length == 4) {
+      setGrid({ rows: 2, cols: 2 });
+    }
+  }, [usersInCall.length]);
 
   return (
     <div className={classes.root}>
@@ -677,6 +721,24 @@ const CallPage = ({match}) => {
               [classes.contentShift]: peopleOpen || chatOpen || infoOpen,
             })}
           >
+            {
+                setTimeout(()=>{
+                  setJoinTimeout(false);
+                },2000)
+            }
+            {
+              joinTimeout ? 
+              <h2 style={{position:"absolute",borderRadius:"4px",fontSize:"18px",zIndex:"10",padding:"20px",color:"white",background:"grey",top:"560px",left:"4px"}}>
+               {joinMsg}
+              </h2> :
+              " "
+            }
+
+       
+                
+
+
+
             <Carousel cols={3} rows={2} gap={10}>
               {usersInCall.map(
                 ({ id: socId, name, profilePic, videoOn,userId }, index) => (
@@ -726,7 +788,7 @@ const CallPage = ({match}) => {
       )}
       <Info open={infoOpen} setDrawerOpen={setInfoOpen} />
       <People open={peopleOpen} setDrawerOpen={setPeopleOpen} />
-      <Chat open={chatOpen} setDrawerOpen={setChatOpen} />
+      <Chat open={chatOpen} setDrawerOpen={setChatOpen} sendMessage={sendMessage} username={username}/>
     </div>
   );
 };
