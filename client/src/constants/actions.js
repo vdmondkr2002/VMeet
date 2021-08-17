@@ -22,3 +22,6 @@ export const SET_USERS = 'SET_USERS'
 export const SET_VIDEO_ON = 'SET_VIDEO_ON'
 export const SET_VIDEO_OFF = 'SET_VIDEO_OFF'
 export const SET_USER_LEFT = 'SET_USER_LEFT'
+
+export const SET_MESSAGE_DATA = 'SET_MESSAGE'
+export const SET_MESSAGES = 'SET_MESSAGES'
