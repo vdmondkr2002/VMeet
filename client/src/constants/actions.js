@@ -30,3 +30,5 @@ export const SET_MESSAGE_DATA = 'SET_MESSAGE'
 export const SET_MESSAGES = 'SET_MESSAGES'
 export const SET_ADMITID = 'SET_ADMITID'
 
+export const USER_LEFT = 'USER_LEFT'
+

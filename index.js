@@ -120,17 +120,23 @@ io.on("connection",(socket)=>{
     })
     socket.on("disconnect",()=>{
         // const path = meetJoined[socket.id]
+        const path=meetJoined[socket.id];
         console.log( socket.id+" left the meet")
-        socket.emit("user-left",socket.id)
-        // var diffTime = Math.abs(timeOnline[socket.id] - new Date())
-		const path=meetJoined[socket.id];
+         
+         
+         var l = connections[path]?.users
+         console.log(l)
+        socket.emit("user-left",socket.id,l)
+  
+		
         if(connections[path]===undefined){
             return;
         }
         if(connections[path].users){
             for(const user of connections[path].users){
                 if(socket.id!=user.socketListId)
-                    io.to(user.socketListId).emit("user-left", socket.id)
+               
+                    io.to(user.socketListId).emit("user-left", socket.id,l)
             }
             connections[path].users = connections[path].users.filter(user=>user.socketListId!==socket.id)
     

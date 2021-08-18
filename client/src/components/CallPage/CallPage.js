@@ -28,7 +28,8 @@ import {
   SET_VIDEOTRACK,
   SET_VIDEO_OFF,
   SET_VIDEO_ON,
-  SET_MESSAGE_DATA
+  SET_MESSAGE_DATA,
+  USER_LEFT
 } from "../../constants/actions";
 import People from "./PeopleDrawer/People";
 import Chat from "./ChatDrawer/Chat";
@@ -36,7 +37,6 @@ import Info from "./InfoDrawer/Info";
 import useStyles from "./styles";
 import {joinCall1} from '../../actions/call'
 import UsersToJoinDialog from "./UsersToJoinDialog/UsersToJoinDialog";
-import { letterSpacing } from "@material-ui/system";
 import { useBeforeunload } from "react-beforeunload";
 
 const CallPage = ({match}) => {
@@ -81,6 +81,7 @@ const CallPage = ({match}) => {
   const [infoOpen, setInfoOpen] = useState(false);
   const [denied,setDenied] = useState(false)
   const username = JSON.stringify(localStorage.getItem('user'));
+  const [leftUser,setLeftUser]  = useState({});
 
 
   //   let participantKey = Object.keys(props.participants);
@@ -246,6 +247,7 @@ const CallPage = ({match}) => {
 
       socket.on("join-accepted",()=>{
         setIsJoined(true)
+        
         socket.emit("join-call",code,profile.name,profile.profilePic,user.videoOn,profile._id);
       })
       
@@ -257,14 +259,27 @@ const CallPage = ({match}) => {
       
       
 
-      socket.on("user-left", (id) => {
+      socket.on("user-left", (id,l) => {
         console.log("userLeft: " + id);
         // const index = users.indexOf({id:id})
         // if (index !== -1) {
         //     users.splice(index, 1);
         //   setUsersInCall(users)
         // }  
+        //  const lUser  = usersInCall.find(user=> user.id == id);
+        //  showUserLeftMessage()
+        var lUser;
+        console.log(l);
+        l.forEach((lu)=>{
+            console.log(lu.socketListId,id);
+            console.log("___")
+            if(lu.socketListId === id){
+              lUser = lu;
+            }
+        })
+        showUserLeftMessage(lUser.name)
         dispatch({ type: SET_USER_LEFT, payload: id });
+       
 
         // setUsersInCall(usersInCall=>usersInCall.filter(socId=>socId!==id))
         // var video = document.getElementById(id)
@@ -283,7 +298,7 @@ const CallPage = ({match}) => {
         async (id, clients, name, profilePic, videoOn,userId) => {
           console.log("user joined :" + id);
           console.log(clients);
-
+          showUserJoinedMessage(name);
           console.log(usersInCall);
           console.log("i am called4");
           // setUsersInCall([...users,id])
@@ -655,6 +670,11 @@ const CallPage = ({match}) => {
     //     tracks.forEach(track => track.stop())
 
     // } catch (e) { }
+    if(leftUser?.name !== undefined){
+      alert(leftUser?.name);
+    }
+    console.log(leftUser);
+    
     window.location.reload();
     console.log("call ended");
   };
@@ -678,18 +698,19 @@ const [joinTimeout,setJoinTimeout] = useState(true);
     console.log(messageData);
 	}
 
-  const showJoinedPopUp = (a) =>{
-    if(a[a?.length-1]?.name !== undefined){
-      setJoinMsg(`${a[a?.length-1]?.name} has joined the meet`);
-    }
+  const showUserJoinedMessage = (a) =>{
+    // if(a[a?.length-1]?.name !== undefined){
+      setJoinMsg(`${a} has joined the meet`);
+      setJoinTimeout(true);
+    // }
+  } 
+  const showUserLeftMessage = (a) =>{
+    // if(a[a?.length-1]?.name !== undefined){
+      setJoinMsg(`${a} has left the meet`);
+      setJoinTimeout(true);
+    // }
   } 
 
-useEffect(() => {
-  setJoinTimeout(true);
-  showJoinedPopUp(usersInCall);
-
-
-},[usersInCall.length])
 
 
   const [grid, setGrid] = useState({ rows: 2, cols: 3 });
