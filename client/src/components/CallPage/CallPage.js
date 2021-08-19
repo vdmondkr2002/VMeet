@@ -710,7 +710,11 @@ const [joinTimeout,setJoinTimeout] = useState(true);
       setJoinTimeout(true);
     // }
   } 
-
+useEffect(() =>{
+  setTimeout(()=>{
+    setJoinTimeout(false);
+  },2000)
+},[usersInCall])
 
 
   const [grid, setGrid] = useState({ rows: 2, cols: 3 });
@@ -743,13 +747,8 @@ const [joinTimeout,setJoinTimeout] = useState(true);
             })}
           >
             {
-                setTimeout(()=>{
-                  setJoinTimeout(false);
-                },2000)
-            }
-            {
               joinTimeout ? 
-              <h2 style={{position:"absolute",borderRadius:"4px",fontSize:"18px",zIndex:"10",padding:"20px",color:"white",background:"grey",top:"560px",left:"4px"}}>
+              <h2 className={classes.joinMsg}>
                {joinMsg}
               </h2> :
               " "
