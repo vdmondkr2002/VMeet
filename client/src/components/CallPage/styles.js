@@ -15,6 +15,24 @@ const useStyles = makeStyles((theme) => ({
       top: "560px", 
       left: "4px"
   },
+  fullScreenExit :
+  {
+    cursor:"pointer",
+    position:"absolute",
+    top:"610px",
+    right:"10px",
+    color:"white",
+    fontSize:"40px"
+  },
+  fullScreenEnter :
+  {
+    cursor:"pointer",
+    position:"absolute",
+    top:"740px",
+    right:"10px",
+    color:"white",
+    fontSize:"40px"
+  },
   root: {
     position: "absolute",
     top: 0,
