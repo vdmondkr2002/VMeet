@@ -10,6 +10,8 @@ import {
     ListItemText,
     ListItem,
     ListItemIcon,
+    ListItemSecondaryAction,
+    List,
     Box} from "@material-ui/core";
 import MuiDialogTitle from "@material-ui/core/DialogTitle";
 import clsx from 'clsx'
@@ -17,7 +19,7 @@ import {useSelector,useDispatch} from 'react-redux'
 import DialogActions from '@material-ui/core/DialogActions';
 import MuiDialogContent from "@material-ui/core/DialogContent";
 import CloseIcon from "@material-ui/icons/Close";
-import { REMOVE_USERS_JOIN, SET_ADMITID } from '../../../constants/actions';
+import { REMOVE_USERS_JOIN, SET_ADMITID, SET_MULTIPLES_ADMITS } from '../../../constants/actions';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -42,20 +44,23 @@ const UsersToJoinDialog = ({open,setOpen}) => {
     const dispatch = useDispatch()
     const handleClose = () => {
       setOpen(false);
-    
     };
 
-    const handleAdmit = ()=>{
-      dispatch({type:SET_ADMITID,payload:{id:usersToJoin[0].id,allow:true}})
+    const handleAdmit = (socId)=>{
+      dispatch({type:SET_ADMITID,payload:{id:socId,allow:true}})
       setOpen(false)
-      dispatch({type:REMOVE_USERS_JOIN,payload:usersToJoin[0].id})
+      dispatch({type:REMOVE_USERS_JOIN,payload:socId})
     }
 
-    const handleDeny = ()=>{
-      dispatch({type:SET_ADMITID,payload:{id:usersToJoin[0].id,allow:false}})
+    const handleDeny = (socId)=>{
+      dispatch({type:SET_ADMITID,payload:{id:socId,allow:false}})
       setOpen(false)
-      dispatch({type:REMOVE_USERS_JOIN,payload:usersToJoin[0].id})
+      dispatch({type:REMOVE_USERS_JOIN,payload:socId})
     }
+    const handleAdmitAll = (users)=>{
+      dispatch({type:SET_MULTIPLES_ADMITS,payload:users.map(user=>user.id)})
+    }
+    
     const DialogTitle = (props) => {
         const classes = useStyles();
         const { children, onClose, ...other } = props;
@@ -91,34 +96,40 @@ const UsersToJoinDialog = ({open,setOpen}) => {
                 open={open}
               >
                 <DialogTitle id="customized-dialog-title" onClose={handleClose}>
-                  Someone wants to join this call:
+                  {
+                    usersToJoin.length>1?(
+                      "Several people want to join this call:"
+                    ):("Someone wants to join this call:")
+                  }
+                  
                 </DialogTitle>
                 <DialogContent dividers>
-                
-                  <ListItem button >
-                    <ListItemIcon>
-                      <Avatar
-                        src={usersToJoin[0].profilePic}
-                        alt={usersToJoin[0].name}
-                      >
-                        {usersToJoin[0].name.charAt(0)}
-                      </Avatar>
-                    </ListItemIcon>
-                    <ListItemText primary={usersToJoin[0].name} />
-                  </ListItem>
-                
-                  {/* <Typography gutterBottom>
-                    {usersToJoin[0].name}
-                  </Typography> */}
+                  <List>
+                    {
+                      usersToJoin.map((user)=>(
+                        <ListItem button >
+                          <ListItemIcon>
+                            <Avatar
+                              src={user.profilePic}
+                              alt={user.name}
+                            >
+                              {user.name.charAt(0)}
+                            </Avatar>
+                          </ListItemIcon>
+                          <ListItemText primary={user.name} />
+                          <DialogActions>
+                            <Button onClick={()=>handleDeny((user.id))} color="primary">
+                              Deny Entry
+                            </Button>
+                            <Button onClick={()=>handleAdmit(user.id)} color="primary">
+                              Admit
+                            </Button>
+                          </DialogActions>
+                        </ListItem>
+                      ))
+                    }
+                  </List>
                 </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleDeny} color="primary">
-                    Deny Entry
-                  </Button>
-                  <Button onClick={handleAdmit} color="primary">
-                    Admit
-                  </Button>
-                </DialogActions>
               </Dialog>
             ):null
           }

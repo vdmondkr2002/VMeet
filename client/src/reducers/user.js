@@ -1,6 +1,6 @@
-import {GET_PROFILE,LOGOUT,SET_ISADMIN,SET_STREAM,TOGGLE_MIC,TOGGLE_VIDEO,SET_AUDIOTRACK,SET_VIDEOTRACK,SET_SOCKETID,SET_CLICKED, SET_ADMITID} from '../constants/actions'
+import {GET_PROFILE,LOGOUT,SET_ISADMIN,SET_STREAM,TOGGLE_MIC,TOGGLE_VIDEO,SET_AUDIOTRACK,SET_VIDEOTRACK,SET_SOCKETID,SET_CLICKED, SET_ADMITID,SET_MULTIPLES_ADMITS} from '../constants/actions'
 
-const userReducer = (userData={isAdmin:false,stream:null,micOn:true,videoOn:true,audioTrack:null,videoTrack:null,socketId:null,clicked:0,toAdmitId:{}},action)=>{
+const userReducer = (userData={isAdmin:false,stream:null,micOn:true,videoOn:true,audioTrack:null,videoTrack:null,socketId:null,clicked:0,toAdmitId:{},admitIds:[]},action)=>{
     switch (action.type) {
         case SET_STREAM:
             return {...userData,stream:action.payload}
@@ -24,6 +24,8 @@ const userReducer = (userData={isAdmin:false,stream:null,micOn:true,videoOn:true
             return {...userData,clicked:clicked+1}
         case SET_ADMITID:
             return {...userData,toAdmitId:action.payload}
+        case SET_MULTIPLES_ADMITS:
+            return {...userData,admitIds:action.payload}
         case LOGOUT:
             return {};
         default:

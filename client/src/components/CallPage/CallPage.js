@@ -96,6 +96,12 @@ const CallPage = ({match}) => {
   },[profile._id])
 
   useEffect(()=>{
+    if(user.admitIds.length>0 && mySocket.current){
+      mySocket.current.emit("admit-all",code,user.admitIds)
+    }
+  },[user.admitIds])
+  
+  useEffect(()=>{
     if(user.toAdmitId && mySocket.current){
       console.log(user.toAdmitId)
       if(user.toAdmitId.allow){
@@ -113,6 +119,7 @@ const CallPage = ({match}) => {
     }
   },[usersToJoin])
 
+  
   
   useEffect(() => {
     console.log("Handling my video");

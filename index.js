@@ -52,6 +52,15 @@ io.on("connection",(socket)=>{
         console.log("Join denied for "+socId)
         io.to(socId).emit("join-denied")
     })
+
+    socket.on("admit-all",(code,socIds)=>{
+        console.log("Joins accepted for multiple users:",socIds)
+        for(const id of socIds){
+            io.to(id).emit("join-accepted")
+        }
+    })
+
+    
     socket.on('join-call', async(path,name,profilePic,videoOn,userId) => {
 		// if(connections[path] === undefined){
 		// 	connections[path] = []
@@ -130,7 +139,7 @@ io.on("connection",(socket)=>{
         if(connections[path].users){
             for(const user of connections[path].users){
                 if(socket.id!=user.socketListId)
-                    io.to(user.socketListId).emit("user-left", socket.id)
+                     io.to(user.socketListId).emit("user-left", socket.id)
             }
             connections[path].users = connections[path].users.filter(user=>user.socketListId!==socket.id)
     
