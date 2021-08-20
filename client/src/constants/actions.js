@@ -26,7 +26,10 @@ export const SET_USER_LEFT = 'SET_USER_LEFT'
 
 export const SET_USERS_JOIN = 'SET_USERS_JOIN'
 export const REMOVE_USERS_JOIN = 'REMOVE_USERS_JOIN'
-
+export const SET_MESSAGE_DATA = 'SET_MESSAGE'
+export const SET_MESSAGES = 'SET_MESSAGES'
 export const SET_ADMITID = 'SET_ADMITID'
 export const SET_MULTIPLES_ADMITS = 'SET_MULTIPLES_ADMITS'
+
+export const USER_LEFT = 'USER_LEFT'
 

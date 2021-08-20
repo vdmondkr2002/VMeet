@@ -10,6 +10,7 @@ const usersInCallReducer = (usersInCall=[],action)=>{
         case SET_VIDEO_ON:
             return usersInCall.map(user=>user.id===action.payload?{...user,videoOn:true}:user)
         case SET_USER_LEFT:
+            
             return usersInCall.filter(user=>user.id!==action.payload)
         default:
             return usersInCall

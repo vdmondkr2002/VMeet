@@ -2,6 +2,37 @@ import { makeStyles } from "@material-ui/core";
 const drawerWidth = 380;
 
 const useStyles = makeStyles((theme) => ({
+  joinMsg: {
+    position: "absolute",
+    borderRadius: "4px", 
+    fontSize: "20px",
+    fontWeight:"300",
+    letterSpacing :"1.5px", 
+    zIndex: "10",
+     padding: "15px", 
+     color: "white", 
+     background: "#535353",
+      top: "560px", 
+      left: "4px"
+  },
+  fullScreenExit :
+  {
+    cursor:"pointer",
+    position:"absolute",
+    top:"610px",
+    right:"10px",
+    color:"white",
+    fontSize:"40px"
+  },
+  fullScreenEnter :
+  {
+    cursor:"pointer",
+    position:"absolute",
+    top:"740px",
+    right:"10px",
+    color:"white",
+    fontSize:"40px"
+  },
   root: {
     position: "absolute",
     top: 0,

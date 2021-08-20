@@ -8,6 +8,7 @@ import {
   Typography,
   Grid,
   Card,
+  Grow
 } from "@material-ui/core";
 import CallPageFooter from "./CallPageFooter/CallPageFooter";
 import JoiningPage from "../JoiningPage/JoiningPage.js";
@@ -16,6 +17,9 @@ import clsx from "clsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import Carousel from "react-grid-carousel";
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import {
   ADD_CONN,
   SET_AUDIOTRACK,
@@ -27,37 +31,39 @@ import {
   SET_VIDEOTRACK,
   SET_VIDEO_OFF,
   SET_VIDEO_ON,
+  SET_MESSAGE_DATA,
+  USER_LEFT
 } from "../../constants/actions";
 import People from "./PeopleDrawer/People";
 import Chat from "./ChatDrawer/Chat";
 import Info from "./InfoDrawer/Info";
 import useStyles from "./styles";
-import {joinCall1} from '../../actions/call'
+import { joinCall1 } from '../../actions/call'
 import UsersToJoinDialog from "./UsersToJoinDialog/UsersToJoinDialog";
-import { letterSpacing } from "@material-ui/system";
 import { useBeforeunload } from "react-beforeunload";
 
-const CallPage = ({match}) => {
+const CallPage = ({ match }) => {
   /*
       States and Varaibles Initializaitons
       */
-  
+
   const classes = useStyles();
   const dispatch = useDispatch();
-  
+
   const code = match.params.code
   // const myStream = useRef(null);
   const mySocket = useRef(null);
   const history = useHistory();
   const profile = useSelector((state) => state.profile);
-  const call = useSelector(state=>state.call)
-  const usersToJoin = useSelector(state=>state.usersToJoin)
+  const call = useSelector(state => state.call)
+  const usersToJoin = useSelector(state => state.usersToJoin)
   const user = useSelector((state) => state.user);
   const [isJoined, setIsJoined] = useState(false);
-  const [openJoinQueueDialog,setOpenJoinQueueDialog] = useState(false)
+
+  // const [usersInCall, setUsersInCall] = useState([])
   const usersInCall = useSelector((state) => state.usersInCall);
-  
-  
+  const messageData = useSelector((state) => state.messageData);
+  const [openJoinQueueDialog, setOpenJoinQueueDialog] = useState(false)
   // const server_url = "https://meetv-v1.herokuapp.com/";
   const server_url = "localhost:5000"; //URL Where room will be created
   var connections = {}; //Stores all the users(connections) joined
@@ -75,8 +81,9 @@ const CallPage = ({match}) => {
   const [peopleOpen, setPeopleOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
-  const [denied,setDenied] = useState(false)
-
+  const [denied, setDenied] = useState(false)
+  const username = JSON.stringify(localStorage.getItem('user'));
+  const [leftUser, setLeftUser] = useState({});
 
 
   //   let participantKey = Object.keys(props.participants);
@@ -87,13 +94,13 @@ const CallPage = ({match}) => {
   //     participantKey.length <= 4
   //       ? participantKey.length
   //       : Math.ceil(participantKey.length / 2);
-  useEffect(()=>{
-        console.log("joining...")
-        if(profile._id){
-          dispatch(joinCall1(history,code,profile._id))
-        }
-        
-  },[profile._id])
+  useEffect(() => {
+    console.log("joining...")
+    if (profile._id) {
+      dispatch(joinCall1(history, code, profile._id))
+    }
+
+  }, [profile._id])
 
   useEffect(()=>{
     if(user.admitIds.length>0 && mySocket.current){
@@ -104,20 +111,21 @@ const CallPage = ({match}) => {
   useEffect(()=>{
     if(user.toAdmitId && mySocket.current){
       console.log(user.toAdmitId)
-      if(user.toAdmitId.allow){
-        mySocket.current.emit("accept-join",code,user.toAdmitId.id)
-      }else{
-        mySocket.current.emit("deny-join",code,user.toAdmitId.id)
+      if (user.toAdmitId.allow) {
+        mySocket.current.emit("accept-join", code, user.toAdmitId.id)
+      } else {
+        mySocket.current.emit("deny-join", code, user.toAdmitId.id)
       }
-      
+
     }
-  },[user.toAdmitId])
-  
-  useEffect(()=>{
-    if(usersToJoin.length>0){
+  }, [user.toAdmitId])
+
+  useEffect(() => {
+    if (usersToJoin.length > 0) {
       setOpenJoinQueueDialog(true)
     }
-  },[usersToJoin])
+  }, [usersToJoin])
+
 
   
   
@@ -165,8 +173,14 @@ const CallPage = ({match}) => {
     // console.log(users)
   }, [usersInCall]);
 
+  useEffect(()=>{
+    for(const {id} of usersInCall){
+      var vid = document.getElementById(id);
+      console.log(vid.srcObject)
+    }
+  },[usersInCall])
   useEffect(() => {
-    if(usersInCall.length===1){
+    if (usersInCall.length === 1) {
       console.log("i am called2");
       var vid;
 
@@ -185,7 +199,7 @@ const CallPage = ({match}) => {
         vid.srcObject = user.stream;
       }
     }
-    
+
   }, [usersInCall]);
 
   useBeforeunload(() => {
@@ -221,9 +235,9 @@ const CallPage = ({match}) => {
       //   user.videoOn,
       //   profile._id
       // );
-      
 
-      if(user.isAdmin){
+
+      if (user.isAdmin) {
         socket.emit(
           "join-call",
           code,
@@ -232,43 +246,49 @@ const CallPage = ({match}) => {
           user.videoOn,
           profile._id
         );
-        
-      }else{
+
+      } else {
         console.log("Sending request not an admin")
-        socket.emit("req-to-join",code,socketId, profile.name,profile.profilePic,user.videoOn,profile._id)
+        socket.emit("req-to-join", code, socketId, profile.name, profile.profilePic, user.videoOn, profile._id)
       }
 
-      socket.on("req-to-join",(id,name,profilePic,videoOn,userId)=>{
-        console.log(name+" is requesting to join")
-        console.log(id,name,profilePic,videoOn,userId)
+      socket.on("req-to-join", (id, name, profilePic, videoOn, userId) => {
+        console.log(name + " is requesting to join")
+        console.log(id, name, profilePic, videoOn, userId)
         dispatch({
           type: SET_USERS_JOIN,
-          payload: { id, name, profilePic, videoOn,userId },
+          payload: { id, name, profilePic, videoOn, userId },
         });
       })
 
-      socket.on("join-accepted",()=>{
+      socket.on("join-accepted", () => {
         setIsJoined(true)
-        socket.emit("join-call",code,profile.name,profile.profilePic,user.videoOn,profile._id);
+
+        socket.emit("join-call", code, profile.name, profile.profilePic, user.videoOn, profile._id);
       })
-      
-      socket.on('join-denied',()=>{
+
+      socket.on('join-denied', () => {
         console.log("denied from call")
         setDenied(true)
       })
 
-      
-      
 
-      socket.on("user-left", (id) => {
+
+
+      socket.on("user-left", (id, name) => {
         console.log("userLeft: " + id);
         // const index = users.indexOf({id:id})
         // if (index !== -1) {
         //     users.splice(index, 1);
         //   setUsersInCall(users)
         // }  
+        //  const lUser  = usersInCall.find(user=> user.id == id);
+        //  showUserLeftMessage()
+      
+        showUserLeftMessage(name)
         dispatch({ type: SET_USER_LEFT, payload: id });
 
+        
         // setUsersInCall(usersInCall=>usersInCall.filter(socId=>socId!==id))
         // var video = document.getElementById(id)
         // video.parentNode.parentNode.removeChild(video.parentNode)
@@ -283,25 +303,25 @@ const CallPage = ({match}) => {
        */
       socket.on(
         "user-joined",
-        async (id, clients, name, profilePic, videoOn,userId) => {
+        async (id, clients, name, profilePic, videoOn, userId) => {
           console.log("user joined :" + id);
           console.log(clients);
-
+          showUserJoinedMessage(name);
           console.log(usersInCall);
           console.log("i am called4");
           // setUsersInCall([...users,id])
           // setUsersInCall([...users, {id,name,profilePic,videoOn}]);
           dispatch({
             type: SET_USERS,
-            payload: { id, name, profilePic, videoOn,userId },
+            payload: { id, name, profilePic, videoOn, userId },
           });
           // users.push({id,name,profilePic,videoOn})
           // users.push(id)
           // usersInCall.push({id,name,profilePic,videoOn});
           // usersInCall.push(id)
           //For every Client/person in the meet make a new RTCPeerConnection
-          clients.forEach(({ socketListId, name, profilePic, videoOn,userId }) => {
-            console.log(socketListId, name, profilePic, videoOn,userId);
+          clients.forEach(({ socketListId, name, profilePic, videoOn, userId }) => {
+            console.log(socketListId, name, profilePic, videoOn, userId);
             connections[socketListId] = new RTCPeerConnection(
               peerConnectionConfig
             );
@@ -340,8 +360,7 @@ const CallPage = ({match}) => {
               if (searchVideo !== null) {
                 console.log("Not null");
                 console.log(muted);
-                if (!muted)
-                  dispatch({ type: SET_VIDEO_ON, payload: socketListId });
+                dispatch({ type: SET_VIDEO_ON, payload: socketListId });
 
                 searchVideo.srcObject = event.streams[0]; //currStream
               } else {
@@ -351,7 +370,7 @@ const CallPage = ({match}) => {
                 // setUsersInCall([...users, {id:socketListId,name,profilePic,videoOn}]);
                 dispatch({
                   type: SET_USERS,
-                  payload: { id: socketListId, name, profilePic, videoOn,userId },
+                  payload: { id: socketListId, name, profilePic, videoOn, userId },
                 });
                 // users.push({id:socketListId,name,profilePic,videoOn})
                 // usersInCall.push({id:socketListId,name,profilePic,videoOn})
@@ -453,7 +472,7 @@ const CallPage = ({match}) => {
         }
       );
 
-      
+
 
       socket.on("video-off", async (id) => {
         console.log(id + "turned off video");
@@ -467,6 +486,9 @@ const CallPage = ({match}) => {
           searchVideo.srcObject = null;
           // setUsersInCall(usersInCall.map(user=>user.id===id?{...user,videoOn:false}:user))
           dispatch({ type: SET_VIDEO_OFF, payload: id });
+          for(const {id} in usersInCall){
+
+          }
           // setUserVidToChange(id);
           // var ind= users.findIndex(user=>user.id===mySocket.current.id)
           // users[ind].videoOn = false
@@ -658,67 +680,144 @@ const CallPage = ({match}) => {
     //     tracks.forEach(track => track.stop())
 
     // } catch (e) { }
+    if (leftUser?.name !== undefined) {
+      alert(leftUser?.name);
+    }
+    console.log(leftUser);
+
     window.location.reload();
     console.log("call ended");
   };
 
   const handleJoin = async () => {
-    if(user.isAdmin)
+    if (user.isAdmin)
       setIsJoined(true);
     // await initWebRTC();
     getUserMediaSuccess(user.stream);
     connectToSocketServer();
+    // setIsJoined(false);
   };
 
+
+
+  const [joinMsg, setJoinMsg] = useState("");
+  const [joinTimeout, setJoinTimeout] = useState(true);
+
+  const sendMessage = () => {
+    // socket.emit('chat-message', message, username)
+    console.log(username)
+    dispatch({ type: SET_MESSAGE_DATA, payload: { message: "", sender: username } })
+    console.log(messageData);
+  }
+
+  const showUserJoinedMessage = (a) => {
+    setJoinMsg(`${a} has joined the meet`);
+    setJoinTimeout(true);
+  }
+  const showUserLeftMessage = (a) => {
+    setJoinMsg(`${a} has left the meet`);
+    setJoinTimeout(true);
+  }
+
+  useEffect(() => {
+    setTimeout(() => {
+      setJoinTimeout(false);
+    }, 2000)
+  }, [usersInCall])
+
+
+  const [grid, setGrid] = useState({ rows: 2, cols: 3 });
+  const handle = useFullScreenHandle();
+  useEffect(() => {
+    if (usersInCall.length === 1) {
+      setGrid({ rows: 1, cols: 1 });
+    } else if (usersInCall.length === 2) {
+      setGrid({ rows: 1, cols: 2 });
+    } else if (usersInCall.length === 3) {
+      setGrid({ rows: 2, cols: 2 });
+    } else if (usersInCall.length === 4) {
+      setGrid({ rows: 2, cols: 2 });
+    }
+  }, [usersInCall.length]);
+
   return (
+    <FullScreen handle={handle}> 
     <div className={classes.root}>
+      
       {!isJoined ? (
         <>
           <JoiningPage denied={denied} handleJoin={handleJoin} />
         </>
       ) : (
         <>
-          <UsersToJoinDialog open={openJoinQueueDialog} setOpen={setOpenJoinQueueDialog}/>
+          <UsersToJoinDialog open={openJoinQueueDialog} setOpen={setOpenJoinQueueDialog} />
           <Container
             className={clsx(classes.content, {
               [classes.contentShift]: peopleOpen || chatOpen || infoOpen,
             })}
           >
+            {
+              joinTimeout ?
+                <h2 className={classes.joinMsg}>
+                  {joinMsg}
+                </h2> :
+                " "
+            }
+
+
+
+
+
+
             <Carousel cols={3} rows={2} gap={10}>
               {usersInCall.map(
-                ({ id: socId, name, profilePic, videoOn,userId }, index) => (
-                  <Carousel.Item>
-                    <div style={{ position: "relative" }}>
-                      <video
-                        data-socket={socId}
-                        id={socId}
-                        playsInline
-                        className={videoOn ? classes.video : classes.offvideo}
-                        muted={socId === mySocket.current.id}
-                        autoPlay
-                      />
-                      {!videoOn ? (
-                        <Paper className={classes.userPaper}>
-                          <Avatar
-                            src={profilePic}
-                            className={clsx(classes.largeAvatar)}
-                            alt={name}
-                          >
+                ({ id: socId, name, profilePic, videoOn, userId }, index) => (
+                  <Carousel.Item>                  
+                      <div style={{ position: "relative" }}>
+                        <video
+                          data-socket={socId}
+                          id={socId}
+                          playsInline
+                          className={videoOn ? classes.video : classes.offvideo}
+                          muted={socId === mySocket.current.id}
+                          autoPlay
+                        />
+                        {!videoOn ? (
+                          <Paper className={classes.userPaper}>
+                            <Avatar
+                              src={profilePic}
+                              className={clsx(classes.largeAvatar)}
+                              alt={name}
+                            >
+                              {name}
+                            </Avatar>
+                          </Paper>
+                        ) : null}
+                        <div className={classes.bottomline}>
+                          <Typography variant="body1" style={{ color: "white" }}>
                             {name}
-                          </Avatar>
-                        </Paper>
-                      ) : null}
-                      <div className={classes.bottomline}>
-                        <Typography variant="body1" style={{ color: "white" }}>
-                          {name}
-                        </Typography>
+                          </Typography>
+                        </div>
+
                       </div>
-                    </div>
+                   
                   </Carousel.Item>
                 )
               )}
             </Carousel>
           </Container>
+          {
+            handle.active ? 
+            <FullscreenExitIcon className={classes.fullScreenEnter} onClick={handle.exit}>
+                Enter  Fullscreen
+            </FullscreenExitIcon>
+            :
+            <FullscreenIcon  className={classes.fullScreenExit} onClick={handle.enter}>
+                Exit  Fullscreen
+            </FullscreenIcon>   
+          }
+
+          
           <CallPageFooter
             handleEndCall={handleEndCall}
             peopleOpen={peopleOpen}
@@ -733,8 +832,9 @@ const CallPage = ({match}) => {
       )}
       <Info open={infoOpen} setDrawerOpen={setInfoOpen} />
       <People open={peopleOpen} setDrawerOpen={setPeopleOpen} />
-      <Chat open={chatOpen} setDrawerOpen={setChatOpen} />
+      <Chat open={chatOpen} setDrawerOpen={setChatOpen} sendMessage={sendMessage} username={username} />
     </div>
+    </FullScreen>
   );
 };
 
